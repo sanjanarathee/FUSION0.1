@@ -11,7 +11,7 @@ export const addCodingQuestion = async (req, res) => {
     const {
       title,
       description,
-      language,
+      language,   // "c" or "cpp"
       unit,
       testcases,
       evaluationSteps,
@@ -35,11 +35,17 @@ export const addCodingQuestion = async (req, res) => {
       marks: Number(s.marks || 0),
     }));
 
+    // Normalize unit → "Unit X"
+    let finalUnit = unit;
+    if (!finalUnit.toLowerCase().includes("unit")) {
+      finalUnit = "Unit " + finalUnit;
+    }
+
     const newQ = new CodingQuestion({
       title,
       description,
       language,
-      unit,
+      unit: finalUnit,
       testcases: cleanedTestcases,
       evaluationSteps: cleanedSteps,
     });
@@ -54,15 +60,28 @@ export const addCodingQuestion = async (req, res) => {
 };
 
 /* ----------------------------------------------------
-   2️⃣ GET QUESTIONS
+   2️⃣ GET CODING QUESTIONS (FIXED – LANGUAGE + UNIT)
 ---------------------------------------------------- */
 export const getCodingQuestions = async (req, res) => {
   try {
-    const { unit } = req.query;
+    let { unit, language } = req.query;
 
-    const questions = await CodingQuestion.find(
-      unit ? { unit } : {}
-    ).sort({ createdAt: -1 });
+    if (!unit || !language) {
+      return res.status(400).json({
+        success: false,
+        message: "unit and language are required",
+      });
+    }
+
+    // Normalize unit → "Unit X"
+    if (!unit.toLowerCase().includes("unit")) {
+      unit = "Unit " + unit;
+    }
+
+    const questions = await CodingQuestion.find({
+      unit,
+      language, // 🔥 MAIN FIX (c / cpp)
+    }).sort({ createdAt: -1 });
 
     res.json({ success: true, questions });
   } catch (err) {
@@ -71,7 +90,7 @@ export const getCodingQuestions = async (req, res) => {
 };
 
 /* ----------------------------------------------------
-   3️⃣ DELETE QUESTION
+   3️⃣ DELETE CODING QUESTION
 ---------------------------------------------------- */
 export const deleteCodingQuestion = async (req, res) => {
   try {
@@ -83,7 +102,7 @@ export const deleteCodingQuestion = async (req, res) => {
 };
 
 /* ----------------------------------------------------
-   4️⃣ EVALUATE CODE + STEP EVALUATION (FINAL FIXED)
+   4️⃣ EVALUATE CODE + STEP EVALUATION
 ---------------------------------------------------- */
 export const evaluateCode = async (req, res) => {
   try {
@@ -119,14 +138,14 @@ export const evaluateCode = async (req, res) => {
         const poll = await axios.get(
           `https://ce.judge0.com/submissions/${token}?base64_encoded=true`
         );
-
         outputData = poll.data;
-
         if (outputData.status.id !== 1 && outputData.status.id !== 2) break;
       }
 
       const output = outputData.stdout
-        ? Buffer.from(outputData.stdout, "base64").toString("utf8").trim()
+        ? Buffer.from(outputData.stdout, "base64")
+            .toString("utf8")
+            .trim()
         : "";
 
       const correct = output === expected;
@@ -140,44 +159,38 @@ export const evaluateCode = async (req, res) => {
       });
     }
 
-    /* ------------ CLEAN CODE FOR EVALUATION ------------ */
-    const cleanedCode = code.replace(/[^\x00-\x7F]/g, ""); // remove fancy quotes
-
     /* ------------ STEP EVALUATION ------------ */
-   /* ------------ STEP-BY-STEP EVALUATION ------------ */
+    const usesScanf = /\bscanf\s*\(/i.test(code);
+    const usesMod = /%/.test(code);
+    const usesIf = /\bif\s*\(/.test(code);
+    const allTestcasesPassed = passed === total;
 
-const usesScanf = /\bscanf\s*\(/i.test(code);       //      // FIXED
-const usesMod = /%/.test(code);
-const usesIf = /\bif\s*\(/.test(code);
-const allTestcasesPassed = passed === total;
-
-const stepResults = [
-  {
-    label: "uses scanf",
-    passed: usesScanf,
-    marksAwarded: usesScanf ? 1 : 0,
-    marksTotal: 1,
-  },
-  {
-    label: "uses modulus operator",
-    passed: usesMod,
-    marksAwarded: usesMod ? 1 : 0,
-    marksTotal: 1,
-  },
-  {
-    label: "uses if condition",
-    passed: usesIf,
-    marksAwarded: usesIf ? 1 : 0,
-    marksTotal: 1,
-  },
-  {
-    label: "all testcases passed",
-    passed: allTestcasesPassed,
-    marksAwarded: allTestcasesPassed ? 5 : 0,
-    marksTotal: 5,
-  },
-];
-
+    const stepResults = [
+      {
+        label: "uses scanf",
+        passed: usesScanf,
+        marksAwarded: usesScanf ? 1 : 0,
+        marksTotal: 1,
+      },
+      {
+        label: "uses modulus operator",
+        passed: usesMod,
+        marksAwarded: usesMod ? 1 : 0,
+        marksTotal: 1,
+      },
+      {
+        label: "uses if condition",
+        passed: usesIf,
+        marksAwarded: usesIf ? 1 : 0,
+        marksTotal: 1,
+      },
+      {
+        label: "all testcases passed",
+        passed: allTestcasesPassed,
+        marksAwarded: allTestcasesPassed ? 5 : 0,
+        marksTotal: 5,
+      },
+    ];
 
     const totalMarks = stepResults.reduce(
       (sum, s) => sum + s.marksAwarded,
@@ -216,7 +229,9 @@ export const getleaderboard = async (req, res) => {
         $group: {
           _id: "$userId",
           accepted: {
-            $sum: { $cond: [{ $eq: ["$status", "Accepted"] }, 1, 0] },
+            $sum: {
+              $cond: [{ $eq: ["$status", "Accepted"] }, 1, 0],
+            },
           },
           totalSubmissions: { $sum: 1 },
           lastSubmission: { $max: "$createdAt" },

@@ -1,0 +1,360 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Editor from "@monaco-editor/react";
+import "./PageStyles.css";
+
+export default function CUnit1Coding() {
+  const [questions, setQuestions] = useState([]);
+  const [selected, setSelected] = useState(null);
+
+  const [language, setLanguage] = useState("c");
+  const [code, setCode] = useState("// Write your C / C++ code here...");
+  const [result, setResult] = useState(null);
+
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const templates = {
+    c: `#include <stdio.h>
+
+int main() {
+    // Write your C code here
+    return 0;
+}`,
+    cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    // Write your C++ code here
+    return 0;
+}`,
+  };
+
+  const getStorageKey = (qId, lang) => `fusion_code_${qId}_${lang}`;
+
+  // Load saved code/template when question or language changes
+  useEffect(() => {
+    if (selected) {
+      const saved = localStorage.getItem(getStorageKey(selected._id, language));
+
+      if (saved) {
+        setCode(saved);
+      } else {
+        setCode(templates[language]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected, language]);
+
+  const handleCodeChange = (value) => {
+    const updated = value || "";
+    setCode(updated);
+    if (selected) {
+      localStorage.setItem(getStorageKey(selected._id, language), updated);
+    }
+  };
+
+  // Fetch questions for Unit 1
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/coding/get?unit=Unit 1")
+      .then((res) => setQuestions(res.data.questions))
+      .catch(console.error);
+  }, []);
+
+  // -------------------- RUN CODE --------------------
+  const runCode = async () => {
+    if (!selected) {
+      alert("Select a question first!");
+      return;
+    }
+
+    try {
+      setIsRunning(true);
+      setCanSubmit(false);
+
+      const res = await axios.post("http://localhost:5000/api/code/run", {
+        code,
+        language,
+        questionId: selected._id,
+      });
+
+      setResult(res.data);
+
+      // ✅ Use correct keys from backend
+      if (
+        res.data.success &&
+        res.data.testcasesPassed === res.data.totalTestcases
+      ) {
+        setCanSubmit(true);
+      } else {
+        setCanSubmit(false);
+      }
+    } catch (err) {
+      console.error("Run error:", err);
+      alert("Run error");
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  // -------------------- SUBMIT CODE (Option C) --------------------
+  const handleSubmit = async () => {
+    if (!selected) {
+      alert("Select a question first!");
+      return;
+    }
+
+    if (!result) {
+      alert("Run your code at least once before submitting.");
+      return;
+    }
+
+    if (!canSubmit) {
+      alert("You can submit only when all testcases pass.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        code,
+        language,
+        questionId: selected._id,
+        userId: localStorage.getItem("userId") || "dummyUser",
+        testcasesPassed: result.testcasesPassed,
+        totalTestcases: result.totalTestcases,
+      };
+
+      const res = await axios.post(
+        "http://localhost:5000/api/code/submit",
+        payload
+      );
+
+      if (res.data && res.data.success) {
+        // ✅ Popup
+        alert("✅ Accepted! All testcases passed.");
+
+        // ✅ Redirect to submission page if backend sends ID
+        if (res.data.submissionId) {
+          window.location.href = `/submission/${res.data.submissionId}`;
+        }
+      } else {
+        alert(res.data?.message || "❌ Submit failed on server.");
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("Submit failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(code);
+    alert("Code copied!");
+  };
+
+  const downloadCode = () => {
+    const blob = new Blob([code], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `solution.${language === "c" ? "c" : "cpp"}`;
+    a.click();
+  };
+
+  const resetTemplate = () => {
+    setCode(templates[language]);
+    if (selected) {
+      localStorage.setItem(
+        getStorageKey(selected._id, language),
+        templates[language]
+      );
+    }
+  };
+
+  return (
+    <div className="coding-container">
+      {!selected && (
+        <div className="question-list">
+          <h1 className="learn-title">💻 Coding Practice — Unit 1</h1>
+
+          {questions.map((q) => (
+            <div
+              key={q._id}
+              className="question-card"
+              onClick={() => {
+                setSelected(q);
+                setLanguage(q.language || "c");
+                setResult(null);
+                setCanSubmit(false);
+              }}
+            >
+              <h3>{q.title}</h3>
+              <p>{q.description.substring(0, 100)}...</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selected && (
+        <div className="leetcode-layout">
+          {/* LEFT PANEL */}
+          <div className="left-panel">
+            <h2>{selected.title}</h2>
+            <p className="question-desc">{selected.description}</p>
+
+            <h3>🧪 Testcases</h3>
+
+            {selected.testcases?.map((tc, idx) => (
+              <div key={idx} className="sample-box">
+                <p>
+                  <b>Testcase {idx + 1}</b>
+                </p>
+                <p>
+                  <b>Input:</b> {tc.input}
+                </p>
+                <p>
+                  <b>Expected Output:</b> {tc.expected}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* RIGHT PANEL */}
+          <div className="right-panel">
+            <div className="language-row">
+              <select
+                className="language-select"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+              </select>
+
+              <button className="editor-action-btn" onClick={resetTemplate}>
+                Reset
+              </button>
+              <button className="editor-action-btn" onClick={copyCode}>
+                Copy
+              </button>
+              <button className="editor-action-btn" onClick={downloadCode}>
+                Download
+              </button>
+            </div>
+
+            {/* Fixed-height wrapper to keep layout stable */}
+            <div style={{ height: "420px", maxHeight: "420px" }}>
+              <Editor
+                height="100%"
+                theme="vs-dark"
+                language={language}
+                value={code}
+                onChange={handleCodeChange}
+              />
+            </div>
+
+            <div className="editor-buttons">
+              <button
+                className="run-btn"
+                onClick={runCode}
+                disabled={isRunning}
+              >
+                {isRunning ? "Running..." : "▶ Run Code"}
+              </button>
+
+              <button
+                className={
+                  canSubmit ? "submit-btn enabled" : "submit-btn disabled"
+                }
+                onClick={handleSubmit}
+                disabled={!canSubmit || isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </button>
+
+              <button
+                className="back-btn"
+                onClick={() => {
+                  setSelected(null);
+                  setResult(null);
+                  setCanSubmit(false);
+                }}
+              >
+                ⬅ Back
+              </button>
+            </div>
+
+            {/* -------- RESULTS BOX -------- */}
+            {result && (
+              <div className="results-box">
+                <h3>Results</h3>
+                <p>
+                  Passed: {result.testcasesPassed}/{result.totalTestcases}
+                </p>
+
+                {/* Testcase Results */}
+                {result.results?.map((r, i) => (
+                  <div key={i} className="testcase-card">
+                    <p>
+                      <b>Testcase {i + 1}</b>
+                    </p>
+                    <p>Input: {r.input}</p>
+                    <p>Expected: {r.expected}</p>
+                    <p>Got: {r.got}</p>
+                    <p>Status: {r.status}</p>
+                  </div>
+                ))}
+
+                {/* -------- STEP BY STEP EVALUATION -------- */}
+                {result.stepResults && (
+                  <div style={{ marginTop: "20px" }}>
+                    <h3>Step-by-Step Evaluation</h3>
+
+                    <table className="result-table">
+                      <thead>
+                        <tr>
+                          <th>Step</th>
+                          <th>Marks</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {result.stepResults.map((s, index) => (
+                          <tr key={index}>
+                            <td>{s.label}</td>
+                            <td>
+                              {s.marksAwarded}/{s.marksTotal}
+                            </td>
+                            <td>
+                              <span
+                                className={
+                                  s.passed ? "badge-pass" : "badge-fail"
+                                }
+                              >
+                                {s.passed ? "Passed" : "Failed"}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+
+                    <div className="final-score-box">
+                      Final Score: {result.totalMarks} / {result.maxMarks}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
