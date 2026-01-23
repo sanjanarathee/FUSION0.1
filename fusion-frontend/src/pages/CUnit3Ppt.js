@@ -11,21 +11,21 @@ export default function CUnit3Ppt() {
   useEffect(() => {
     const fetchPPTs = async () => {
       try {
-        console.log("📡 Fetching PPTs for Unit 3...");
+        console.log("📡 Fetching C Unit 3 PPTs...");
 
-        // 🔥 Correct API call (unit = 3 exactly like DB)
-        const res = await axios.get(
-          "http://localhost:5000/api/files/unit/3"
-        );
+        const res = await axios.get("http://localhost:5000/api/notes/filter", {
+          params: {
+            subject: "c",    // 🔥 C language
+            unit: 3,         // 🔥 Unit 3
+            category: "PPT"  // 🔥 PPT
+          }
+        });
 
-        // 🔥 Filter only PPTs (category = "PPT")
-        const filteredPPTs = res.data.filter(
-          (file) =>
-            file.metadata?.category &&
-            file.metadata.category.toLowerCase() === "ppt"
-        );
-
-        setPpts(filteredPPTs);
+        if (res.data.success) {
+          setPpts(res.data.files);
+        } else {
+          setPpts([]);
+        }
       } catch (error) {
         console.error("❌ Error fetching Unit 3 PPTs:", error);
       } finally {
@@ -42,7 +42,7 @@ export default function CUnit3Ppt() {
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">📊 Unit 3 – PPTs</h1>
+      <h1 className="learn-title">📊 C – Unit 3 PPTs</h1>
       <p className="learn-text">
         PPTs uploaded by your teacher for Unit 3.
       </p>
@@ -56,17 +56,20 @@ export default function CUnit3Ppt() {
               <h3>{ppt.metadata?.title || ppt.filename}</h3>
 
               <p>
-                👩‍🏫 <b>Uploaded By:</b> {ppt.metadata?.uploadedBy || "Teacher"}
+                👩‍🏫 <b>Uploaded By:</b>{" "}
+                {ppt.metadata?.uploadedBy || "Teacher"}
                 <br />
                 📘 <b>Unit:</b> {ppt.metadata?.unit}
                 <br />
                 📅 <b>Date:</b>{" "}
-                {new Date(ppt.uploadDate).toLocaleDateString("en-GB")}
+                {ppt.uploadDate
+                  ? new Date(ppt.uploadDate).toLocaleDateString("en-GB")
+                  : "N/A"}
               </p>
 
               <div className="file-actions">
                 <a
-                  href={`http://localhost:5000/api/files/download/${ppt.filename}`}
+                  href={`http://localhost:5000/api/notes/file/${ppt.filename}`}
                   target="_blank"
                   rel="noreferrer"
                   className="view-btn"

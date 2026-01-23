@@ -29,21 +29,28 @@ using namespace std;
 int main() {
     // Write your C++ code here
     return 0;
-}`
+}`,
   };
 
   // ⭐ UNIQUE LOCAL STORAGE KEY FOR UNIT 3
   const getStorageKey = (qId, lang) => `fusion_code_unit3_${qId}_${lang}`;
 
-  // ⭐ FETCH UNIT 3 QUESTIONS
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/coding/unit/3")
-      .then((res) => {
-        if (res.data.success) setQuestions(res.data.questions);
-      })
-      .catch(console.error);
-  }, []);
+  // 🔥 FETCH C UNIT 3 QUESTIONS (LMS STYLE)
+  // 🔥 Fetch GLOBAL coding questions (C language)
+useEffect(() => {
+  axios
+    .get("http://localhost:5000/api/coding/practice", {
+      params: { language: "c" },
+    })
+    .then((res) => {
+      console.log("UNIT 3 CODING QUESTIONS:", res.data.questions);
+      setQuestions(res.data.questions || []);
+    })
+    .catch((err) => {
+      console.error("UNIT 3 CODING FETCH ERROR:", err);
+    });
+}, []);
+
 
   // ⭐ Load stored code when question/language changes
   useEffect(() => {
@@ -61,9 +68,9 @@ int main() {
   }, [selected, language]);
 
   const handleCodeChange = (val) => {
-    setCode(val);
+    setCode(val || "");
     if (selected)
-      localStorage.setItem(getStorageKey(selected._id, language), val);
+      localStorage.setItem(getStorageKey(selected._id, language), val || "");
   };
 
   // -------------------- RUN CODE --------------------
@@ -159,7 +166,7 @@ int main() {
       {/* Question List */}
       {!selected && (
         <div className="question-list">
-          <h1 className="learn-title">💻 Coding Practice — Unit 3</h1>
+          <h1 className="learn-title">💻 Coding Practice — C Unit 3</h1>
 
           {questions.map((q) => (
             <div
@@ -238,7 +245,9 @@ int main() {
               </button>
 
               <button
-                className={canSubmit ? "submit-btn enabled" : "submit-btn disabled"}
+                className={
+                  canSubmit ? "submit-btn enabled" : "submit-btn disabled"
+                }
                 disabled={!canSubmit || isSubmitting}
                 onClick={handleSubmit}
               >

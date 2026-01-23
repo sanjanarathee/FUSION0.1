@@ -1,15 +1,32 @@
 import mongoose from "mongoose";
 
 const submissionSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  questionId: { type: String, required: true },
+  // 🔗 Student reference
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+
+  // 🔗 Question reference
+  questionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "CodingQuestion",
+    required: true
+  },
+
   code: { type: String, required: true },
   language: { type: String, default: "c" },
+
   status: { type: String, required: true },   // Accepted / Wrong Answer
-  runtime: { type: String },
-  memory: { type: String },
+
   passed: { type: Number },
   total: { type: Number },
+
+  // ✅ NEW — for teacher results page
+  totalMarks: { type: Number, default: 0 },
+  maxMarks: { type: Number, default: 0 },
+
   createdAt: { type: Date, default: Date.now }
 });
 

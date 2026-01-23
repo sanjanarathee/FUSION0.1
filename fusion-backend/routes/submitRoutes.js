@@ -8,7 +8,7 @@ const router = express.Router();
 /* ----------------------------------------------------
    🔹 POST – Submit Code
 ---------------------------------------------------- */
-router.post("/submit", submitCode);
+router.post("/", submitCode);
 
 /* ----------------------------------------------------
    🔹 GET – Get All Submissions for UNIT 3

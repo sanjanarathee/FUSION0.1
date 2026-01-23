@@ -4,7 +4,7 @@ import Submission from "../models/Submission.js";
 import User from "../models/user.js";
 
 /* ----------------------------------------------------
-   1️⃣ ADD CODING QUESTION
+   1️⃣ ADD CODING PRACTICE QUESTION (GLOBAL)
 ---------------------------------------------------- */
 export const addCodingQuestion = async (req, res) => {
   try {
@@ -12,15 +12,20 @@ export const addCodingQuestion = async (req, res) => {
       title,
       description,
       language,   // "c" or "cpp"
-      unit,
       testcases,
       evaluationSteps,
     } = req.body;
 
+    if (!title || !description || !language) {
+      return res.status(400).json({
+        success: false,
+        message: "title, description and language are required",
+      });
+    }
+
     const cleanedTestcases = (testcases || []).map((tc) => ({
       input: tc.input || "",
       expected: tc.expectedOutput || tc.expected || "",
-      visible: tc.visible ?? true,
     }));
 
     const cleanedSteps = (evaluationSteps || []).map((s) => ({
@@ -35,24 +40,18 @@ export const addCodingQuestion = async (req, res) => {
       marks: Number(s.marks || 0),
     }));
 
-    // Normalize unit → "Unit X"
-    let finalUnit = unit;
-    if (!finalUnit.toLowerCase().includes("unit")) {
-      finalUnit = "Unit " + finalUnit;
-    }
-
     const newQ = new CodingQuestion({
       title,
       description,
       language,
-      unit: finalUnit,
+      category: "practice", // ✅ GLOBAL PRACTICE
       testcases: cleanedTestcases,
       evaluationSteps: cleanedSteps,
     });
 
     await newQ.save();
 
-    res.json({ success: true, message: "Question saved successfully!" });
+    res.json({ success: true, message: "Practice question saved successfully!" });
   } catch (err) {
     console.error("ADD QUESTION ERROR:", err);
     res.status(500).json({ success: false, error: err.message });
@@ -60,31 +59,27 @@ export const addCodingQuestion = async (req, res) => {
 };
 
 /* ----------------------------------------------------
-   2️⃣ GET CODING QUESTIONS (FIXED – LANGUAGE + UNIT)
+   2️⃣ GET GLOBAL CODING PRACTICE QUESTIONS
 ---------------------------------------------------- */
 export const getCodingQuestions = async (req, res) => {
   try {
-    let { unit, language } = req.query;
+    const { language } = req.query;
 
-    if (!unit || !language) {
+    if (!language) {
       return res.status(400).json({
         success: false,
-        message: "unit and language are required",
+        message: "language is required (c / cpp)",
       });
     }
 
-    // Normalize unit → "Unit X"
-    if (!unit.toLowerCase().includes("unit")) {
-      unit = "Unit " + unit;
-    }
-
     const questions = await CodingQuestion.find({
-      unit,
-      language, // 🔥 MAIN FIX (c / cpp)
+      language,
+      category: "practice",   // ✅ only practice questions
     }).sort({ createdAt: -1 });
 
     res.json({ success: true, questions });
   } catch (err) {
+    console.error("GET QUESTIONS ERROR:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 };
@@ -267,3 +262,24 @@ export const getleaderboard = async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
+
+/* ----------------------------------------------------
+   6️⃣ TEACHER: GET ALL STUDENTS CODING RESULTS
+---------------------------------------------------- */
+export const getAllCodingResults = async (req, res) => {
+  try {
+    const results = await Submission.find()
+      .populate("userId", "name email")
+      .populate("questionId", "title")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      results
+    });
+  } catch (err) {
+    console.error("GET ALL RESULTS ERROR:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+

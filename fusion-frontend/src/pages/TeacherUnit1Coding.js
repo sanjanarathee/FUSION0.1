@@ -3,7 +3,10 @@ import axios from "axios";
 import "./PageStyles.css";
 
 export default function TeacherUnit1Coding() {
-  const [question, setQuestion] = useState("");
+
+  // ✅ NEW: Separate title and description
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   // 🔹 Multiple Testcases
   const [testcases, setTestcases] = useState([
@@ -16,12 +19,12 @@ export default function TeacherUnit1Coding() {
   const [allQuestions, setAllQuestions] = useState([]);
 
   // ============================
-  // 🔥 FETCH ALL QUESTIONS
+  // 🔥 FETCH ALL GLOBAL PRACTICE QUESTIONS
   // ============================
   const fetchQuestions = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/coding/get?unit=Unit 1"
+        "http://localhost:5000/api/coding/practice?language=c"
       );
       setAllQuestions(res.data.questions || []);
     } catch (error) {
@@ -69,10 +72,12 @@ export default function TeacherUnit1Coding() {
   };
 
   // ============================
-  // 🔥 ADD QUESTION
+  // 🔥 ADD QUESTION (GLOBAL)
   // ============================
   const handleSubmit = async () => {
-    if (!question) return alert("Please enter the question!");
+
+    if (!title || !description)
+      return alert("Please enter title and problem statement!");
 
     // Testcase validation
     for (let tc of testcases) {
@@ -102,9 +107,8 @@ export default function TeacherUnit1Coding() {
 
     try {
       await axios.post("http://localhost:5000/api/coding/add", {
-        unit: "Unit 1",
-        title: question,
-        description: question,
+        title: title,               // ✅ short heading
+        description: description,   // ✅ full question
         language: "c",
 
         testcases: testcases.map((tc) => ({
@@ -126,12 +130,14 @@ export default function TeacherUnit1Coding() {
         })),
       });
 
-      alert("✅ Coding Question Added!");
+      alert("✅ Global Coding Practice Question Added!");
 
-      setQuestion("");
+      setTitle("");
+      setDescription("");
       setTestcases([{ input: "", output: "", visible: true }]);
       setSteps([]);
       fetchQuestions();
+
     } catch (err) {
       console.error(err);
       alert("Something went wrong!");
@@ -156,14 +162,23 @@ export default function TeacherUnit1Coding() {
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">💻 Add Coding Practice Question (Unit 1)</h1>
+      <h1 className="learn-title">💻 Add Global Coding Practice Question</h1>
 
-      {/* ---------- QUESTION ---------- */}
+      {/* ✅ QUESTION TITLE */}
+      <input
+        className="clean-input"
+        value={title}
+        placeholder="Enter question title (e.g. Reverse an Array)"
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      {/* ✅ FULL DESCRIPTION */}
       <textarea
         className="clean-input"
-        value={question}
-        placeholder="Enter coding question..."
-        onChange={(e) => setQuestion(e.target.value)}
+        style={{ marginTop: "10px" }}
+        value={description}
+        placeholder="Enter full problem statement..."
+        onChange={(e) => setDescription(e.target.value)}
       />
 
       {/* ---------- MULTIPLE TESTCASES ---------- */}
@@ -310,12 +325,16 @@ export default function TeacherUnit1Coding() {
       </button>
 
       {/* ---------- SUBMIT ---------- */}
-      <button className="view-btn" style={{ marginTop: "15px" }} onClick={handleSubmit}>
+      <button
+        className="view-btn"
+        style={{ marginTop: "15px" }}
+        onClick={handleSubmit}
+      >
         ✔ Add Coding Question
       </button>
 
       {/* ---------- SHOW ALL QUESTIONS ---------- */}
-      <h2 style={{ marginTop: "40px" }}>📋 All Added Questions</h2>
+      <h2 style={{ marginTop: "40px" }}>📋 All Global Coding Practice Questions</h2>
 
       {allQuestions.length === 0 ? (
         <p>No questions added yet.</p>
@@ -324,6 +343,8 @@ export default function TeacherUnit1Coding() {
           {allQuestions.map((q) => (
             <div className="question-card" key={q._id}>
               <h3>{q.title}</h3>
+
+              <p><b>Description:</b> {q.description}</p>
 
               <b>Testcases:</b>
               {q.testcases?.map((tc, i) => (

@@ -7,15 +7,15 @@ export default function CUnit1Assignments() {
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">🧩 Unit 1 Assignments</h1>
+      <h1 className="learn-title">🧩 C – Unit 1 Assignments</h1>
       <p className="learn-text">
-        Attempt the latest MCQ assignments for Unit 1.
+        Attempt the latest MCQ assignments for C Unit 1.
       </p>
 
       <div className="button-container">
         <button
           className="dashboard-btn purple"
-          onClick={() => navigate("/student-assignment?unit=1")}
+          onClick={() => navigate("/student-assignment?unit=1&subject=c")}
         >
           🎯 Go to Unit 1 Assignment
         </button>

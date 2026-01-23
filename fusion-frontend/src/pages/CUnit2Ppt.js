@@ -11,14 +11,22 @@ export default function CUnit2Ppt() {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        console.log("📡 Fetching Unit 2 PPTs...");
-        const res = await axios.get("http://localhost:5000/api/files/unit/Unit 2");
+        console.log("📡 Fetching C Unit 2 PPTs...");
 
-        const pptFiles = res.data.filter(
-          (file) => file.metadata?.category?.toLowerCase() === "ppt"
-        );
+        const res = await axios.get("http://localhost:5000/api/notes/filter", {
+          params: {
+            subject: "c",     // 🔥 C language
+            unit: 2,          // 🔥 Unit 2
+            category: "PPT"   // 🔥 PPT
+          }
+        });
 
-        setFiles(pptFiles);
+        if (res.data.success) {
+          setFiles(res.data.files);
+        } else {
+          setFiles([]);
+        }
+
       } catch (error) {
         console.error("❌ Error fetching PPTs:", error);
       } finally {
@@ -33,7 +41,7 @@ export default function CUnit2Ppt() {
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">📊 Unit 2 - PPTs</h1>
+      <h1 className="learn-title">📊 C – Unit 2 PPTs</h1>
       <p className="learn-text">
         Here are all the PPTs uploaded by your teacher for Unit 2.
       </p>
@@ -47,14 +55,16 @@ export default function CUnit2Ppt() {
               <h3>{file.metadata?.title || file.filename}</h3>
 
               <p>
-                👩‍🏫 <b>Uploaded By:</b> {file.metadata?.uploadedBy} <br />
+                👩‍🏫 <b>Uploaded By:</b> {file.metadata?.uploadedBy || "Teacher"} <br />
                 📅 <b>Date:</b>{" "}
-                {new Date(file.uploadDate).toLocaleDateString("en-GB")}
+                {file.uploadDate
+                  ? new Date(file.uploadDate).toLocaleDateString("en-GB")
+                  : "N/A"}
               </p>
 
               <div className="file-actions">
                 <a
-                  href={`http://localhost:5000/api/files/download/${file.filename}`}
+                  href={`http://localhost:5000/api/notes/file/${file.filename}`}
                   target="_blank"
                   rel="noreferrer"
                   className="view-btn"

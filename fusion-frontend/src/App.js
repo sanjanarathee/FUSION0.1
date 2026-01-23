@@ -154,6 +154,11 @@ import StudentAssignment from "./pages/StudentAssignment";
 import SubmissionResult from "./pages/SubmissionResult";
 import SubmissionHistory from "./pages/SubmissionHistory";
 
+
+import TeacherCodingHome from "./pages/TeacherCodingHome";
+import TeacherCodingResults from "./pages/TeacherCodingResults";
+
+
 /* ===========================
    🔹 MISC
 =========================== */
@@ -180,8 +185,18 @@ function App() {
         <Route path="/learn-c" element={<LearnC />} />
         <Route path="/learn-cpp" element={<LearnCpp />} />
 
+
+        <Route path="/teacher/coding" element={<TeacherCodingHome />} />
+        <Route path="/teacher/coding/add" element={<TeacherUnit1Coding />} />
+        <Route path="/teacher/coding/results" element={<TeacherCodingResults />} />
+
+
+
+
         {/* ----- Unit 1 ----- */}
         <Route path="/learn-c/unit1" element={<CUnit1 />} />
+        <Route path="/learn-c/unit1/coding" element={<CUnit1Coding />} />
+
         {/* ----- Unit 1 (CPP Student) ----- */}
         <Route path="/learn-cpp/unit1" element={<CUnit1 />} />
 

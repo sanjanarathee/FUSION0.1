@@ -31,7 +31,7 @@ const storage = multer.memoryStorage();
 export const upload = multer({ storage });
 
 // =========================================================
-//                  UPLOAD FILE (FINAL FIX)
+//                  UPLOAD FILE
 // =========================================================
 export const uploadFile = async (req, res) => {
   try {
@@ -41,12 +41,10 @@ export const uploadFile = async (req, res) => {
         .json({ success: false, msg: "No file uploaded" });
     }
 
-    // Convert buffer → stream
     const readableStream = new Readable();
     readableStream.push(req.file.buffer);
     readableStream.push(null);
 
-    // Normalize unit → "Unit X"
     let unit = String(req.body.unit || "").trim();
     if (!unit.toLowerCase().includes("unit")) {
       unit = "Unit " + unit;
@@ -55,9 +53,9 @@ export const uploadFile = async (req, res) => {
     const metadata = {
       title: req.body.title || req.file.originalname,
       description: req.body.description || "",
-      category: req.body.category || "Notes",
-      unit,                          // "Unit 1"
-      subject: req.body.subject,     // 🔥 "cpp" / "c"
+      category: req.body.category,     // Notes / PPT / Coding
+      unit,                            // Unit 1
+      subject: req.body.subject,       // c / cpp
       uploadedBy: req.body.uploadedBy || "Unknown Teacher",
     };
 
@@ -74,7 +72,6 @@ export const uploadFile = async (req, res) => {
     readableStream.pipe(uploadStream);
 
     uploadStream.on("finish", () => {
-      console.log("📁 Uploaded:", req.file.originalname);
       res.status(200).json({
         success: true,
         msg: "File uploaded successfully",
@@ -102,7 +99,49 @@ export const uploadFile = async (req, res) => {
 };
 
 // =========================================================
-//              GET FILES (STUDENT NOTES) 🔥
+//      🔥 COMMON FILTER API (LMS CORE ENGINE)
+// =========================================================
+export const getFilteredFiles = async (req, res) => {
+  try {
+    let { subject, unit, category } = req.query;
+
+    if (!subject || !unit || !category) {
+      return res.status(400).json({
+        success: false,
+        msg: "subject, unit and category are required",
+      });
+    }
+
+    if (!unit.toLowerCase().includes("unit")) {
+      unit = "Unit " + unit;
+    }
+
+    const files = await conn.db
+      .collection("uploads.files")
+      .find({
+        "metadata.subject": subject,     // c / cpp
+        "metadata.unit": unit,           // Unit 1
+        "metadata.category": category,   // Notes / PPT / Coding
+      })
+      .sort({ uploadDate: -1 })
+      .toArray();
+
+    res.status(200).json({
+      success: true,
+      files,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      msg: "Error fetching filtered files",
+      error: error.message,
+    });
+  }
+};
+
+// =========================================================
+//              GET FILES BY UNIT (OLD - OPTIONAL)
 // =========================================================
 export const getFilesByUnit = async (req, res) => {
   try {
@@ -114,7 +153,6 @@ export const getFilesByUnit = async (req, res) => {
       });
     }
 
-    // Normalize unit → "Unit X"
     if (!unit.toLowerCase().includes("unit")) {
       unit = "Unit " + unit;
     }
@@ -122,8 +160,8 @@ export const getFilesByUnit = async (req, res) => {
     const files = await conn.db
       .collection("uploads.files")
       .find({
-        "metadata.subject": subject,     // cpp / c
-        "metadata.unit": unit,           // Unit 1
+        "metadata.subject": subject,
+        "metadata.unit": unit,
         "metadata.category": "Notes",
       })
       .toArray();

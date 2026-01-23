@@ -11,18 +11,22 @@ export default function CUnit1PPT() {
   useEffect(() => {
     const fetchFiles = async () => {
       try {
-        console.log("📡 Fetching Unit 1 PPTs...");
+        console.log("📡 Fetching C Unit 1 PPTs...");
 
-        // 🔥 FIX: Always call ONLY "1"
-        const res = await axios.get("http://localhost:5000/api/files/unit/1");
+        const res = await axios.get("http://localhost:5000/api/notes/filter", {
+          params: {
+            subject: "c",     // 🔥 C language
+            unit: 1,          // 🔥 Unit 1
+            category: "PPT"   // 🔥 PPT
+          }
+        });
 
-        const pptFiles = res.data.filter(
-          (file) =>
-            file.metadata?.category?.toLowerCase() === "ppt" &&
-            file.metadata?.unit?.toLowerCase() === "unit 1"
-        );
+        if (res.data.success) {
+          setFiles(res.data.files);
+        } else {
+          setFiles([]);
+        }
 
-        setFiles(pptFiles);
       } catch (error) {
         console.error("❌ Error fetching PPTs:", error);
       } finally {
@@ -37,7 +41,7 @@ export default function CUnit1PPT() {
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">📊 Unit 1 - PPTs</h1>
+      <h1 className="learn-title">📊 C – Unit 1 PPTs</h1>
       <p className="learn-text">
         Here are all the PPTs uploaded by your teacher for Unit 1.
       </p>
@@ -51,14 +55,17 @@ export default function CUnit1PPT() {
               <h3>{file.metadata?.title || file.filename}</h3>
 
               <p>
-                👩‍🏫 <b>Uploaded By:</b> {file.metadata?.uploadedBy} <br />
+                👩‍🏫 <b>Uploaded By:</b>{" "}
+                {file.metadata?.uploadedBy || "Teacher"} <br />
                 📅 <b>Date:</b>{" "}
-                {new Date(file.uploadDate).toLocaleDateString("en-GB")}
+                {file.uploadDate
+                  ? new Date(file.uploadDate).toLocaleDateString("en-GB")
+                  : "N/A"}
               </p>
 
               <div className="file-actions">
                 <a
-                  href={`http://localhost:5000/api/files/download/${file.filename}`}
+                  href={`http://localhost:5000/api/notes/file/${file.filename}`}
                   target="_blank"
                   rel="noreferrer"
                   className="view-btn"
@@ -71,7 +78,7 @@ export default function CUnit1PPT() {
         </div>
       )}
 
-      <button className="back-btn" onClick={() => navigate("/unit1")}>
+      <button className="back-btn" onClick={() => navigate("/learn-c/unit1")}>
         ⬅ Back to Unit 1
       </button>
     </div>

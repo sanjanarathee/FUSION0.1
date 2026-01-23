@@ -27,6 +27,11 @@ export default function Login() {
 
       // ✅ Save user directly (no nested user object)
       localStorage.setItem("fusionUser", JSON.stringify(res.data.user));
+      localStorage.setItem("userId", res.data.user._id);
+
+      console.log("Stored userId:", res.data.user._id);
+
+
 
       setMsg("✅ Login successful!");
 

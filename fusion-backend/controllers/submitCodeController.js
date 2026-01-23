@@ -3,7 +3,16 @@ import CodingQuestion from "../models/CodingQuestion.js";
 
 export const submitCode = async (req, res) => {
   try {
-    const { userId, code, language, questionId, testcasesPassed, totalTestcases } = req.body;
+    const {
+      userId,
+      code,
+      language,
+      questionId,
+      testcasesPassed,
+      totalTestcases,
+      totalMarks,     // ✅ NEW
+      maxMarks        // ✅ NEW
+    } = req.body;
 
     if (!userId || !questionId)
       return res.status(400).json({ success: false, message: "Missing data" });
@@ -22,6 +31,10 @@ export const submitCode = async (req, res) => {
       status,
       passed: testcasesPassed,
       total: totalTestcases,
+
+      // ✅ VERY IMPORTANT (Teacher ke liye)
+      totalMarks,
+      maxMarks
     });
 
     return res.json({

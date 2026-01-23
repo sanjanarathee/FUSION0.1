@@ -4,26 +4,45 @@ import "./PageStyles.css";
 
 export default function CUnit3Notes() {
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/notes/unit/3")
-      .then((res) => {
-        if (res.data.success) setFile(res.data.notes);
+      .get("http://localhost:5000/api/notes/filter", {
+        params: {
+          subject: "c",      // 🔥 C language
+          unit: 3,           // 🔥 Unit 3
+          category: "Notes"  // 🔥 Notes
+        }
       })
-      .catch((err) => console.log(err));
+      .then((res) => {
+        if (res.data.success && res.data.files.length > 0) {
+          setFile(res.data.files[0].filename);
+        } else {
+          setFile(null);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
   }, []);
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">📝 Unit 3 – Notes</h1>
-      <p className="learn-text">Download detailed study notes uploaded by teacher.</p>
+      <h1 className="learn-title">📝 C – Unit 3 Notes</h1>
+      <p className="learn-text">
+        Download detailed study notes uploaded by your teacher.
+      </p>
 
-      {!file ? (
+      {loading ? (
+        <p style={{ marginTop: "20px" }}>Loading notes...</p>
+      ) : !file ? (
         <p style={{ marginTop: "20px" }}>No notes uploaded yet.</p>
       ) : (
         <iframe
-          src={`http://localhost:5000/uploads/unit3/notes/${file}`}
+          src={`http://localhost:5000/api/notes/file/${file}`}
           className="pdf-viewer"
           title="Unit 3 Notes"
         ></iframe>

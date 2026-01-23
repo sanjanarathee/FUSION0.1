@@ -41,7 +41,7 @@ export default function TeacherUnit2() {
         {/* Coding Practice */}
         <button
           className="dashboard-btn orange"
-          onClick={() => navigate("/teacher/unit2/coding")}
+          onClick={() => navigate("/teacher/coding")}
         >
           💻 Coding Practice
         </button>

@@ -12,10 +12,9 @@ import assignmentRoutes from "./routes/assignmentRoutes.js";
 import codingRoutes from "./routes/codingRoutes.js";
 import seedRoutes from "./routes/seedRoutes.js";
 import submitRoutes from "./routes/submitRoutes.js";
-
 import notesRoutes from "./routes/notesRoutes.js";
 import pptRoutes from "./routes/pptRoutes.js";
-import evaluatecodeRoutes from "./routes/evaluatecodeRoutes.js"; // ⭐ Correct file name
+import evaluatecodeRoutes from "./routes/evaluatecodeRoutes.js"; 
 
 dotenv.config();
 
@@ -33,23 +32,31 @@ app.use(
 );
 
 app.use(express.json());
+
+// ------------------------------
+// ✅ Basic Routes
+// ------------------------------
 app.use("/api/seed", seedRoutes);
 app.use("/api/code", submitRoutes);
 app.use("/api/notes", notesRoutes);
 
 // ------------------------------
-// ✅ Register All Routes
+// ✅ Register All Feature Routes
 // ------------------------------
 app.use("/api/auth", authRoutes);
 app.use("/api/files", fileRoutes);
 app.use("/api/ppt", pptRoutes);
 app.use("/api/assignments", assignmentRoutes);
 
-// ⭐ Coding Questions Routes
+// ⭐ GLOBAL Coding Practice Routes
 app.use("/api/coding", codingRoutes);
 
-// ⭐ Judge0 Code Evaluation Route
+// ⭐ Judge0 / code execution route
 app.use("/api/code", evaluatecodeRoutes);
+
+
+app.use("/api/submit", submitRoutes);
+
 
 // ------------------------------
 // ✅ MongoDB Connection
@@ -68,7 +75,7 @@ const connectDB = async () => {
 
 connectDB();
 
-// Optional: Debug Logs
+// Optional debug logs
 mongoose.connection.on("connected", () => {
   console.log("📦 Mongoose is connected & ready!");
 });
@@ -80,14 +87,14 @@ mongoose.connection.on("disconnected", () => {
 });
 
 // ------------------------------
-// Root Check Route
+// ✅ Root Route
 // ------------------------------
 app.get("/", (req, res) => {
   res.send("🚀 Fusion Backend Server is Running Perfectly!");
 });
 
 // ------------------------------
-// Start Server
+// ✅ Start Server
 // ------------------------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

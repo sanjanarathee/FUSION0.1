@@ -1,31 +1,41 @@
 import express from "express";
-import fs from "fs";
-import path from "path";
+import {
+  upload,
+  uploadFile,
+  getFilteredFiles,
+  getAllFiles,
+  getFile,
+  deleteFile
+} from "../controllers/fileController.js";
 
 const router = express.Router();
 
-// ⭐ GET NOTES OF ANY UNIT (Dynamic)
-router.get("/unit/:unitId", (req, res) => {
-  const unit = req.params.unitId;
+// =========================================================
+//                  TEACHER: UPLOAD FILE
+// =========================================================
+router.post("/upload", upload.single("file"), uploadFile);
 
-  // folder where teacher uploads files
-  const notesFolder = path.join(process.cwd(), "uploads", `unit${unit}`, "notes");
+// =========================================================
+//        🔥 STUDENT: COMMON FILTER API (LMS CORE)
+// =========================================================
+// Example:
+// /api/notes/filter?subject=cpp&unit=2&category=Notes
+// /api/notes/filter?subject=c&unit=4&category=Coding
+router.get("/filter", getFilteredFiles);
 
-  // If folder does not exist or empty
-  if (!fs.existsSync(notesFolder)) {
-    return res.json({ success: false, files: [] });
-  }
+// =========================================================
+//                  (OPTIONAL) GET ALL FILES
+// =========================================================
+router.get("/", getAllFiles);
 
-  fs.readdir(notesFolder, (err, files) => {
-    if (err || files.length === 0) {
-      return res.json({ success: false, files: [] });
-    }
+// =========================================================
+//                  DOWNLOAD FILE
+// =========================================================
+router.get("/file/:filename", getFile);
 
-    return res.json({
-      success: true,
-      files: files // return all uploaded notes
-    });
-  });
-});
+// =========================================================
+//                  DELETE FILE
+// =========================================================
+router.delete("/file/:filename", deleteFile);
 
 export default router;

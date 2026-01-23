@@ -40,7 +40,7 @@ export default function TeacherUnit3() {
         {/* ❗ FIXED: consistent naming */}
         <button
           className="dashboard-btn orange"
-          onClick={() => navigate("/teacher/unit3/coding")}
+          onClick={() => navigate("/teacher/coding")}
         >
           💻 Coding Practice
         </button>

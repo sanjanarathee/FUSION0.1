@@ -34,12 +34,24 @@ int main() {
 
   const getStorageKey = (qId, lang) => `fusion_code_unit2_${qId}_${lang}`;
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/coding/get?unit=Unit 2")
-      .then((res) => setQuestions(res.data.questions))
-      .catch(console.error);
-  }, []);
+  // 🔥 Fetch coding questions for C – Unit 2
+  // 🔥 Fetch GLOBAL coding questions (C language)
+useEffect(() => {
+  axios
+    .get("http://localhost:5000/api/coding/practice", {
+      params: {
+        language: "c",   // ✅ backend expects "language"
+      },
+    })
+    .then((res) => {
+      console.log("CODING QUESTIONS:", res.data.questions);
+      setQuestions(res.data.questions);
+    })
+    .catch((err) => {
+      console.error("CODING FETCH ERROR:", err);
+    });
+}, []);
+
 
   useEffect(() => {
     if (selected) {
@@ -160,7 +172,7 @@ int main() {
     <div className="coding-container">
       {!selected && (
         <div className="question-list">
-          <h1 className="learn-title">💻 Coding Practice — Unit 2</h1>
+          <h1 className="learn-title">💻 Coding Practice — C Unit 2</h1>
 
           {questions.map((q) => (
             <div
@@ -238,7 +250,9 @@ int main() {
               </button>
 
               <button
-                className={canSubmit ? "submit-btn enabled" : "submit-btn disabled"}
+                className={
+                  canSubmit ? "submit-btn enabled" : "submit-btn disabled"
+                }
                 disabled={!canSubmit || isSubmitting}
                 onClick={handleSubmit}
               >
@@ -256,7 +270,6 @@ int main() {
               </button>
             </div>
 
-            {/* RESULTS */}
             {result && (
               <div className="results-box">
                 <h3>Results</h3>
@@ -298,7 +311,9 @@ int main() {
                             </td>
                             <td>
                               <span
-                                className={s.passed ? "badge-pass" : "badge-fail"}
+                                className={
+                                  s.passed ? "badge-pass" : "badge-fail"
+                                }
                               >
                                 {s.passed ? "Passed" : "Failed"}
                               </span>

@@ -11,8 +11,12 @@ export default function CUnit3Assignments() {
 
   useEffect(() => {
     axios
-    .get(`http://localhost:5000/api/assignments?unit=${unit}`)
-
+      .get("http://localhost:5000/api/assignments", {
+        params: {
+          unit: unit,    // Unit 3
+          subject: "c"   // 🔥 ONLY C assignments
+        }
+      })
       .then((res) => {
         setAssignments(res.data.assignments || []);
       })
@@ -22,11 +26,13 @@ export default function CUnit3Assignments() {
   return (
     <div className="teacher-unit-container">
       <h1 className="dashboard-title">
-        MCQ Assignments – <span className="fusion-text">Unit {unit}</span>
+        MCQ Assignments – <span className="fusion-text">C Unit {unit}</span>
       </h1>
 
       {assignments.length === 0 ? (
-        <div className="no-assignments">No assignments available for this unit.</div>
+        <div className="no-assignments">
+          No assignments available for this unit.
+        </div>
       ) : (
         <div className="assignment-list">
           {assignments.map((a) => (
@@ -36,7 +42,9 @@ export default function CUnit3Assignments() {
 
               <button
                 className="attempt-btn"
-                onClick={() => navigate(`/student/attempt-assignment/${a._id}`)}
+                onClick={() =>
+                  navigate(`/student/attempt-assignment/${a._id}`)
+                }
               >
                 ▶ Attempt Assignment
               </button>
@@ -45,7 +53,10 @@ export default function CUnit3Assignments() {
         </div>
       )}
 
-      <button className="back-button" onClick={() => navigate("/student/unit3")}>
+      <button
+        className="back-button"
+        onClick={() => navigate("/student/unit3")}
+      >
         ⬅ Back
       </button>
     </div>

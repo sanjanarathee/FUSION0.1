@@ -55,13 +55,13 @@ int main() {
     }
   };
 
-  // Fetch questions for Unit 1
+  // 🔥 Fetch coding questions for C – Unit 1
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/coding/get?unit=Unit 1")
-      .then((res) => setQuestions(res.data.questions))
-      .catch(console.error);
-  }, []);
+  axios
+    .get("http://localhost:5000/api/coding/practice?language=c")
+    .then((res) => setQuestions(res.data.questions || []))
+    .catch(console.error);
+}, []);
 
   // -------------------- RUN CODE --------------------
   const runCode = async () => {
@@ -82,7 +82,6 @@ int main() {
 
       setResult(res.data);
 
-      // ✅ Use correct keys from backend
       if (
         res.data.success &&
         res.data.testcasesPassed === res.data.totalTestcases
@@ -99,7 +98,7 @@ int main() {
     }
   };
 
-  // -------------------- SUBMIT CODE (Option C) --------------------
+  // -------------------- SUBMIT CODE --------------------
   const handleSubmit = async () => {
     if (!selected) {
       alert("Select a question first!");
@@ -119,24 +118,28 @@ int main() {
     setIsSubmitting(true);
     try {
       const payload = {
-        code,
-        language,
-        questionId: selected._id,
-        userId: localStorage.getItem("userId") || "dummyUser",
-        testcasesPassed: result.testcasesPassed,
-        totalTestcases: result.totalTestcases,
-      };
+  code,
+  language,
+  questionId: selected._id,
+userId: localStorage.getItem("userId"),
+  testcasesPassed: result.testcasesPassed,
+  totalTestcases: result.totalTestcases,
+
+  // ✅ ADD THESE
+  totalMarks: result.totalMarks,
+  maxMarks: result.maxMarks
+};
+
 
       const res = await axios.post(
-        "http://localhost:5000/api/code/submit",
-        payload
-      );
+  "http://localhost:5000/api/submit",
+  payload
+);
+
 
       if (res.data && res.data.success) {
-        // ✅ Popup
         alert("✅ Accepted! All testcases passed.");
 
-        // ✅ Redirect to submission page if backend sends ID
         if (res.data.submissionId) {
           window.location.href = `/submission/${res.data.submissionId}`;
         }
@@ -179,26 +182,48 @@ int main() {
   return (
     <div className="coding-container">
       {!selected && (
-        <div className="question-list">
-          <h1 className="learn-title">💻 Coding Practice — Unit 1</h1>
+  <div className="question-list">
+    <h1 className="learn-title">💻 Coding Practice — C</h1>
 
-          {questions.map((q) => (
-            <div
-              key={q._id}
-              className="question-card"
-              onClick={() => {
-                setSelected(q);
-                setLanguage(q.language || "c");
-                setResult(null);
-                setCanSubmit(false);
-              }}
-            >
-              <h3>{q.title}</h3>
-              <p>{q.description.substring(0, 100)}...</p>
-            </div>
-          ))}
-        </div>
-      )}
+    {questions.map((q, index) => (
+  <div
+    key={q._id}
+    className="question-card"
+    onClick={() => {
+      setSelected(q);
+      setLanguage(q.language || "c");
+      setResult(null);
+      setCanSubmit(false);
+    }}
+    style={{ display: "flex", alignItems: "center", gap: "16px" }}
+  >
+    <div
+      style={{
+        minWidth: "40px",
+        height: "40px",
+        borderRadius: "50%",
+        background: "linear-gradient(135deg, #38bdf8, #06b6d4)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: "700",
+        color: "#021526",
+        fontSize: "16px",
+        boxShadow: "0 0 12px rgba(56,189,248,0.6)",
+      }}
+    >
+      {index + 1}
+    </div>
+
+    <h3 style={{ margin: 0 }}>{q.title}</h3>
+  </div>
+))}
+
+
+  </div>
+)}
+
+
 
       {selected && (
         <div className="leetcode-layout">
@@ -247,7 +272,6 @@ int main() {
               </button>
             </div>
 
-            {/* Fixed-height wrapper to keep layout stable */}
             <div style={{ height: "420px", maxHeight: "420px" }}>
               <Editor
                 height="100%"
@@ -289,7 +313,6 @@ int main() {
               </button>
             </div>
 
-            {/* -------- RESULTS BOX -------- */}
             {result && (
               <div className="results-box">
                 <h3>Results</h3>
@@ -297,7 +320,6 @@ int main() {
                   Passed: {result.testcasesPassed}/{result.totalTestcases}
                 </p>
 
-                {/* Testcase Results */}
                 {result.results?.map((r, i) => (
                   <div key={i} className="testcase-card">
                     <p>
@@ -310,7 +332,6 @@ int main() {
                   </div>
                 ))}
 
-                {/* -------- STEP BY STEP EVALUATION -------- */}
                 {result.stepResults && (
                   <div style={{ marginTop: "20px" }}>
                     <h3>Step-by-Step Evaluation</h3>

@@ -35,15 +35,22 @@ int main() {
   // ⭐ UNIQUE LOCAL STORAGE KEY FOR UNIT 4
   const getStorageKey = (qId, lang) => `fusion_code_unit4_${qId}_${lang}`;
 
-  // ⭐ FETCH QUESTIONS FOR UNIT 4
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/coding/unit/4")
-      .then((res) => {
-        if (res.data.success) setQuestions(res.data.questions);
-      })
-      .catch(console.error);
-  }, []);
+  // 🔥 FETCH C UNIT 4 QUESTIONS (LMS STYLE)
+  // 🔥 Fetch GLOBAL coding questions (C language)
+useEffect(() => {
+  axios
+    .get("http://localhost:5000/api/coding/practice", {
+      params: { language: "c" },
+    })
+    .then((res) => {
+      console.log("UNIT 3 CODING QUESTIONS:", res.data.questions);
+      setQuestions(res.data.questions || []);
+    })
+    .catch((err) => {
+      console.error("UNIT 3 CODING FETCH ERROR:", err);
+    });
+}, []);
+
 
   // ⭐ Load template or saved code when switching language or question
   useEffect(() => {
@@ -61,9 +68,9 @@ int main() {
   }, [selected, language]);
 
   const handleCodeChange = (val) => {
-    setCode(val);
+    setCode(val || "");
     if (selected)
-      localStorage.setItem(getStorageKey(selected._id, language), val);
+      localStorage.setItem(getStorageKey(selected._id, language), val || "");
   };
 
   // -------------------- RUN CODE --------------------
@@ -158,7 +165,7 @@ int main() {
       {/* ---------------- QUESTION LIST ---------------- */}
       {!selected && (
         <div className="question-list">
-          <h1 className="learn-title">💻 Coding Practice — Unit 4</h1>
+          <h1 className="learn-title">💻 Coding Practice — C Unit 4</h1>
 
           {questions.map((q) => (
             <div
@@ -237,7 +244,9 @@ int main() {
               </button>
 
               <button
-                className={canSubmit ? "submit-btn enabled" : "submit-btn disabled"}
+                className={
+                  canSubmit ? "submit-btn enabled" : "submit-btn disabled"
+                }
                 disabled={!canSubmit || isSubmitting}
                 onClick={handleSubmit}
               >
@@ -298,7 +307,9 @@ int main() {
                             </td>
                             <td>
                               <span
-                                className={s.passed ? "badge-pass" : "badge-fail"}
+                                className={
+                                  s.passed ? "badge-pass" : "badge-fail"
+                                }
                               >
                                 {s.passed ? "Passed" : "Failed"}
                               </span>

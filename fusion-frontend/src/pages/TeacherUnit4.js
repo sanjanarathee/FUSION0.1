@@ -36,7 +36,7 @@ export default function TeacherUnit4() {
 
         <button
           className="dashboard-btn orange"
-          onClick={() => navigate("/teacher/unit4/coding")}
+          onClick={() => navigate("/teacher/coding")}
         >
           💻 Coding Practice
         </button>

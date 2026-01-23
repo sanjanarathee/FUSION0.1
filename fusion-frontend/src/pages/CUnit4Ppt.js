@@ -9,33 +9,32 @@ export default function CUnit4Ppt() {
   const navigate = useNavigate();
 
   useEffect(() => {
-  const fetchPPTs = async () => {
-    try {
-      console.log("📡 Fetching PPTs for Unit 4...");
+    const fetchPPTs = async () => {
+      try {
+        console.log("📡 Fetching C Unit 4 PPTs...");
 
-      // Correct URL (Unit 4 NOT 4)
-      const res = await axios.get(
-        "http://localhost:5000/api/files/unit/Unit 4"
-      );
+        const res = await axios.get("http://localhost:5000/api/notes/filter", {
+          params: {
+            subject: "c",    // 🔥 C language
+            unit: 4,         // 🔥 Unit 4
+            category: "PPT"  // 🔥 PPT
+          }
+        });
 
-      // Filter PPT only
-      const filteredPPTs = res.data.filter(
-        (file) =>
-          file.metadata?.category &&
-          file.metadata.category.toLowerCase() === "ppt"
-      );
+        if (res.data.success) {
+          setPpts(res.data.files);
+        } else {
+          setPpts([]);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching Unit 4 PPTs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setPpts(filteredPPTs);
-    } catch (error) {
-      console.error("❌ Error fetching Unit 4 PPTs:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchPPTs();
-}, []);
-
+    fetchPPTs();
+  }, []);
 
   if (loading) {
     return <p className="learn-text">⏳ Loading PPTs for Unit 4...</p>;
@@ -43,7 +42,7 @@ export default function CUnit4Ppt() {
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">📊 Unit 4 - PPTs</h1>
+      <h1 className="learn-title">📊 C – Unit 4 PPTs</h1>
       <p className="learn-text">
         Here are all the PPTs uploaded by your teacher for Unit 4.
       </p>
@@ -57,16 +56,18 @@ export default function CUnit4Ppt() {
               <h3>{ppt.metadata?.title || ppt.filename}</h3>
 
               <p>
-                👩‍🏫 <b>Uploaded By:</b> {ppt.metadata?.uploadedBy || "Teacher"}{" "}
-                <br />
+                👩‍🏫 <b>Uploaded By:</b>{" "}
+                {ppt.metadata?.uploadedBy || "Teacher"} <br />
                 📘 <b>Unit:</b> {ppt.metadata?.unit} <br />
                 📅 <b>Date:</b>{" "}
-                {new Date(ppt.uploadDate).toLocaleDateString("en-GB")}
+                {ppt.uploadDate
+                  ? new Date(ppt.uploadDate).toLocaleDateString("en-GB")
+                  : "N/A"}
               </p>
 
               <div className="file-actions">
                 <a
-                  href={`http://localhost:5000/api/files/download/${ppt.filename}`}
+                  href={`http://localhost:5000/api/notes/file/${ppt.filename}`}
                   target="_blank"
                   rel="noreferrer"
                   className="view-btn"
