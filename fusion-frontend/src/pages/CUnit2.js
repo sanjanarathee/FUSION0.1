@@ -22,9 +22,10 @@ export default function CUnit2() {
         className="button-container"
         style={{ gap: "20px", flexWrap: "wrap", justifyContent: "center" }}
       >
+        {/* ✅ FIXED NOTES BUTTON */}
         <button
           className="unit-btn"
-          onClick={() => navigate("/student/notes/2")}
+          onClick={() => navigate("/student/notes/c/2")}
         >
           📝 Notes
         </button>
@@ -43,7 +44,6 @@ export default function CUnit2() {
           💻 Coding Practice
         </button>
 
-        {/* ⭐ Correct Unit Navigation */}
         <button
           className="unit-btn"
           onClick={() => navigate("/student-assignment?unit=2")}
@@ -52,6 +52,7 @@ export default function CUnit2() {
         </button>
       </div>
 
+      {/* 🔙 Back Button */}
       <button
         className="back-btn"
         onClick={() => navigate("/learn-c")}

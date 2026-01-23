@@ -25,7 +25,7 @@ export default function CUnit3() {
         {/* Notes */}
         <button
           className="unit-btn"
-          onClick={() => navigate("/student/notes/3")}
+          onClick={() => navigate("/student/notes/c/3")}
         >
           📝 Notes
         </button>

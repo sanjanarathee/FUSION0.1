@@ -180,20 +180,30 @@ function App() {
         <Route path="/learn-c" element={<LearnC />} />
         <Route path="/learn-cpp" element={<LearnCpp />} />
 
-        {/* ----- Unit 1 ----- */}
-        <Route path="/learn-c/unit1" element={<CUnit1 />} />
-        {/* ----- Unit 1 (CPP Student) ----- */}
-        <Route path="/learn-cpp/unit1" element={<CUnit1 />} />
+        {/* ----- Unit 1 (Student) ----- */}
+<Route path="/learn-c/unit1" element={<CUnit1 />} />
+<Route path="/learn-cpp/unit1" element={<CUnit1 />} />
 
-        <Route path="/unit1/notes"element={<Navigate to="/student/notes/c/1" replace />}/>
-        <Route path="/unit1/ppt" element={<CUnit1Ppt />} />
-        <Route path="/unit1/assignments" element={<CUnit1Assignments />} />
-        <Route path="/unit1/coding" element={<CUnit1Coding />} />
+{/* Notes */}
+<Route
+  path="/learn-c/unit1/notes"
+  element={<Navigate to="/student/notes/c/1" replace />}
+/>
+<Route
+  path="/learn-cpp/unit1/notes"
+  element={<Navigate to="/student/notes/cpp/1" replace />}
+/>
 
-        <Route path="/learn-cpp/unit1/notes"element={<Navigate to="/student/notes/cpp/1" replace />}/>
-        <Route path="/learn-cpp/unit1/ppt" element={<CUnit1Ppt />} />
-        <Route path="/learn-cpp/unit1/coding" element={<CUnit1Coding />} />
+{/* PPT */}
+<Route path="/learn-c/unit1/ppt" element={<CUnit1Ppt />} />
+<Route path="/learn-cpp/unit1/ppt" element={<CUnit1Ppt />} />
 
+{/* Assignments (C only) */}
+<Route path="/learn-c/unit1/assignments" element={<CUnit1Assignments />} />
+
+{/* Coding */}
+<Route path="/learn-c/unit1/coding" element={<CUnit1Coding />} />
+<Route path="/learn-cpp/unit1/coding" element={<CUnit1Coding />} />
 
         {/* ----- Unit 2 ----- */}
         <Route path="/learn-c/unit2" element={<CUnit2 />} />
@@ -229,7 +239,19 @@ function App() {
 
 
         {/* ⭐ UNIVERSAL NOTES PAGE */}
-       <Route path="/student/notes/:subject/:unitId" element={<StudentNotes />} />
+        <Route path="/student/notes/:subject/:unitId" element={<StudentNotes />} />
+
+      {/* C NOTES */}
+<Route path="/learn-c/unit1/notes" element={<Navigate to="/student/notes/c/1" replace />} />
+<Route path="/learn-c/unit2/notes" element={<Navigate to="/student/notes/c/2" replace />} />
+<Route path="/learn-c/unit3/notes" element={<Navigate to="/student/notes/c/3" replace />} />
+<Route path="/learn-c/unit4/notes" element={<Navigate to="/student/notes/c/4" replace />} />
+
+{/* CPP NOTES */}
+<Route path="/learn-cpp/unit1/notes" element={<Navigate to="/student/notes/cpp/1" replace />} />
+<Route path="/learn-cpp/unit2/notes" element={<Navigate to="/student/notes/cpp/2" replace />} />
+<Route path="/learn-cpp/unit3/notes" element={<Navigate to="/student/notes/cpp/3" replace />} />
+<Route path="/learn-cpp/unit4/notes" element={<Navigate to="/student/notes/cpp/4" replace />} />
 
         {/* General student pages */}
         <Route path="/notes" element={<CNotes />} />
