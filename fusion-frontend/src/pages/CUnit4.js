@@ -14,7 +14,7 @@ export default function CUnit4() {
       <div className="unit-buttons">
         <button
           className="unit-btn blue-btn"
-          onClick={() => window.location.href = "/student/notes/4"}
+          onClick={() => window.location.href = "/student/notes/c/4"}
 
         >
           📝 Notes
