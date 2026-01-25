@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./PageStyles.css";
 
-export default function TeacherUnit4UploadNotes() {
+export default function TeacherUnit4UploadNotes({ course = "c" }) {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
@@ -18,8 +18,18 @@ export default function TeacherUnit4UploadNotes() {
     formData.append("title", title);
     formData.append("description", desc);
     formData.append("category", "Notes");
-    formData.append("unit", 4);
+    formData.append("unit", "4");
+
+    // 🔥 REQUIRED
+    formData.append("subject", course);
+
     formData.append("file", file);
+
+    console.log("Uploading:", {
+      subject: course,
+      unit: "4",
+      category: "Notes",
+    });
 
     await axios.post("http://localhost:5000/api/files/upload", formData);
 
@@ -48,7 +58,7 @@ export default function TeacherUnit4UploadNotes() {
           <option>Notes</option>
         </select>
 
-        <select value="3" disabled>
+        <select value="4" disabled>
           <option>Unit 4</option>
         </select>
 
@@ -57,14 +67,12 @@ export default function TeacherUnit4UploadNotes() {
         <button onClick={handleUpload}>Upload</button>
       </div>
 
-      {/* Success Message */}
       {success && (
         <p style={{ color: "#00ff00", marginTop: "15px", fontWeight: "bold" }}>
           ✔ Upload successful!
         </p>
       )}
 
-      {/* ⭐ NEW BUTTON: View uploaded study material */}
       {success && (
         <button
           className="back-button"
@@ -75,10 +83,9 @@ export default function TeacherUnit4UploadNotes() {
         </button>
       )}
 
-      {/* Back to Unit 4 */}
       <button
         className="back-button"
-        onClick={() => navigate("/teacher/unit3")}
+        onClick={() => navigate("/teacher/unit4")}
       >
         ⬅ Back to Unit 4
       </button>

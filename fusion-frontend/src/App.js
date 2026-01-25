@@ -273,7 +273,7 @@ function App() {
         <Route path="/teacher/unit1/manage-assignments" element={<ManageAssignments />} />
         <Route path="/teacher/unit1/results" element={<AssignmentResults />} />
         <Route path="/teacher/unit1/coding" element={<TeacherUnit1Coding />} />
-        <Route path="/teacher/unit1/upload-notes" element={<TeacherUnit1UploadNotes />} />
+        <Route path="/teacher/unit1/upload-notes"element={<TeacherUnit1UploadNotes course="c" unit={1} />}/>
         <Route path="/teacher/unit1/upload-ppt" element={<TeacherUnit1UploadPPT />} /> {/* ⭐ FIXED */}
 
         {/* Teacher Unit 2 */}
@@ -284,11 +284,11 @@ function App() {
         <Route path="/teacher/unit2/results/:assignmentId" element={<AssignmentResultTable />} />
         <Route path="/teacher/unit2/coding" element={<TeacherUnit2Coding />} />
         <Route path="/teacher/unit2/upload-ppt" element={<TeacherUnit2UploadPPT />} />
-        <Route path="/teacher/unit2/upload-notes" element={<TeacherUnit2UploadNotes />} />
+        <Route path="/teacher/unit2/upload-notes"element={<TeacherUnit2UploadNotes course="c" unit={2} />}/>
 
         {/* Teacher Unit 3 */}
         <Route path="/teacher/unit3" element={<TeacherUnit3 />} />
-        <Route path="/teacher/unit3/upload-notes" element={<TeacherUnit3UploadNotes />} />
+        <Route path="/teacher/unit3/upload-notes"element={<TeacherUnit3UploadNotes course="c" unit={3} />}/>        
         <Route path="/teacher/unit3/upload-ppt" element={<TeacherUnit3UploadPPT />} />
         <Route path="/teacher/unit3/assignments" element={<TeacherUnit3Assignment />} />
         <Route path="/teacher/unit3/manage-assignments" element={<TeacherUnit3ManageAssignments />} />
@@ -302,7 +302,7 @@ function App() {
 
         {/* Teacher Unit 4 */}
         <Route path="/teacher/unit4" element={<TeacherUnit4 />} />
-        <Route path="/teacher/unit4/upload-notes" element={<TeacherUnit4UploadNotes />} />
+        <Route path="/teacher/unit4/upload-notes"element={<TeacherUnit4UploadNotes course="c" unit={4} />}/>      
         <Route path="/teacher/unit4/upload-ppt" element={<TeacherUnit4UploadPPT />} />
         <Route path="/teacher/unit4/assignments" element={<TeacherUnit4Assignment />} />
         <Route path="/teacher/unit4/coding" element={<TeacherUnit4Coding />} />

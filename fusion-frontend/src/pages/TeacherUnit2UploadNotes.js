@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./PageStyles.css";
 
-export default function TeacherUnit2UploadNotes() {
+export default function TeacherUnit2UploadNotes({ course = "c" }) {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
@@ -17,9 +17,19 @@ export default function TeacherUnit2UploadNotes() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", desc);
-    formData.append("category", "Notes");  // ⭐ FIXED
-    formData.append("unit", 2);            // ⭐ FIXED
+    formData.append("category", "Notes");
+    formData.append("unit", "2");
+
+    // 🔥 MOST IMPORTANT LINE
+    formData.append("subject", course);   // "c" or "cpp"
+
     formData.append("file", file);
+
+    console.log("Uploading:", {
+      subject: course,
+      unit: "2",
+      category: "Notes",
+    });
 
     await axios.post("http://localhost:5000/api/files/upload", formData);
 

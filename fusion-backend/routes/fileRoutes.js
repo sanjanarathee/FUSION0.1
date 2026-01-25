@@ -5,7 +5,9 @@ import {
   getAllFiles,
   getFilesByUnit,
   getFile,
+  getFilteredFiles
 } from "../controllers/fileController.js";
+
 
 import mongoose from "mongoose";
 import Grid from "gridfs-stream";
@@ -69,6 +71,12 @@ router.get("/unit/:unit", async (req, res) => {
 // 4️⃣ Download file by FILENAME
 // ------------------------------------------
 router.get("/download/:filename", getFile);
+
+// ------------------------------------------
+// 7️⃣ FILTER FILES (subject + unit + category)
+// ------------------------------------------
+router.get("/filter", getFilteredFiles);
+
 
 // ------------------------------------------
 // 5️⃣ Delete file by FILENAME

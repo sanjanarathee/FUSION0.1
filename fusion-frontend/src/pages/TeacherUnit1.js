@@ -33,11 +33,12 @@ export default function TeacherUnit1() {
         </button>
 
         <button
-          className="unit-btn orange"
-          onClick={() => navigate("/teacher/coding")}
-        >
-          💻 Coding Practice
-        </button>
+  className="unit-btn orange"
+  onClick={() => navigate("/teacher/unit1/coding")}
+>
+  💻 Coding Practice
+</button>
+
       </div>
 <button
   className="back-btn"

@@ -115,16 +115,18 @@ export const evaluateCode = async (req, res) => {
     /* ------------ RUN TESTCASES ------------ */
     for (let tc of question.testcases) {
       const input = tc.input ?? "";
-      const expected = (tc.expected ?? "").trim();
+      const expected = (tc.expected ?? "").trim().toLowerCase();
 
-      const submit = await axios.post(
-        "https://ce.judge0.com/submissions/?base64_encoded=true&wait=false",
-        {
-          source_code: code,
-          language_id: langId,
-          stdin: input,
-        }
-      );
+    const submit = await axios.post(
+  "https://ce.judge0.com/submissions/?base64_encoded=true&wait=false",
+  {
+    source_code: Buffer.from(code).toString("base64"),
+    language_id: langId,
+    stdin: Buffer.from(input).toString("base64"),
+  }
+);
+
+
 
       const token = submit.data.token;
       let outputData = null;
@@ -138,10 +140,13 @@ export const evaluateCode = async (req, res) => {
       }
 
       const output = outputData.stdout
-        ? Buffer.from(outputData.stdout, "base64")
-            .toString("utf8")
-            .trim()
-        : "";
+  ? Buffer.from(outputData.stdout, "base64")
+      .toString("utf8")
+      .trim()
+      .toLowerCase()
+  : "";
+
+
 
       const correct = output === expected;
       if (correct) passed++;
@@ -279,6 +284,55 @@ export const getAllCodingResults = async (req, res) => {
     });
   } catch (err) {
     console.error("GET ALL RESULTS ERROR:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+/* ----------------------------------------------------
+   7️⃣ SUBMIT CODING RESULT (SAVE TO DB)
+---------------------------------------------------- */
+export const submitCode = async (req, res) => {
+  try {
+    console.log("====== SUBMIT HIT ======");
+    console.log(req.body);
+
+    const {
+      userId,
+      questionId,
+      code,
+      language,
+      passed,
+      total
+    } = req.body;
+
+    if (!userId || !questionId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId and questionId are required"
+      });
+    }
+
+    const status = passed === total ? "Accepted" : "Wrong Answer";
+
+    const submission = new Submission({
+      userId,
+      questionId,
+      code,
+      language,
+      status,
+      passed,
+      total
+    });
+
+    await submission.save();
+
+    res.json({
+      success: true,
+      message: "Submission saved successfully",
+      submission
+    });
+
+  } catch (err) {
+    console.error("❌ SUBMIT ERROR:", err);
     res.status(500).json({ success: false, error: err.message });
   }
 };

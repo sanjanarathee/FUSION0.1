@@ -5,7 +5,8 @@ import {
   deleteCodingQuestion,
   evaluateCode,
   getleaderboard,
-  getAllCodingResults   // ✅ NEW
+  getAllCodingResults,
+  submitCode              // ✅ ADDED
 } from "../controllers/codingController.js";
 
 const router = express.Router();
@@ -17,7 +18,7 @@ router.post("/add", addCodingQuestion);
 
 // -------------------------------------------------
 // 📥 Get GLOBAL coding practice questions (Student)
-// Example: /api/coding/practice?language=cpp
+// Example: /api/coding/practice?language=c
 // -------------------------------------------------
 router.get("/practice", getCodingQuestions);
 
@@ -27,9 +28,14 @@ router.get("/practice", getCodingQuestions);
 router.delete("/delete/:id", deleteCodingQuestion);
 
 // -------------------------------------------------
-// ▶ Run / evaluate code
+// ▶ Run / evaluate code (no DB save)
 // -------------------------------------------------
 router.post("/run", evaluateCode);
+
+// -------------------------------------------------
+// 📤 Submit coding result (save to DB)
+// -------------------------------------------------
+router.post("/submit", submitCode);
 
 // -------------------------------------------------
 // 🏆 Leaderboard
@@ -39,6 +45,6 @@ router.get("/leaderboard", getleaderboard);
 // -------------------------------------------------
 // 📊 Teacher – Get all students coding results
 // -------------------------------------------------
-router.get("/results", getAllCodingResults);   // ✅ NEW
+router.get("/results", getAllCodingResults);
 
 export default router;

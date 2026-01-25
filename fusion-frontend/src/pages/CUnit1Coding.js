@@ -33,18 +33,12 @@ int main() {
 
   const getStorageKey = (qId, lang) => `fusion_code_${qId}_${lang}`;
 
-  // Load saved code/template when question or language changes
   useEffect(() => {
     if (selected) {
       const saved = localStorage.getItem(getStorageKey(selected._id, language));
-
-      if (saved) {
-        setCode(saved);
-      } else {
-        setCode(templates[language]);
-      }
+      if (saved) setCode(saved);
+      else setCode(templates[language]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected, language]);
 
   const handleCodeChange = (value) => {
@@ -55,13 +49,13 @@ int main() {
     }
   };
 
-  // 🔥 Fetch coding questions for C – Unit 1
+  // 🔥 Fetch coding questions
   useEffect(() => {
-  axios
-    .get("http://localhost:5000/api/coding/practice?language=c")
-    .then((res) => setQuestions(res.data.questions || []))
-    .catch(console.error);
-}, []);
+    axios
+      .get("http://localhost:5000/api/coding/practice?language=c")
+      .then((res) => setQuestions(res.data.questions || []))
+      .catch(console.error);
+  }, []);
 
   // -------------------- RUN CODE --------------------
   const runCode = async () => {
@@ -74,7 +68,7 @@ int main() {
       setIsRunning(true);
       setCanSubmit(false);
 
-      const res = await axios.post("http://localhost:5000/api/code/run", {
+      const res = await axios.post("http://localhost:5000/api/coding/run", {
         code,
         language,
         questionId: selected._id,
@@ -118,24 +112,24 @@ int main() {
     setIsSubmitting(true);
     try {
       const payload = {
-  code,
-  language,
-  questionId: selected._id,
-userId: localStorage.getItem("userId"),
-  testcasesPassed: result.testcasesPassed,
-  totalTestcases: result.totalTestcases,
+        code,
+        language,
+        questionId: selected._id,
+        userId: localStorage.getItem("userId"),
 
-  // ✅ ADD THESE
-  totalMarks: result.totalMarks,
-  maxMarks: result.maxMarks
-};
+        // ✅ corrected keys for backend
+        passed: result.passed,
+total: result.total,
 
+
+        totalMarks: result.totalMarks,
+        maxMarks: result.maxMarks,
+      };
 
       const res = await axios.post(
-  "http://localhost:5000/api/submit",
-  payload
-);
-
+        "http://localhost:5000/api/coding/submit",
+        payload
+      );
 
       if (res.data && res.data.success) {
         alert("✅ Accepted! All testcases passed.");
@@ -182,48 +176,44 @@ userId: localStorage.getItem("userId"),
   return (
     <div className="coding-container">
       {!selected && (
-  <div className="question-list">
-    <h1 className="learn-title">💻 Coding Practice — C</h1>
+        <div className="question-list">
+          <h1 className="learn-title">💻 Coding Practice — C</h1>
 
-    {questions.map((q, index) => (
-  <div
-    key={q._id}
-    className="question-card"
-    onClick={() => {
-      setSelected(q);
-      setLanguage(q.language || "c");
-      setResult(null);
-      setCanSubmit(false);
-    }}
-    style={{ display: "flex", alignItems: "center", gap: "16px" }}
-  >
-    <div
-      style={{
-        minWidth: "40px",
-        height: "40px",
-        borderRadius: "50%",
-        background: "linear-gradient(135deg, #38bdf8, #06b6d4)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: "700",
-        color: "#021526",
-        fontSize: "16px",
-        boxShadow: "0 0 12px rgba(56,189,248,0.6)",
-      }}
-    >
-      {index + 1}
-    </div>
+          {questions.map((q, index) => (
+            <div
+              key={q._id}
+              className="question-card"
+              onClick={() => {
+                setSelected(q);
+                setLanguage(q.language || "c");
+                setResult(null);
+                setCanSubmit(false);
+              }}
+              style={{ display: "flex", alignItems: "center", gap: "16px" }}
+            >
+              <div
+                style={{
+                  minWidth: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #38bdf8, #06b6d4)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: "700",
+                  color: "#021526",
+                  fontSize: "16px",
+                  boxShadow: "0 0 12px rgba(56,189,248,0.6)",
+                }}
+              >
+                {index + 1}
+              </div>
 
-    <h3 style={{ margin: 0 }}>{q.title}</h3>
-  </div>
-))}
-
-
-  </div>
-)}
-
-
+              <h3 style={{ margin: 0 }}>{q.title}</h3>
+            </div>
+          ))}
+        </div>
+      )}
 
       {selected && (
         <div className="leetcode-layout">
@@ -317,8 +307,9 @@ userId: localStorage.getItem("userId"),
               <div className="results-box">
                 <h3>Results</h3>
                 <p>
-                  Passed: {result.testcasesPassed}/{result.totalTestcases}
-                </p>
+  Passed: {result.passed} / {result.total}
+</p>
+
 
                 {result.results?.map((r, i) => (
                   <div key={i} className="testcase-card">

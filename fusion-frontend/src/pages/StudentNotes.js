@@ -16,16 +16,18 @@ export default function StudentNotes() {
         console.log("📡 Fetching notes:", subject, unitId);
 
         const res = await axios.get(
-          "http://localhost:5000/api/files/notes",
+          "http://localhost:5000/api/files/filter",
           {
             params: {
-              subject,
-              unit: unitId
+              subject,          // c / cpp
+              unit: unitId,     // 1
+              category: "notes" // REQUIRED
             }
           }
         );
 
-        setFiles(res.data);
+        // backend sends { success, files }
+        setFiles(res.data.files || []);
 
       } catch (err) {
         console.error("❌ Fetch error:", err);

@@ -17,19 +17,21 @@ export default function Login() {
     try {
       console.log("➡️ Sending login data:", { email, password, role });
 
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        email: email.toLowerCase().trim(),
-        password,
-        role,
-      });
+const res = await axios.post("http://localhost:5000/api/auth/login", {
+  email: email.toLowerCase().trim(),
+  password,
+  role,
+});
 
-      console.log("✅ Backend response:", res.data);
+console.log("✅ FULL backend response:", res.data);
+console.log("👤 USER object exactly:", res.data.user);
 
-      // ✅ Save user directly (no nested user object)
-      localStorage.setItem("fusionUser", JSON.stringify(res.data.user));
-      localStorage.setItem("userId", res.data.user._id);
+// ✅ Save user directly
+localStorage.setItem("fusionUser", JSON.stringify(res.data.user));
+localStorage.setItem("userId", res.data.user.id);
 
-      console.log("Stored userId:", res.data.user._id);
+console.log("Stored userId:", res.data.user.id);
+
 
 
 

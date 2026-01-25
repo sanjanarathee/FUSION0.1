@@ -50,14 +50,16 @@ export const uploadFile = async (req, res) => {
       unit = "Unit " + unit;
     }
 
-    const metadata = {
-      title: req.body.title || req.file.originalname,
-      description: req.body.description || "",
-      category: req.body.category,     // Notes / PPT / Coding
-      unit,                            // Unit 1
-      subject: req.body.subject,       // c / cpp
-      uploadedBy: req.body.uploadedBy || "Unknown Teacher",
-    };
+   const metadata = {
+  title: req.body.title || req.file.originalname,
+  description: req.body.description || "",
+  category: (req.body.category || "").toLowerCase(),
+  unit: unit.toLowerCase(),
+  subject: req.body.subject ? req.body.subject.toLowerCase() : "c", // 👈 TEMP DEFAULT
+  uploadedBy: req.body.uploadedBy || "Unknown Teacher",
+};
+
+
 
     console.log("📥 Upload metadata:", metadata);
 
@@ -112,19 +114,26 @@ export const getFilteredFiles = async (req, res) => {
       });
     }
 
+    // 🔥 Normalize inputs
+    subject = subject.toLowerCase().trim();
+    category = category.toLowerCase().trim();
+
     if (!unit.toLowerCase().includes("unit")) {
-      unit = "Unit " + unit;
+      unit = "unit " + unit;
+    } else {
+      unit = unit.toLowerCase();
     }
 
     const files = await conn.db
-      .collection("uploads.files")
-      .find({
-        "metadata.subject": subject,     // c / cpp
-        "metadata.unit": unit,           // Unit 1
-        "metadata.category": category,   // Notes / PPT / Coding
-      })
-      .sort({ uploadDate: -1 })
-      .toArray();
+  .collection("uploads.files")
+  .find({
+    "metadata.subject": { $regex: new RegExp("^" + subject + "$", "i") },
+    "metadata.unit": { $regex: new RegExp("^" + unit + "$", "i") },
+    "metadata.category": { $regex: new RegExp("^" + category + "$", "i") },
+  })
+  .sort({ uploadDate: -1 })
+  .toArray();
+
 
     res.status(200).json({
       success: true,
@@ -132,6 +141,7 @@ export const getFilteredFiles = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("❌ Error fetching filtered files:", error);
     res.status(500).json({
       success: false,
       msg: "Error fetching filtered files",
