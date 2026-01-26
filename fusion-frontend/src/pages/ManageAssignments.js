@@ -16,7 +16,7 @@ export default function ManageAssignments() {
     const fetchAssignments = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/assignments/unit/${unit}`
+          `https://fusion0-1.onrender.com/api/assignments/unit/${unit}`
         );
 
         console.log("Fetched assignments:", res.data.assignments);
@@ -35,7 +35,7 @@ export default function ManageAssignments() {
       return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/assignments/${id}`);
+      await axios.delete(`https://fusion0-1.onrender.com/api/assignments/${id}`);
       alert("Assignment deleted!");
 
       setAssignments(assignments.filter((a) => a._id !== id));

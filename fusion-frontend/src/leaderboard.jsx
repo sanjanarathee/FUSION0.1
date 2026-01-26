@@ -9,7 +9,7 @@ export default function Leaderboard() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/code/leaderboard")
+      .get("https://fusion0-1.onrender.com/api/code/leaderboard")
       .then((res) => {
         setUsers(res.data.leaders);   // IMPORTANT FIX
         setLoading(false);

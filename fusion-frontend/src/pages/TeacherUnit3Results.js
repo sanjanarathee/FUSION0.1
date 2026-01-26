@@ -9,7 +9,7 @@ export default function TeacherUnit3Results() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/assignments/performance")
+    axios.get("https://fusion0-1.onrender.com/api/assignments/performance")
       .then((res) => {
         const filtered = res.data.performances.filter(
           (x) => Number(x.unit) === 3

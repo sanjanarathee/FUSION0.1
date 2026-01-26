@@ -38,7 +38,7 @@ router.delete("/:id", deleteAssignment);
 /*
   📋 Student fetch assignments  
   correct endpoint the frontend MUST call:
-  GET http://localhost:5000/api/assignments/student?unit=3
+  GET https://fusion0-1.onrender.com/api/assignments/student?unit=3
 */
 router.get("/student", getAssignment);
 

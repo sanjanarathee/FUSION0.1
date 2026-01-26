@@ -9,7 +9,7 @@ export default function TeacherUnit3ManageAssignments() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/assignments/unit/3")
+      .get("https://fusion0-1.onrender.com/api/assignments/unit/3")
       .then((res) => {
         console.log("Unit 3 assignments → ", res.data.assignments);
         setAssignments(res.data.assignments || []);
@@ -19,7 +19,7 @@ export default function TeacherUnit3ManageAssignments() {
 
   const deleteAssignment = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/assignments/${id}`);
+      await axios.delete(`https://fusion0-1.onrender.com/api/assignments/${id}`);
       alert("Assignment Deleted");
 
       // Refresh list after delete

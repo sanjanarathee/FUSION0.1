@@ -11,7 +11,7 @@ export default function CUnit4Assignments() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/assignments", {
+      .get("https://fusion0-1.onrender.com/api/assignments", {
         params: {
           unit: unit,     // Unit 4
           subject: "c"    // 🔥 ONLY C assignments

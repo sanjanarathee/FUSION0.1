@@ -17,7 +17,7 @@ export default function AssignmentResults() {
     const fetchResults = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/assignments/performance"
+          "https://fusion0-1.onrender.com/api/assignments/performance"
         );
 
         console.log("API response →", res.data);

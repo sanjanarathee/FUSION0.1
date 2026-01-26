@@ -8,7 +8,7 @@ export default function TrackAssignments() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/assignments/performance");
+        const res = await axios.get("https://fusion0-1.onrender.com/api/assignments/performance");
         setPerformances(res.data);
       } catch (error) {
         console.error("❌ Error fetching performance data:", error);

@@ -52,7 +52,7 @@ int main() {
   // 🔥 Fetch coding questions
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/coding/practice?language=c")
+      .get("https://fusion0-1.onrender.com/api/coding/practice?language=c")
       .then((res) => setQuestions(res.data.questions || []))
       .catch(console.error);
   }, []);
@@ -68,7 +68,7 @@ int main() {
       setIsRunning(true);
       setCanSubmit(false);
 
-      const res = await axios.post("http://localhost:5000/api/coding/run", {
+      const res = await axios.post("https://fusion0-1.onrender.com/api/coding/run", {
         code,
         language,
         questionId: selected._id,
@@ -127,7 +127,7 @@ total: result.total,
       };
 
       const res = await axios.post(
-        "http://localhost:5000/api/coding/submit",
+        "https://fusion0-1.onrender.com/api/coding/submit",
         payload
       );
 

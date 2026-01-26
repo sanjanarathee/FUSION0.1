@@ -21,7 +21,7 @@ export default function TeacherCppUnit2Coding() {
   const fetchQuestions = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/coding/get?unit=CPP Unit 2"
+        "https://fusion0-1.onrender.com/api/coding/get?unit=CPP Unit 2"
       );
       setAllQuestions(res.data.questions || []);
     } catch (error) {
@@ -99,7 +99,7 @@ export default function TeacherCppUnit2Coding() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/coding/add", {
+      await axios.post("https://fusion0-1.onrender.com/api/coding/add", {
         unit: "CPP Unit 2",
         title: question,
         description: question,
@@ -143,7 +143,7 @@ export default function TeacherCppUnit2Coding() {
     if (!window.confirm("Delete this question?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/coding/delete/${id}`);
+      await axios.delete(`https://fusion0-1.onrender.com/api/coding/delete/${id}`);
       fetchQuestions();
       alert("Question deleted!");
     } catch (err) {

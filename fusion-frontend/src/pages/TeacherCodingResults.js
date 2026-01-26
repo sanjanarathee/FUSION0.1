@@ -7,7 +7,7 @@ export default function TeacherCodingResults() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/coding/results")
+      .get("https://fusion0-1.onrender.com/api/coding/results")
       .then((res) => setResults(res.data.results || []))
       .catch((err) => console.error("Fetch results error:", err));
   }, []);

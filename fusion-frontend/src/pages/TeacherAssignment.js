@@ -57,7 +57,7 @@ export default function TeacherAssignment() {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/assignments", {
+      const res = await axios.post("https://fusion0-1.onrender.com/api/assignments", {
         questions,
       });
       console.log("✅ Assignment Saved:", res.data);

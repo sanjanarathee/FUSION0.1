@@ -8,7 +8,7 @@ export default function CUnit1Notes() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/notes/filter", {
+      .get("https://fusion0-1.onrender.com/api/notes/filter", {
         params: {
           subject: "c",      // 🔥 C language
           unit: 1,           // 🔥 Unit 1
@@ -54,7 +54,7 @@ export default function CUnit1Notes() {
               </p>
 
               <a
-                href={`http://localhost:5000/api/notes/file/${file.filename}`}
+                href={`https://fusion0-1.onrender.com/api/notes/file/${file.filename}`}
                 className="view-btn"
                 target="_blank"
                 rel="noreferrer"

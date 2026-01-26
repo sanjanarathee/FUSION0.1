@@ -8,7 +8,7 @@ export default function AssignmentResultTable() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/submissions/assignment/${assignmentId}`)
+      .get(`https://fusion0-1.onrender.com/api/submissions/assignment/${assignmentId}`)
       .then((res) => setResults(res.data))
       .catch((err) => console.log(err));
   }, [assignmentId]);

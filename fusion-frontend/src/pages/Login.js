@@ -17,7 +17,7 @@ export default function Login() {
     try {
       console.log("➡️ Sending login data:", { email, password, role });
 
-const res = await axios.post("http://localhost:5000/api/auth/login", {
+const res = await axios.post("https://fusion0-1.onrender.com/api/auth/login", {
   email: email.toLowerCase().trim(),
   password,
   role,

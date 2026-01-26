@@ -13,8 +13,8 @@ export default function TrackPerformance() {
         setLoading(true);
         const endpoint =
           tab === "assignment"
-            ? "http://localhost:5000/api/assignments/performance"
-            : "http://localhost:5000/api/coding/performance";
+            ? "https://fusion0-1.onrender.com/api/assignments/performance"
+            : "https://fusion0-1.onrender.com/api/coding/performance";
 
         const res = await axios.get(endpoint);
 

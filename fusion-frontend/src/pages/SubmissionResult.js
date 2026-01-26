@@ -13,7 +13,7 @@ export default function SubmissionResult() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/code/submission/${id}`)
+      .get(`https://fusion0-1.onrender.com/api/code/submission/${id}`)
       .then((res) => setData(res.data.submission))
       .catch(console.error);
   }, [id]);

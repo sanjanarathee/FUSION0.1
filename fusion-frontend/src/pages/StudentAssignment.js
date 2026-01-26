@@ -27,7 +27,7 @@ export default function StudentAssignment() {
       try {
         // 🔥 FIX 2: Use CORRECT STUDENT API
         const res = await axios.get(
-          `http://localhost:5000/api/assignments/student?unit=${selectedUnit}`
+          `https://fusion0-1.onrender.com/api/assignments/student?unit=${selectedUnit}`
         );
 
         setAssignments(res.data.assignments || []);
@@ -61,7 +61,7 @@ export default function StudentAssignment() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/assignments/performance",
+        "https://fusion0-1.onrender.com/api/assignments/performance",
         {
           studentName,
           rollNumber,
@@ -91,7 +91,7 @@ export default function StudentAssignment() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/assignments/check",
+        "https://fusion0-1.onrender.com/api/assignments/check",
         {
           rollNumber,
           unit: assignment.unit,
