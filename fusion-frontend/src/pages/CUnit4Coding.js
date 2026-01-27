@@ -65,7 +65,7 @@ useEffect(() => {
       setResult(null);
       setCanSubmit(false);
     }
-  }, [selected, language]);
+  }, [selected, language , templates]);
 
   const handleCodeChange = (val) => {
     setCode(val || "");

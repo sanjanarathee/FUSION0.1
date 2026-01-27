@@ -55,7 +55,7 @@ int main() {
       .get("https://fusion0-1.onrender.com/api/coding/practice?language=c")
       .then((res) => setQuestions(res.data.questions || []))
       .catch(console.error);
-  }, []);
+  }, [templates]);
 
   // -------------------- RUN CODE --------------------
   const runCode = async () => {

@@ -90,7 +90,7 @@ export default function CreateAssignment() {
     }
 
     try {
-      const res = await axios.post("https://fusion0-1.onrender.com/api/assignments/create", {
+        await axios.post("https://fusion0-1.onrender.com/api/assignments/create", {
         unit: Number(unit),
         title,
         description,

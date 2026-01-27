@@ -66,7 +66,7 @@ useEffect(() => {
       setCanSubmit(false);
     }
     // eslint-disable-next-line
-  }, [selected, language]);
+  }, [selected, language, templates]);
 
   const handleCodeChange = (val) => {
     setCode(val);
