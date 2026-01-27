@@ -49,7 +49,7 @@ useEffect(() => {
     .catch((err) => {
       console.error("UNIT 3 CODING FETCH ERROR:", err);
     });
-}, []);
+}, [templates]);
 
 
   // ⭐ Load template or saved code when switching language or question

@@ -50,7 +50,7 @@ useEffect(() => {
     .catch((err) => {
       console.error("CODING FETCH ERROR:", err);
     });
-}, []);
+}, [templates]);
 
 
   useEffect(() => {

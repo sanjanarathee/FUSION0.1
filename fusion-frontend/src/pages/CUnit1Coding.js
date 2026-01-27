@@ -39,7 +39,7 @@ int main() {
       if (saved) setCode(saved);
       else setCode(templates[language]);
     }
-  }, [selected, language]);
+  }, [selected, language, templates]);
 
   const handleCodeChange = (value) => {
     const updated = value || "";
