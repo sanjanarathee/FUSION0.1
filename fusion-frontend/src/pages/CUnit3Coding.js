@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Editor from "@monaco-editor/react";
 import "./PageStyles.css";
@@ -16,21 +16,22 @@ export default function CUnit3Coding() {
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const templates = {
-    c: `#include <stdio.h>
+  const templates = useMemo(() => ({
+  c: `#include <stdio.h>
 
 int main() {
     // Write your C code here
     return 0;
 }`,
-    cpp: `#include <iostream>
+  cpp: `#include <iostream>
 using namespace std;
 
 int main() {
     // Write your C++ code here
     return 0;
-}`,
-  };
+}`
+}), []);
+
 
   // ⭐ UNIQUE LOCAL STORAGE KEY FOR UNIT 3
   const getStorageKey = (qId, lang) => `fusion_code_unit3_${qId}_${lang}`;

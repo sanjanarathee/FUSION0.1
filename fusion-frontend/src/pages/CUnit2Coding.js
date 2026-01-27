@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Editor from "@monaco-editor/react";
 import "./PageStyles.css";
@@ -16,21 +16,22 @@ export default function CUnit2Coding() {
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const templates = {
-    c: `#include <stdio.h>
+  const templates = useMemo(() => ({
+  c: `#include <stdio.h>
 
 int main() {
     // Write your C code here
     return 0;
 }`,
-    cpp: `#include <iostream>
+  cpp: `#include <iostream>
 using namespace std;
 
 int main() {
     // Write your C++ code here
     return 0;
-}`,
-  };
+}`
+}), []);
+
 
   const getStorageKey = (qId, lang) => `fusion_code_unit2_${qId}_${lang}`;
 
@@ -39,9 +40,7 @@ int main() {
 useEffect(() => {
   axios
     .get("https://fusion0-1.onrender.com/api/coding/practice", {
-      params: {
-        language: "c",   // ✅ backend expects "language"
-      },
+      params: { language: "c" },
     })
     .then((res) => {
       console.log("CODING QUESTIONS:", res.data.questions);
@@ -50,7 +49,8 @@ useEffect(() => {
     .catch((err) => {
       console.error("CODING FETCH ERROR:", err);
     });
-}, [templates]);
+}, []);
+
 
 
   useEffect(() => {
