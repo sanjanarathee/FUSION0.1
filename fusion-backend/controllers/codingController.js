@@ -29,6 +29,8 @@ export const addCodingQuestion = async (req, res) => {
     }));
 
     const cleanedSteps = (evaluationSteps || []).map((s) => ({
+      stepId: s.stepId || `step_${index}`,   // ✅ ADD THIS
+
       label: s.label,
       type: s.type,
       value:
@@ -159,65 +161,38 @@ export const evaluateCode = async (req, res) => {
       });
     }
 
-    /* ------------ STEP EVALUATION ------------ */
-    const usesScanf = /\bscanf\s*\(/i.test(code);
-    const usesMod = /%/.test(code);
-    const usesIf = /\bif\s*\(/.test(code);
-    const allTestcasesPassed = passed === total;
+    const stepResults = [];
 
-    const stepResults = [
-      {
-        label: "uses scanf",
-        passed: usesScanf,
-        marksAwarded: usesScanf ? 1 : 0,
-        marksTotal: 1,
-      },
-      {
-        label: "uses modulus operator",
-        passed: usesMod,
-        marksAwarded: usesMod ? 1 : 0,
-        marksTotal: 1,
-      },
-      {
-        label: "uses if condition",
-        passed: usesIf,
-        marksAwarded: usesIf ? 1 : 0,
-        marksTotal: 1,
-      },
-      {
-        label: "all testcases passed",
-        passed: allTestcasesPassed,
-        marksAwarded: allTestcasesPassed ? 5 : 0,
-        marksTotal: 5,
-      },
-    ];
+for (const step of question.evaluationSteps) {
+  let passedStep = false;
 
-    const totalMarks = stepResults.reduce(
-      (sum, s) => sum + s.marksAwarded,
-      0
-    );
-    const maxMarks = stepResults.reduce(
-      (sum, s) => sum + s.marksTotal,
-      0
-    );
+  switch (step.type) {
+    case "code-contains":
+      passedStep = code.includes(step.value);
+      break;
 
-    return res.json({
-      success: true,
-      passed,
-      total,
-      results,
-      stepResults,
-      totalMarks,
-      maxMarks,
-    });
-  } catch (err) {
-    console.error("🔥 EVALUATE ERROR", err);
-    res.status(500).json({
-      success: false,
-      error: err.response?.data || err.message,
-    });
+    case "code-regex":
+      passedStep = new RegExp(step.value).test(code);
+      break;
+
+    case "all-testcases-pass":
+      passedStep = passed === total;
+      break;
+
+    case "min-testcases-pass":
+      passedStep = passed >= step.minPassed;
+      break;
   }
-};
+
+  stepResults.push({
+    stepId: step.stepId,
+    label: step.label,
+    passed: passedStep,
+    marksAwarded: passedStep ? step.marks : 0,
+    marksTotal: step.marks,
+  });
+}
+
 
 /* ----------------------------------------------------
    5️⃣ LEADERBOARD

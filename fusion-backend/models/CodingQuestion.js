@@ -12,6 +12,8 @@ const testcaseSchema = new mongoose.Schema({
 // Evaluation Steps Schema
 // ----------------------
 const evaluationStepSchema = new mongoose.Schema({
+    stepId: { type: String, required: true },   // ✅ ADD THIS
+
   label: { type: String, required: true },
   type: {
     type: String,
