@@ -28,8 +28,9 @@ export const addCodingQuestion = async (req, res) => {
       expected: tc.expectedOutput || tc.expected || "",
     }));
 
-    const cleanedSteps = (evaluationSteps || []).map((s) => ({
-      stepId: s.stepId || `step_${index}`,   // ✅ ADD THIS
+    const cleanedSteps = (evaluationSteps || []).map((s, index) => ({
+  stepId: s.stepId || `step_${index}`,
+
 
       label: s.label,
       type: s.type,
@@ -197,51 +198,6 @@ for (const step of question.evaluationSteps) {
 /* ----------------------------------------------------
    5️⃣ LEADERBOARD
 ---------------------------------------------------- */
-export const getleaderboard = async (req, res) => {
-  try {
-    const leaders = await Submission.aggregate([
-      {
-        $group: {
-          _id: "$userId",
-          accepted: {
-            $sum: {
-              $cond: [{ $eq: ["$status", "Accepted"] }, 1, 0],
-            },
-          },
-          totalSubmissions: { $sum: 1 },
-          lastSubmission: { $max: "$createdAt" },
-        },
-      },
-      {
-        $addFields: {
-          accuracy: {
-            $multiply: [
-              { $divide: ["$accepted", "$totalSubmissions"] },
-              100,
-            ],
-          },
-        },
-      },
-      { $sort: { accuracy: -1, accepted: -1 } },
-    ]);
-
-    const withNames = await Promise.all(
-      leaders.map(async (item) => {
-        const user = await User.findById(item._id).select("name");
-        return {
-          userId: item._id,
-          username: user?.name || "Unknown User",
-          ...item,
-          accuracy: item.accuracy.toFixed(2),
-        };
-      })
-    );
-
-    res.json({ success: true, users: withNames });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-};
 
 /* ----------------------------------------------------
    6️⃣ TEACHER: GET ALL STUDENTS CODING RESULTS
