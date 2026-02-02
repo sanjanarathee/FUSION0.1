@@ -4,10 +4,11 @@ import {
   getCodingQuestions,
   deleteCodingQuestion,
   evaluateCode,
-  getleaderboard,
   getAllCodingResults,
   submitCode              // ✅ ADDED
 } from "../controllers/codingController.js";
+
+import { getLeaderboard } from "../controllers/leaderboardController.js";
 
 
 const router = express.Router();
@@ -41,7 +42,7 @@ router.post("/submit", submitCode);
 // -------------------------------------------------
 // 🏆 Leaderboard
 // -------------------------------------------------
-router.get("/leaderboard", getleaderboard);
+router.get("/leaderboard", getLeaderboard);
 
 // -------------------------------------------------
 // 📊 Teacher – Get all students coding results
