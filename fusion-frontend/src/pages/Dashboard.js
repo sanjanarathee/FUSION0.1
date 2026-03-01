@@ -22,7 +22,11 @@ export default function Dashboard() {
   }, [userData, role, navigate]);
 
   return (
+
+    
     <div className="dashboard-container">
+     
+
       <h1 className="dashboard-title">
         Welcome to <span className="fusion-text">Fusion Dashboard</span> 🎓
       </h1>
