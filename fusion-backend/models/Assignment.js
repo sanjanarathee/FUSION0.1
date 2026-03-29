@@ -9,7 +9,7 @@ const questionSchema = new mongoose.Schema({
 const assignmentSchema = new mongoose.Schema({
   unit: { type: Number, required: true },
 
-  // 🔑 ADD THIS
+  // 🔑 already present
   subject: {
     type: String,
     enum: ["c", "cpp"],
@@ -26,7 +26,19 @@ const assignmentSchema = new mongoose.Schema({
 
   questions: [questionSchema],
 
+  // ✅ ADD THESE TWO FIELDS
+  section: {
+    type: String,
+    required: true,
+  },
+
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+
   createdAt: { type: Date, default: Date.now },
+
 });
 
 export default mongoose.model("Assignment", assignmentSchema);

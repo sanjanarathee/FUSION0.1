@@ -4,14 +4,16 @@ import Performance from "../models/Performance.js";
 /* ================================================================
    🧩 TEACHER: CREATE ASSIGNMENT
 ================================================================ */
+import User from "../models/user.js";
+
 export const createAssignment = async (req, res) => {
   try {
-    const { unit, subject, title, description, questions, deadline } = req.body;
+    const { unit, subject, title, description, questions, deadline, teacherId, section } = req.body;
 
-    if (!title || !unit || !subject)
+    if (!title || !unit || !subject || !section)
       return res.status(400).json({
         success: false,
-        message: "Unit, subject (c/cpp) and title are required!",
+        message: "Unit, subject, title and section are required!",
       });
 
     if (!deadline)
@@ -26,6 +28,16 @@ export const createAssignment = async (req, res) => {
         message: "Questions are missing!",
       });
 
+    // ✅ Verify teacher is allowed for this section
+    const teacher = await User.findById(teacherId);
+
+    if (!teacher || !teacher.sections.includes(section)) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to create quiz for this section",
+      });
+    }
+
     const formattedQuestions = questions.map((q) => ({
       questionText: q.questionText || "",
       options: q.options || [],
@@ -34,11 +46,16 @@ export const createAssignment = async (req, res) => {
 
     const newAssignment = new Assignment({
       unit: Number(unit),
-      subject, // 🔑 c / cpp
+      subject,
       title,
       description: description || "",
       deadline: new Date(deadline),
       questions: formattedQuestions,
+
+      // ⭐ MOST IMPORTANT
+      section: section,
+      createdBy: teacherId,
+
       createdAt: new Date(),
     });
 
@@ -48,6 +65,7 @@ export const createAssignment = async (req, res) => {
       success: true,
       message: "Assignment created successfully!",
     });
+
   } catch (error) {
     console.error("❌ Error creating assignment:", error);
     res.status(500).json({
@@ -131,10 +149,31 @@ export const getAssignmentsByUnit = async (req, res) => {
 ================================================================ */
 export const getAssignment = async (req, res) => {
   try {
+    const { rollNumber } = req.query;
     const unit = Number(req.query.unit);
     const subject = req.query.subject;
 
-    const filter = {};
+    if (!rollNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Roll number required",
+      });
+    }
+
+    // ✅ Find student & get his section
+    const student = await User.findOne({ rollNumber });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    const filter = {
+      section: student.section,   // ⭐ MOST IMPORTANT LINE
+    };
+
     if (!isNaN(unit)) filter.unit = unit;
     if (subject) filter.subject = subject;
 
@@ -146,6 +185,7 @@ export const getAssignment = async (req, res) => {
       success: true,
       assignments,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -155,6 +195,7 @@ export const getAssignment = async (req, res) => {
   }
 };
 
+
 /* ================================================================
    🧠 STUDENT: SAVE PERFORMANCE (UNIT + SUBJECT SAFE)
 ================================================================ */
@@ -163,11 +204,29 @@ export const savePerformance = async (req, res) => {
     const { studentName, rollNumber, answers, unit, subject } = req.body;
     const numericUnit = Number(unit);
 
-    if (!subject)
-      return res.status(400).json({
+    // ✅ Get student section
+    const student = await User.findOne({ rollNumber });
+
+    if (!student) {
+      return res.status(404).json({
         success: false,
-        message: "Subject (c/cpp) is required",
+        message: "Student not found",
       });
+    }
+
+    // ✅ Find assignment ONLY of that section
+    const assignment = await Assignment.findOne({
+      unit: numericUnit,
+      subject,
+      section: student.section,   // ⭐ LOCK
+    });
+
+    if (!assignment) {
+      return res.status(404).json({
+        success: false,
+        message: "No assignment found for your section",
+      });
+    }
 
     const alreadyAttempted = await Performance.findOne({
       rollNumber,
@@ -179,17 +238,6 @@ export const savePerformance = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "You have already attempted this assignment!",
-      });
-
-    const assignment = await Assignment.findOne({
-      unit: numericUnit,
-      subject,
-    });
-
-    if (!assignment)
-      return res.status(404).json({
-        success: false,
-        message: "No assignment found for this unit & subject",
       });
 
     let correct = 0;
@@ -211,11 +259,12 @@ export const savePerformance = async (req, res) => {
     const performance = new Performance({
       studentName,
       rollNumber,
-      subject, // 🔑 c / cpp
+      subject,
       correct,
       wrong,
       accuracy,
       unit: numericUnit,
+      section: student.section,   // ⭐ SAVE SECTION
     });
 
     await performance.save();
@@ -226,7 +275,6 @@ export const savePerformance = async (req, res) => {
       performance,
     });
   } catch (error) {
-    console.error("⚠ Error saving performance:", error.message);
     res.status(500).json({
       success: false,
       message: "Error saving performance",
@@ -240,9 +288,27 @@ export const savePerformance = async (req, res) => {
 ================================================================ */
 export const getAllPerformances = async (req, res) => {
   try {
-    const { unit, subject } = req.query;
+    const { unit, subject, teacherId, section } = req.query;
 
-    const filter = {};
+    if (!teacherId || !section) {
+      return res.status(400).json({
+        success: false,
+        message: "Teacher and section required",
+      });
+    }
+
+    // ✅ Verify teacher allowed for this section
+    const teacher = await User.findById(teacherId);
+
+    if (!teacher || !teacher.sections.includes(section)) {
+      return res.status(403).json({
+        success: false,
+        message: "Not allowed to view this section data",
+      });
+    }
+
+    const filter = { section };
+
     if (unit) filter.unit = Number(unit);
     if (subject) filter.subject = subject;
 

@@ -8,20 +8,26 @@ export default function SubmissionResult() {
   const navigate = useNavigate();
 
   const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState("details"); // details | code | output
+  const [activeTab, setActiveTab] = useState("details");
   const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`https://fusion0-1.onrender.com/api/code/submission/${id}`)
-      .then((res) => setData(res.data.submission))
-      .catch(console.error);
-  }, [id]);
+  axios
+    .get(`http://localhost:5000/api/code/submission/${id}`)
+    .then((res) => {
+      console.log("FULL DATA:", res.data);   // 🔥 ADD
+      console.log("SUBMISSION:", res.data.submission);   // 🔥 ADD
+      console.log("STEP RESULTS:", res.data.submission?.stepResults);   // 🔥 ADD
+      
+      setData(res.data.submission);
+    })
+    .catch(console.error);
+}, [id]);
 
   if (!data) return <h2 className="loading-text">Loading submission...</h2>;
 
-  // runtime graph width (simple)
-  const runtimeMs = parseFloat(data.runtime); // "4ms" -> 4
+  // runtime graph
+  const runtimeMs = parseFloat(data.runtime) || 0;
   const maxRuntime = 100;
   const runtimeWidth = Math.max(
     10,
@@ -30,9 +36,16 @@ export default function SubmissionResult() {
 
   return (
     <div className={`submission-page ${isDark ? "theme-dark" : "theme-light"}`}>
+      
       {/* TOP BAR */}
       <div className="submission-topbar">
-        <h1 className={data.status === "Accepted" ? "status-badge success" : "status-badge fail"}>
+        <h1
+          className={
+            data.status === "Accepted"
+              ? "status-badge success"
+              : "status-badge fail"
+          }
+        >
           {data.status}
         </h1>
 
@@ -75,32 +88,59 @@ export default function SubmissionResult() {
         </button>
       </div>
 
-      {/* TAB CONTENTS */}
+      {/* DETAILS TAB */}
       {activeTab === "details" && (
         <div className="tab-content">
+
+          {/* STATS */}
           <div className="stats-container">
             <div className="stat-card">
               <h4>Runtime</h4>
-              <p>{data.runtime}</p>
+              <p>{data.runtime || "-"}</p>
             </div>
+
             <div className="stat-card">
               <h4>Memory</h4>
-              <p>{data.memory}</p>
+              <p>{data.memory || "-"}</p>
             </div>
+
             <div className="stat-card">
               <h4>Passed</h4>
-              <p>
-                {data.passed}/{data.total}
-              </p>
+              <p>{data.passed}/{data.total}</p>
             </div>
           </div>
 
-          {/* Simple runtime graph */}
+          {/* 🔥 STEP EVALUATION */}
+          {data.stepResults && (
+            <div className="step-evaluation-box">
+              <h3>Step Evaluation</h3>
+
+              {data.stepResults.map((step, index) => (
+                <div key={index} className="step-item">
+                  <p>
+                    <b>Step {index + 1}:</b> {step.label}
+                  </p>
+
+                  <p>
+                    {step.passed ? "✅ Pass" : "❌ Fail"}{" "}
+                    ({step.marksAwarded}/{step.maxMarks})
+                  </p>
+                </div>
+              ))}
+
+              <h2 className="total-score">
+                Total Score: {data.totalMarks} / {data.maxMarks}
+              </h2>
+            </div>
+          )}
+
+          {/* RUNTIME GRAPH */}
           <div className="runtime-graph">
             <div className="runtime-graph-header">
               <span>Runtime distribution</span>
               <span>Your runtime: {data.runtime}</span>
             </div>
+
             <div className="runtime-bar-bg">
               <div
                 className="runtime-bar-fill"
@@ -108,9 +148,11 @@ export default function SubmissionResult() {
               />
             </div>
           </div>
+
         </div>
       )}
 
+      {/* CODE TAB */}
       {activeTab === "code" && (
         <div className="tab-content">
           <h2 className="code-title">Submitted Code</h2>
@@ -120,9 +162,11 @@ export default function SubmissionResult() {
         </div>
       )}
 
+      {/* OUTPUT TAB */}
       {activeTab === "output" && (
         <div className="tab-content">
           <h2 className="code-title">Output Summary</h2>
+
           <div className="output-box">
             {data.status === "Accepted" ? (
               <p>All testcases passed successfully ✅</p>
@@ -131,9 +175,11 @@ export default function SubmissionResult() {
                 {data.passed} out of {data.total} testcases passed.
               </p>
             )}
+
             <p>
               <b>Language:</b> {data.language?.toUpperCase() || "C"}
             </p>
+
             <p>
               <b>Submitted at:</b>{" "}
               {new Date(data.createdAt).toLocaleString()}

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./PageStyles.css";
+const user = JSON.parse(localStorage.getItem("fusionUser"));
+
 
 export default function CreateAssignment() {
   const navigate = useNavigate();
@@ -14,6 +16,8 @@ export default function CreateAssignment() {
   const [title, setTitle] = useState("");
   const [deadline, setDeadline] = useState("");
   const [description, setDescription] = useState("");
+  const [section, setSection] = useState("");
+
 
   const [questions, setQuestions] = useState(
     Array.from({ length: 10 }, () => ({
@@ -90,13 +94,17 @@ export default function CreateAssignment() {
     }
 
     try {
-        await axios.post("https://fusion0-1.onrender.com/api/assignments/create", {
-        unit: Number(unit),
-        title,
-        description,
-        deadline,
-        questions,
-      });
+        await axios.post("http://localhost:5000/api/assignments/create", {
+
+  unit: Number(unit),
+  title,
+  description,
+  deadline,
+  questions,
+  teacherId: user.id,
+  section: section,
+});
+
 
       setMsg("✅ Assignment published successfully!");
 
@@ -130,6 +138,27 @@ export default function CreateAssignment() {
           <option value={4}>Unit 4</option>
         </select>
       </div>
+      {/* SECTION */}
+<div style={{ marginTop: 20, marginBottom: 30 }}>
+  <label style={{ color: "white", fontWeight: "bold" }}>
+    🏫 Section:
+  </label>
+  <select
+    value={section}
+    onChange={(e) => setSection(e.target.value)}
+    className="dropdown"
+    style={{ marginLeft: 10 }}
+    required
+  >
+    <option value="">Select Section</option>
+    {user.sections.map((sec) => (
+      <option key={sec} value={sec}>
+        {sec}
+      </option>
+    ))}
+  </select>
+</div>
+
 
       {/* TITLE */}
       <div style={{ marginBottom: 25 }}>

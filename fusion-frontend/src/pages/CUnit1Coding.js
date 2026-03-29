@@ -15,6 +15,7 @@ export default function CUnit1Coding() {
   const [canSubmit, setCanSubmit] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
 
   const templates = useMemo(() => ({
   c: `#include <stdio.h>
@@ -29,9 +30,16 @@ using namespace std;
 int main() {
     // Write your C++ code here
     return 0;
-}`
-}), []);
+}`,
+  python: `# Write your Python code here
 
+def main():
+    pass
+
+if __name__ == "__main__":
+    main()
+`
+}), []);
 
   const getStorageKey = (qId, lang) => `fusion_code_${qId}_${lang}`;
 
@@ -54,47 +62,51 @@ int main() {
   // 🔥 Fetch coding questions
   useEffect(() => {
   axios
-    .get("https://fusion0-1.onrender.com/api/coding/practice?language=c")
+    .get(`https://fusion0-1.onrender.com/api/coding/practice?language=${language}`)
     .then((res) => setQuestions(res.data.questions || []))
     .catch(console.error);
-}, []);
+}, [language]);
 
 
   // -------------------- RUN CODE --------------------
   const runCode = async () => {
-    if (!selected) {
-      alert("Select a question first!");
+  if (!selected) {
+    alert("Select a question first!");
+    return;
+  }
+
+  try {
+    setIsRunning(true);
+    setCanSubmit(false);
+
+    const res = await axios.post("http://localhost:5000/api/coding/run", {
+      code,
+      language,
+      questionId: selected._id,
+    });
+
+    console.log("FULL RESPONSE:", res);
+
+    // ✅ Safety check
+    if (!res || !res.data) {
+      alert("No response from server");
       return;
     }
 
-    try {
-      setIsRunning(true);
-      setCanSubmit(false);
+    setResult(res.data);
 
-      const res = await axios.post("https://fusion0-1.onrender.com/api/coding/run", {
-        code,
-        language,
-        questionId: selected._id,
-      });
+    const allPassed =
+      res.data.testcasesPassed === res.data.totalTestcases;
 
-      setResult(res.data);
+    setCanSubmit(allPassed);
 
-      if (
-        res.data.success &&
-        res.data.testcasesPassed === res.data.totalTestcases
-      ) {
-        setCanSubmit(true);
-      } else {
-        setCanSubmit(false);
-      }
-    } catch (err) {
-      console.error("Run error:", err);
-      alert("Run error");
-    } finally {
-      setIsRunning(false);
-    }
-  };
-
+  } catch (err) {
+    console.error("Run error:", err);
+    alert("Run failed (check backend)");
+  } finally {
+    setIsRunning(false);
+  }
+};
   // -------------------- SUBMIT CODE --------------------
   const handleSubmit = async () => {
     if (!selected) {
@@ -118,22 +130,17 @@ int main() {
         code,
         language,
         questionId: selected._id,
-        userId: localStorage.getItem("userId"),
-
+userId: localStorage.getItem("userId") || "guest_user",
         // ✅ corrected keys for backend
-        passed: result.passed,
-total: result.total,
+        passed: result.testcasesPassed,
+total: result.totalTestcases,
 
 
         totalMarks: result.totalMarks,
         maxMarks: result.maxMarks,
       };
 
-      const res = await axios.post(
-        "https://fusion0-1.onrender.com/api/coding/submit",
-        payload
-      );
-
+const res = await axios.post("http://localhost:5000/api/code/submit", payload);
       if (res.data && res.data.success) {
         alert("✅ Accepted! All testcases passed.");
 
@@ -252,6 +259,7 @@ total: result.total,
               >
                 <option value="c">C</option>
                 <option value="cpp">C++</option>
+                <option value="python">Python</option>
               </select>
 
               <button className="editor-action-btn" onClick={resetTemplate}>
@@ -266,15 +274,20 @@ total: result.total,
             </div>
 
             <div style={{ height: "420px", maxHeight: "420px" }}>
-              <Editor
-                height="100%"
-                theme="vs-dark"
-                language={language}
-                value={code}
-                onChange={handleCodeChange}
-              />
-            </div>
-
+             <Editor
+  height="100%"
+  theme="vs-dark"
+  language={
+    language === "cpp"
+      ? "cpp"
+      : language === "c"
+      ? "c"
+      : "python"
+  }
+  value={code}
+  onChange={handleCodeChange}
+/>
+</div>
             <div className="editor-buttons">
               <button
                 className="run-btn"
@@ -310,7 +323,7 @@ total: result.total,
               <div className="results-box">
                 <h3>Results</h3>
                 <p>
-  Passed: {result.passed} / {result.total}
+   Passed: {result.testcasesPassed} / {result.totalTestcases}
 </p>
 
 

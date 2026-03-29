@@ -1,6 +1,7 @@
 import CodingQuestion from "../models/CodingQuestion.js";
 import axios from "axios";
 import Submission from "../models/Submission.js";
+
 import User from "../models/user.js";
 
 /* 1️⃣ ADD CODING PRACTICE QUESTION */
@@ -75,8 +76,23 @@ export const deleteCodingQuestion = async (req, res) => {
 /* 4️⃣ EVALUATE CODE */
 export const evaluateCode = async (req, res) => {
   try {
+    console.log("🔥 evaluateCode API HIT");
     const { code, language, questionId } = req.body;
-    const langId = language === "cpp" ? 54 : 50;
+
+    let langId;
+
+    if (language === "c") {
+      langId = 50;
+    } 
+    else if (language === "cpp") {
+      langId = 54;
+    } 
+    else if (language === "python") {
+      langId = 71;
+    } 
+    else {
+      return res.json({ success: false, message: "Unsupported language" });
+    }
 
     const question = await CodingQuestion.findById(questionId);
     if (!question) return res.json({ success: false });
@@ -105,6 +121,11 @@ export const evaluateCode = async (req, res) => {
         outputData = poll.data;
         if (outputData.status.id > 2) break;
       }
+      console.log("Language:", language);
+      console.log("LangId:", langId);
+      console.log("Judge0 Status:", outputData.status);
+      console.log("Stdout:", outputData.stdout);
+      console.log("Stderr:", outputData.stderr);
 
       const output = outputData.stdout
         ? Buffer.from(outputData.stdout, "base64").toString().trim().toLowerCase()
@@ -123,14 +144,68 @@ export const evaluateCode = async (req, res) => {
       });
     }
 
-    res.json({ success: true, passed, total, results });
+// ✅ STEP EVALUATION ADD (PASTE HERE)
+let stepResults = [];
+let totalMarks = 0;
 
+const allPassed = passed === total;
+
+if (question.evaluationSteps && question.evaluationSteps.length > 0) {
+  question.evaluationSteps.forEach((step) => {
+    let isPassed = false;
+
+    if (step.type === "Code contains substring") {
+      isPassed = code.includes(step.value);
+    }
+
+    if (step.type === "Code matches regex") {
+      const regex = new RegExp(step.value);
+      isPassed = regex.test(code);
+    }
+
+    if (step.type === "all-testcases-pass") {
+      isPassed = allPassed;
+    }
+
+    const marksAwarded = isPassed ? step.marks : 0;
+    totalMarks += marksAwarded;
+
+    stepResults.push({
+      label: step.label,
+      passed: isPassed,
+      marksAwarded,
+      marksTotal: step.marks
+    });
+  });
+}
+
+res.json({
+  success: true,
+  testcasesPassed: passed,
+  totalTestcases: total,
+  results,
+  stepResults,   // 🔥 ADD
+  totalMarks     // 🔥 ADD
+});
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
 /* 5️⃣ TEACHER RESULTS */
+export const updateCodingQuestion = async (req, res) => {
+  try {
+
+    await CodingQuestion.findByIdAndUpdate(
+      req.params.id,
+      req.body
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+};
 export const getAllCodingResults = async (req, res) => {
   try {
     const results = await Submission.find()
@@ -144,26 +219,4 @@ export const getAllCodingResults = async (req, res) => {
   }
 };
 
-/* 6️⃣ SUBMIT CODE */
-export const submitCode = async (req, res) => {
-  try {
-    const { userId, questionId, code, language, passed, total } = req.body;
 
-    const status = passed === total ? "Accepted" : "Wrong Answer";
-
-    const submission = new Submission({
-      userId,
-      questionId,
-      code,
-      language,
-      status,
-      passed,
-      total,
-    });
-
-    await submission.save();
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false });
-  }
-};

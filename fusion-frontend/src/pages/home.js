@@ -14,9 +14,12 @@ export default function Home() {
           <Link to="/login">
             <button className="fusion-btn login-btn">Login</button>
           </Link>
-          <Link to="/signup">
-            <button className="fusion-btn signup-btn">Signup</button>
-          </Link>
+
+          {/* 🔑 Replaced Signup with Set Password */}
+         <Link to="/register">
+  <button className="fusion-btn signup-btn">Register</button>
+</Link>
+
         </div>
       </div>
 

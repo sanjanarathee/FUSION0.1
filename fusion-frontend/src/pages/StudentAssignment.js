@@ -27,8 +27,10 @@ export default function StudentAssignment() {
       try {
         // 🔥 FIX 2: Use CORRECT STUDENT API
         const res = await axios.get(
-          `https://fusion0-1.onrender.com/api/assignments/student?unit=${selectedUnit}`
-        );
+  `http://localhost:5000/api/assignments/student?unit=${selectedUnit}`
+);
+
+
 
         setAssignments(res.data.assignments || []);
       } catch (err) {
@@ -36,10 +38,11 @@ export default function StudentAssignment() {
       }
     };
 
-    if (selectedUnit) {
-      fetchAssignments();
-    }
-  }, [selectedUnit]);
+    if (selectedUnit && rollNumber) {
+  fetchAssignments();
+}
+
+  }, [selectedUnit, rollNumber]);
 
   const handleOptionSelect = (qIndex, option) => {
     setAnswers({ ...answers, [qIndex]: option });

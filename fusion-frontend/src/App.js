@@ -4,9 +4,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
    🔹 CORE PAGES
 =========================== */
 import Home from "./pages/home";
-import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import SetPassword from "./pages/SetPassword";
+
+
+
 
 /* ===========================
    🔹 STUDENT – LEARNING
@@ -44,9 +47,15 @@ import CCodingPractice from "./pages/CCodingPractices";
 /* ⭐ Dynamic Notes Page */
 import StudentNotes from "./pages/StudentNotes";
 
+
 /* ===========================
    🔹 TEACHER – DASHBOARD
 =========================== */
+import Register from "./pages/Register";
+import TeacherSignup from "./pages/TeacherSignup";
+
+import AdminDashboard from "./pages/AdminDashboard";
+
 import TeacherDashboard from "./pages/TeacherDashboard";
 import ManageCLanguage from "./pages/ManageCLanguage";
 import ManageCppLanguage from "./pages/ManageCppLanguage";
@@ -170,13 +179,21 @@ function App() {
             AUTH
         ====================== */}
         <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/set-password" element={<SetPassword />} />
+        
+
 
         {/* ======================
             STUDENT
         ====================== */}
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/teacher-signup" element={<TeacherSignup />} />
+
+
+
         <Route path="/learn-c" element={<LearnC />} />
         <Route path="/learn-cpp" element={<LearnCpp />} />
 

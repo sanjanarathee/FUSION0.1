@@ -25,11 +25,13 @@ const app = express();
 // ------------------------------
 app.use(
   cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "http://localhost:3000",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
   })
 );
+
 
 
 app.use(express.json());
@@ -38,7 +40,6 @@ app.use(express.json());
 // ✅ Basic Routes
 // ------------------------------
 app.use("/api/seed", seedRoutes);
-app.use("/api/code", submitRoutes);
 app.use("/api/notes", notesRoutes);
 
 // ------------------------------

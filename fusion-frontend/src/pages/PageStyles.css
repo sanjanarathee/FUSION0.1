@@ -2939,3 +2939,257 @@ select.clean-input option {
     transform: translateY(0);
   }
 }
+/* ================= ADMIN DASHBOARD ================= */
+
+.admin-container {
+  padding: 40px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: white;
+}
+
+.admin-title {
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+.empty-state {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 18px;
+  backdrop-filter: blur(10px);
+}
+
+.teacher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.teacher-card {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  transition: 0.3s ease;
+}
+
+.teacher-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.teacher-card h3 {
+  margin-bottom: 8px;
+}
+
+.approve-btn {
+  margin-top: 12px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  background: #00c853;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.approve-btn:hover {
+  background: #00e676;
+}
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background: #ff5252;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: #ff1744;
+}
+.teacher-card.approved {
+  border: 2px solid green;
+}
+.teacher-card p strong {
+  color: #00c853;
+}
+ /* MAIN CONTAINER */
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+/* HEADER BAR */
+.dashboard-header {
+  width: 100%;
+  height: 65px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* PROFILE SECTION (LEFT) */
+.header-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* AVATAR */
+.profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}
+
+/* PROFILE TEXT */
+.profile-details h4 {
+  margin: 0;
+  font-size: 14px;
+  color: white;
+}
+
+.profile-details p {
+  margin: 0;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.branch-text {
+  font-size: 11px;
+  color: #4da6ff;
+}
+
+/* LOGOUT BUTTON (RIGHT) */
+.header-logout {
+  background: #ff4d4d;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.3s ease;
+}
+
+.header-logout:hover {
+  background: #e60000;
+}
+
+/* CONTENT AREA */
+.dashboard-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;   /* 👈 center ki jagah flex-start */
+  align-items: center;
+  gap: 25px;
+  text-align: center;
+  padding-top: 120px;            /* 👈 yaha se control hoga */
+}
+.step-box {
+  margin-top: 20px;
+  padding: 20px;
+  background: #1e293b;
+  border-radius: 12px;
+  border: 1px solid #334155;
+}
+
+.step-title {
+  color: #38bdf8;
+  margin-bottom: 15px;
+}
+
+.step-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #334155;
+}
+
+.step-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step-text {
+  font-size: 14px;
+}
+
+.step-right {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.step-total {
+  margin-top: 15px;
+  text-align: right;
+  font-weight: bold;
+  color: #22c55e;
+}
+/* 🔥 FORCE CLEAN STEP UI */
+.step-box-clean {
+  margin-top: 20px;
+  padding: 20px;
+  background: #1e293b !important;
+  border-radius: 12px;
+}
+
+.step-box-clean h3 {
+  text-align: center;
+  color: #38bdf8;
+  margin-bottom: 15px;
+}
+
+.step-row-clean {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #334155;
+}
+
+.step-row-clean .left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.step-row-clean .right {
+  color: #94a3b8;
+}
+
+.total-clean {
+  margin-top: 15px;
+  text-align: right;
+  color: #22c55e;
+  font-weight: bold;
+}

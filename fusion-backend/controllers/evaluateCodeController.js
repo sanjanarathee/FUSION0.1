@@ -9,15 +9,15 @@ const normalize = (str) => {
   if (!str) return "";
   return str
     .toString()
+    .replace(/\n/g, " ") 
     .replace(/\r/g, "")
     .replace(/\n/g, "")
     .replace(/\t/g, "")
     .replace(/\u00A0/g, "")
     .replace(/\u200B/g, "")
-    .trim()
-    .toLowerCase();
+    .replace(/\s+/g, " ")   // 🔥 remove extra spaces
+    .trim();
 };
-
 /* -----------------------------------------
    Strip ONLY comments (safe for regex)
 ------------------------------------------*/
@@ -43,8 +43,13 @@ export const evaluateCode = async (req, res) => {
     if (!question)
       return res.json({ success: false, message: "Question not found" });
 
-    const langId = language === "c" ? 50 : 54;
+    let langId;
+const lang = language.toLowerCase();
 
+if (lang === "c") langId = 50;
+else if (lang === "cpp") langId = 54;
+else if (lang === "python") langId = 63;
+else return res.json({ success: false, message: "Unsupported language" });
     let passed = 0;
     const total = question.testcases.length;
     const testcaseResults = [];
@@ -54,7 +59,12 @@ export const evaluateCode = async (req, res) => {
     ---------------------------------------------------------- */
     for (let tc of question.testcases) {
       const input = tc.input || "";
-      const expected = tc.expected || "";
+      const expected = (tc.expected || "")
+  .toString()
+  .replace(/\n/g, " ")
+  .replace(/\r/g, "")
+  .replace(/\s+/g, " ")
+  .trim();
 
       const submitRes = await axios.post(
         "https://ce.judge0.com/submissions/?base64_encoded=true&wait=false",
@@ -75,14 +85,41 @@ export const evaluateCode = async (req, res) => {
         result = poll.data;
 
         if (result.status.id !== 1 && result.status.id !== 2) break;
+        console.log("FULL RESULT:", result);
       }
 
-      const rawOutput = result.stdout
-        ? Buffer.from(result.stdout, "base64").toString("utf8")
-        : "";
+      let rawOutput = "";
 
-      const output = rawOutput.trim();
-      const isCorrect = normalize(output) === normalize(expected);
+if (result.stdout) {
+  rawOutput = Buffer.from(result.stdout, "base64").toString("utf8");
+} else if (result.stderr) {
+  rawOutput = Buffer.from(result.stderr, "base64").toString("utf8");
+} else if (result.compile_output) {
+  rawOutput = Buffer.from(result.compile_output, "base64").toString("utf8");
+}
+
+      const output = rawOutput;
+
+// 🔥 FINAL FIX (newline + format safe)
+const normalizeString = (str) =>
+  str
+    .toString()
+    .replace(/\n/g, " ")
+    .replace(/\r/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const cleanOutput = normalizeString(output);
+const cleanExpected = normalizeString(expected);
+
+// 🔥 FINAL HARD FIX (remove ALL hidden chars)
+const finalOutput = cleanOutput.replace(/\s/g, "");
+const finalExpected = cleanExpected.replace(/\s/g, "");
+
+console.log("FINAL OUTPUT:", `"${finalOutput}"`);
+console.log("FINAL EXPECTED:", `"${finalExpected}"`);
+
+const isCorrect = finalOutput === finalExpected;
 
       if (isCorrect) passed++;
 
@@ -188,8 +225,13 @@ export const evaluateCode = async (req, res) => {
 ============================================================ */
 export const runSingleTestcase = async (code, language, input) => {
   try {
-    const langId = language === "c" ? 50 : 54;
+let langId;
+const lang = (language || "").toString().toLowerCase();
 
+if (lang === "c") langId = 50;
+else if (lang === "cpp") langId = 54;
+else if (lang === "python") langId = 63;
+else throw new Error("Unsupported language");
     const submitRes = await axios.post(
       "https://ce.judge0.com/submissions/?base64_encoded=true&wait=false",
       {
@@ -215,11 +257,11 @@ export const runSingleTestcase = async (code, language, input) => {
       ? Buffer.from(result.stdout, "base64").toString("utf8").trim()
       : "";
 
-    return { output };
+    return output;
 
   } catch (err) {
     console.error("❌ runSingleTestcase Error:", err);
-    return { output: "" };
+    return "";
   }
 };
 
@@ -239,16 +281,17 @@ export const submitCode = async (req, res) => {
     const total = evaluation.totalTestcases;
 
     const submission = await Submission.create({
-      userId,
-      questionId,
-      code,
-      language,
-      passedCount: passed,
-      totalCount: total,
-      status: passed === total ? "Accepted" : "Wrong Answer",
-      totalMarks: evaluation.totalMarks,
-      maxMarks: evaluation.maxMarks,
-    });
+  userId,
+  questionId,
+  code,
+  language,
+  passedCount: passed,
+  totalCount: total,
+  status: passed === total ? "Accepted" : "Wrong Answer",
+  totalMarks: evaluation.totalMarks,
+  maxMarks: evaluation.maxMarks,
+  stepResults: evaluation.stepResults   // 🔥🔥 ADD THIS
+});
 
     return res.json({
       success: true,
