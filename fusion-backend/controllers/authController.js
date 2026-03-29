@@ -5,58 +5,67 @@ import User from "../models/user.js";
 
 dotenv.config();
 
+
 // =================== SIGNUP ===================
 export const signup = async (req, res) => {
   try {
-    const { name, email, password, role, extraField } = req.body;
+    const { name, email, password, role, sections, rollNumber, section } = req.body;
 
     console.log("📥 Signup Request Received:", req.body);
 
-    // ✅ Validate required fields
     if (!name || !email || !password || !role) {
-      console.log("❌ Missing required fields");
       return res.status(400).json({ msg: "All required fields must be filled" });
     }
 
-    // ✅ Normalize email
+    if (role === "admin") {
+      return res.status(403).json({ msg: "Admin cannot be created publicly" });
+    }
+
     const normalizedEmail = email.toLowerCase().trim();
 
-    // ✅ Check if user already exists
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
-      console.log("⚠️ User already exists:", normalizedEmail);
       return res.status(400).json({ msg: "User already exists" });
     }
 
-    // ✅ Hash password securely
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("🔐 Password hashed successfully for:", normalizedEmail);
+    const finalRole =
+  process.env.TEST_MODE === "true" && role === "student"
+    ? "test_student"
+    : role;
 
-    // ✅ Create new user object
-    const newUser = new User({
-      name,
-      email: normalizedEmail,
-      password: hashedPassword,
-      role,
-      extraField,
-    });
+const newUser = new User({
+  name,
+  email: normalizedEmail,
+  password: hashedPassword,
+  role: finalRole,
+  sections: finalRole === "teacher" ? sections : undefined,
+  rollNumber:
+    finalRole === "student" || finalRole === "test_student"
+      ? rollNumber
+      : undefined,
+  section:
+    finalRole === "student" || finalRole === "test_student"
+      ? section
+      : undefined,
+});
 
-    // ✅ Save user in database
     await newUser.save();
-    console.log(`✅ New ${role} saved in DB:`, normalizedEmail);
 
     return res.status(200).json({
-      msg: "User signup successful!",
+      msg: role === "teacher"
+        ? "Registration request sent. Wait for admin approval."
+        : "Signup successful!",
       user: {
-  _id: newUser._id,     // ✅ FIXED
-  name: newUser.name,
-  email: newUser.email,
-  role: newUser.role,
-},
-
+        _id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+      },
     });
+
   } catch (error) {
-    console.error("🔥 Signup Error Details:", error);
+    console.error("🔥 Signup Error:", error);
     return res.status(500).json({
       msg: "Signup failed, try again!",
       error: error.message,
@@ -64,69 +73,67 @@ export const signup = async (req, res) => {
   }
 };
 
+
+
 // =================== LOGIN ===================
 export const login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { identifier, password } = req.body;
 
-    console.log("📥 Login Request Received:", req.body);
-
-    // ✅ Validate fields
-    if (!email || !password || !role) {
-      console.log("❌ Missing fields");
+    if (!identifier || !password) {
       return res.status(400).json({ msg: "Please enter all fields" });
     }
 
-    // ✅ Normalize email
-    const normalizedEmail = email.toLowerCase().trim();
+    const cleanIdentifier = identifier.trim();
 
-    // ✅ Find user by email
-    const user = await User.findOne({ email: normalizedEmail });
+    console.log("LOGIN TRY:", cleanIdentifier);
+
+
+    const user = await User.findOne({
+      $or: [
+        { email: cleanIdentifier.toLowerCase() },
+        { rollNumber: cleanIdentifier }
+      ]
+    });
+
     if (!user) {
-      console.log("❌ User not found:", normalizedEmail);
       return res.status(400).json({ msg: "User not found!" });
     }
 
-    // ✅ Check if role matches
-    if (user.role !== role) {
-      console.log(`❌ Role mismatch: tried '${role}' but user is '${user.role}'`);
-      return res.status(400).json({ msg: "Invalid role selected!" });
+    // ✅ STUDENT: password set nahi hai
+    if (user.role === "student" && !user.password) {
+      return res.status(400).json({
+        msg: "Please set your password first"
+      });
     }
 
-    // ✅ Compare password
+    // ✅ TEACHER: approval required
+    if (user.role === "teacher" && !user.isApproved) {
+      return res.status(403).json({
+        msg: "Wait for admin approval"
+      });
+    }
+
     const isMatch = await bcrypt.compare(password.trim(), user.password);
-    console.log("🧩 Password match result:", isMatch);
 
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid credentials!" });
     }
 
-    // ✅ Generate JWT Token
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    console.log(`✅ ${role} login successful:`, normalizedEmail);
-
-    return res.status(200).json({
-  msg: "Login successful!",
-  token,
-  user: {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    rollNumber: user.extraField   // 🔥 ADD THIS
-  },
-});
+    res.json({
+      msg: "Login successful",
+      token,
+      user
+    });
 
   } catch (error) {
-    console.error("🔥 Login Error Details:", error);
-    return res.status(500).json({
-      msg: "Login failed, try again!",
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ msg: "Login failed" });
   }
 };

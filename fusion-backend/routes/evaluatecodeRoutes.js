@@ -29,8 +29,13 @@ router.post("/submit", async (req, res) => {
       const expected = (tc.expected || tc.sampleOutput || "").toString().trim();
 
       const output = await runSingleTestcase(code, language, input);
+      output = output
+  ? Buffer.from(output, "base64").toString("utf-8")
+  : "";
 
-      if (output === expected) passed++;
+output = output.trim();
+
+      if (output.trim() === expected.trim()) passed++;
     }
 
     const status = passed === total ? "Accepted" : "Wrong Answer";

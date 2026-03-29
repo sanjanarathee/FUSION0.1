@@ -5,10 +5,13 @@ import {
   deleteCodingQuestion,
   evaluateCode,
   getAllCodingResults,
-  submitCode              // ✅ ADDED
+       
+   updateCodingQuestion          // ✅ ADDED
 } from "../controllers/codingController.js";
+import { submitCode } from "../controllers/evaluateCodeController.js";
 
 import { getLeaderboard } from "../controllers/leaderboardController.js";
+import { getSubmissionById } from "../controllers/submitCodeController.js";
 
 
 const router = express.Router();
@@ -24,6 +27,10 @@ router.post("/add", addCodingQuestion);
 // -------------------------------------------------
 router.get("/practice", getCodingQuestions);
 
+// -------------------------------------------------
+// 📄 Get single submission (IMPORTANT 🔥)
+// -------------------------------------------------
+router.get("/submission/:id", getSubmissionById);
 // -------------------------------------------------
 // ❌ Delete coding question
 // -------------------------------------------------
@@ -48,5 +55,6 @@ router.get("/leaderboard", getLeaderboard);
 // 📊 Teacher – Get all students coding results
 // -------------------------------------------------
 router.get("/results", getAllCodingResults);
+router.put("/update/:id", updateCodingQuestion);
 
 export default router;

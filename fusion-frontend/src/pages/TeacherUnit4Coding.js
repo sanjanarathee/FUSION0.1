@@ -3,6 +3,9 @@ import axios from "axios";
 import "./PageStyles.css";
 
 export default function TeacherUnit4Coding() {
+
+  // 🔹 Title + Description
+  const [title, setTitle] = useState("");
   const [question, setQuestion] = useState("");
 
   // 🔹 Multiple Testcases
@@ -16,13 +19,14 @@ export default function TeacherUnit4Coding() {
   const [allQuestions, setAllQuestions] = useState([]);
 
   // ============================
-  // 🔥 FETCH ALL QUESTIONS (UNIT 4)
+  // 🔥 FETCH ALL QUESTIONS
   // ============================
   const fetchQuestions = async () => {
     try {
       const res = await axios.get(
-        "https://fusion0-1.onrender.com/api/coding/get?unit=Unit 4"
-      );
+  "https://fusion0-1.onrender.com/api/coding/practice",
+  { params: { language: "c" } }
+);
       setAllQuestions(res.data.questions || []);
     } catch (error) {
       console.error("Error loading questions:", error);
@@ -72,7 +76,10 @@ export default function TeacherUnit4Coding() {
   // 🔥 ADD QUESTION
   // ============================
   const handleSubmit = async () => {
-    if (!question) return alert("Please enter the question!");
+
+    if (!title || !question) {
+      return alert("Please enter title and question description!");
+    }
 
     for (let tc of testcases) {
       if (!tc.input || !tc.output) {
@@ -82,24 +89,22 @@ export default function TeacherUnit4Coding() {
 
     for (let s of steps) {
       if (!s.label || !s.type) {
-        return alert("Please fill all evaluation step fields or remove empty ones.");
+        return alert("Please fill all evaluation step fields.");
       }
       if (!s.marks || Number(s.marks) <= 0) {
-        return alert("Marks in each step should be > 0");
-      }
-      if ((s.type === "code-contains" || s.type === "code-regex") && !s.value) {
-        return alert("Please provide 'value' for code-based steps.");
-      }
-      if (s.type === "min-testcases-pass" && !s.minPassed) {
-        return alert("Please provide 'minimum testcases to pass'");
+        return alert("Marks should be greater than 0");
       }
     }
 
     try {
       await axios.post("https://fusion0-1.onrender.com/api/coding/add", {
-        unit: "Unit 4",
-        title: question,
+
+        
+
+        // 🔹 Correct Title + Description
+        title: title,
         description: question,
+
         language: "c",
 
         testcases: testcases.map((tc) => ({
@@ -112,7 +117,9 @@ export default function TeacherUnit4Coding() {
           label: s.label,
           type: s.type,
           value:
-            s.type === "all-testcases-pass" ? undefined : (s.value || ""),
+            s.type === "all-testcases-pass"
+              ? undefined
+              : (s.value || ""),
           minPassed:
             s.type === "min-testcases-pass"
               ? Number(s.minPassed || 0)
@@ -123,10 +130,13 @@ export default function TeacherUnit4Coding() {
 
       alert("✅ Coding Question Added!");
 
+      setTitle("");
       setQuestion("");
       setTestcases([{ input: "", output: "", visible: true }]);
       setSteps([]);
+
       fetchQuestions();
+
     } catch (err) {
       console.error(err);
       alert("Something went wrong!");
@@ -140,9 +150,14 @@ export default function TeacherUnit4Coding() {
     if (!window.confirm("Delete this question?")) return;
 
     try {
-      await axios.delete(`https://fusion0-1.onrender.com/api/coding/delete/${id}`);
+      await axios.delete(
+        `https://fusion0-1.onrender.com/api/coding/delete/${id}`
+      );
+
       fetchQuestions();
+
       alert("Question deleted!");
+
     } catch (err) {
       console.error("Delete error:", err);
       alert("Error deleting question");
@@ -151,21 +166,33 @@ export default function TeacherUnit4Coding() {
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">💻 Add Coding Practice Question (Unit 4)</h1>
 
-      {/* ---------- QUESTION ---------- */}
+      <h1 className="learn-title">
+        💻 Add Coding Practice Question (Unit 4)
+      </h1>
+
+      {/* ---------- TITLE ---------- */}
+      <input
+        className="clean-input"
+        value={title}
+        placeholder="Enter Question Title..."
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      {/* ---------- DESCRIPTION ---------- */}
       <textarea
         className="clean-input"
         value={question}
-        placeholder="Enter coding question..."
+        placeholder="Enter full coding question description..."
         onChange={(e) => setQuestion(e.target.value)}
       />
 
-      {/* ---------- MULTIPLE TESTCASES ---------- */}
+      {/* ---------- TESTCASES ---------- */}
       <h3 style={{ marginTop: "20px" }}>🧪 Testcases</h3>
 
       {testcases.map((tc, index) => (
         <div key={index} className="tc-box" style={{ marginBottom: "15px" }}>
+
           <textarea
             className="clean-input"
             placeholder={`Testcase ${index + 1} Input`}
@@ -197,9 +224,10 @@ export default function TeacherUnit4Coding() {
                 updated[index].visible = e.target.checked;
                 setTestcases(updated);
               }}
-            />{" "}
+            />
             Visible to Students
           </label>
+
         </div>
       ))}
 
@@ -207,96 +235,90 @@ export default function TeacherUnit4Coding() {
         ➕ Add More Testcase
       </button>
 
-      {/* ---------- STEP-BY-STEP RULES ---------- */}
-      <h3 style={{ marginTop: "30px" }}>🧩 Step-by-Step Evaluation Rules</h3>
+      {/* ---------- STEP RULES ---------- */}
+      <h3 style={{ marginTop: "30px" }}>
+        🧩 Step-by-Step Evaluation Rules
+      </h3>
 
       {steps.map((step, index) => (
-        <div
-          key={index}
-          className="tc-box"
-          style={{ marginBottom: "15px", padding: "15px" }}
-        >
-          <div style={{ marginBottom: "8px" }}>
-            <label>Step Label</label>
-            <input
-              className="clean-input"
-              value={step.label}
-              placeholder="e.g. Uses scanf()"
-              onChange={(e) => updateStepField(index, "label", e.target.value)}
-            />
-          </div>
+        <div key={index} className="tc-box">
 
-          <div style={{ marginBottom: "8px" }}>
-            <label>Step Type</label>
-            <select
-              className="clean-input"
-              value={step.type}
-              onChange={(e) => updateStepField(index, "type", e.target.value)}
-            >
-              <option value="code-contains">Code contains substring</option>
-              <option value="code-regex">Code matches regex</option>
-              <option value="all-testcases-pass">All testcases pass</option>
-              <option value="min-testcases-pass">Minimum testcases passed</option>
-            </select>
-          </div>
+          <input
+            className="clean-input"
+            placeholder="Step Label"
+            value={step.label}
+            onChange={(e) =>
+              updateStepField(index, "label", e.target.value)
+            }
+          />
 
+          <select
+         
+
+            className="clean-input"
+            value={step.type}
+            onChange={(e) =>
+              updateStepField(index, "type", e.target.value)
+            }
+          >
+            <option value="code-contains">
+              Code contains substring
+            </option>
+            <option value="code-regex">
+              Code matches regex
+            </option>
+            <option value="all-testcases-pass">
+              All testcases pass
+            </option>
+            <option value="min-testcases-pass">
+              Minimum testcases passed
+            </option>
+          </select>
           {(step.type === "code-contains" || step.type === "code-regex") && (
-            <div style={{ marginBottom: "8px" }}>
-              <label>Value</label>
-              <input
-                className="clean-input"
-                value={step.value}
-                placeholder={
-                  step.type === "code-contains"
-                    ? 'e.g. "scanf" or "%"'
-                    : "e.g. /if\\s*\\(/"
-                }
-                onChange={(e) => updateStepField(index, "value", e.target.value)}
-              />
-            </div>
-          )}
+  <input
+    className="clean-input"
+    placeholder='e.g. "scanf" or "%"'
+    value={step.value || ""}
+    onChange={(e) =>
+      updateStepField(index, "value", e.target.value)
+    }
+  />
+)}
 
-          {step.type === "min-testcases-pass" && (
-            <div style={{ marginBottom: "8px" }}>
-              <label>Minimum testcases to pass</label>
-              <input
-                className="clean-input"
-                type="number"
-                min="1"
-                value={step.minPassed}
-                onChange={(e) =>
-                  updateStepField(index, "minPassed", e.target.value)
-                }
-              />
-            </div>
-          )}
+{/* MIN TESTCASE FIELD */}
+{step.type === "min-testcases-pass" && (
+  <input
+    className="clean-input"
+    type="number"
+    placeholder="Minimum testcases required"
+    value={step.minPassed || ""}
+    onChange={(e) =>
+      updateStepField(index, "minPassed", e.target.value)
+    }
+  />
+)}
+          
 
-          <div style={{ marginBottom: "8px" }}>
-            <label>Marks</label>
-            <input
-              className="clean-input"
-              type="number"
-              min="1"
-              value={step.marks}
-              onChange={(e) => updateStepField(index, "marks", e.target.value)}
-            />
-          </div>
+          <input
+            className="clean-input"
+            type="number"
+            value={step.marks}
+            onChange={(e) =>
+              updateStepField(index, "marks", e.target.value)
+            }
+          />
 
           <button
             className="back-btn"
-            style={{ background: "#ff4d4d", color: "white" }}
             onClick={() => removeStep(index)}
           >
             🗑 Remove Step
           </button>
+
         </div>
       ))}
 
-      <button
-        className="view-btn"
-        style={{ marginTop: "5px" }}
-        onClick={addStep}
-      >
+      <button className="view-btn" onClick={addStep}>
         ➕ Add Evaluation Step
       </button>
 
@@ -309,8 +331,8 @@ export default function TeacherUnit4Coding() {
         ✔ Add Coding Question
       </button>
 
-      {/* ---------- SHOW ALL QUESTIONS ---------- */}
-      <h2 style={{ marginTop: "40px" }}>📋 All Added Questions</h2>
+      {/* ---------- ALL QUESTIONS ---------- */}
+       <h2 style={{ marginTop: "40px" }}>📋 All Global Coding Practice Questions</h2>
 
       {allQuestions.length === 0 ? (
         <p>No questions added yet.</p>
@@ -320,12 +342,14 @@ export default function TeacherUnit4Coding() {
             <div className="question-card" key={q._id}>
               <h3>{q.title}</h3>
 
+              <p><b>Description:</b> {q.description}</p>
+
               <b>Testcases:</b>
               {q.testcases?.map((tc, i) => (
                 <p key={i}>
                   <b>TC {i + 1}:</b> <br />
                   <b>Input:</b> {tc.input} <br />
-                  <b>Expected:</b> {tc.expectedOutput}
+                  <b>Expected:</b> {tc.expected}
                 </p>
               ))}
 
@@ -334,7 +358,8 @@ export default function TeacherUnit4Coding() {
                   <b>Steps:</b>
                   {q.evaluationSteps.map((s, i) => (
                     <p key={i}>
-                      <b>Step {i + 1}:</b> {s.label} ({s.type}) – Marks: {s.marks}
+                      <b>Step {i + 1}:</b> {s.label} ({s.type}) – Marks:{" "}
+                      {s.marks}
                     </p>
                   ))}
                 </>

@@ -1,111 +1,212 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
+import jwt from "jsonwebtoken";
+
 
 const router = express.Router();
+
+// ✅ SET PASSWORD (first time only)
+router.post("/set-password", async (req, res) => {
+  try {
+    const { rollNumber, email, password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ msg: "Password required" });
+    }
+
+    const user = await User.findOne({
+      $or: [{ rollNumber }, { email }],
+    });
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found in system" });
+    }
+
+    if (user.passwordSet) {
+      return res.status(400).json({ msg: "Password already set. Please login." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+    user.passwordSet = true;
+
+    await user.save();
+
+    res.status(200).json({ msg: "Password set successfully. You can now login." });
+
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
 
 // ✅ SIGNUP ROUTE
 router.post("/signup", async (req, res) => {
   console.log("🧩 Signup attempt:", req.body);
-  try {
-    const { name, email, password, role, extraField } = req.body;
 
-    // Check all fields
-    if (!name || !email || !password || !role || !extraField) {
+  try {
+    const { name, email, password, role, sections } = req.body;
+
+    if (!name || !email || !password || !role) {
       return res.status(400).json({ msg: "All fields are required" });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.log("⚠️ User already exists:", email);
       return res.status(400).json({ msg: "User already exists" });
     }
 
-    // Hash password safely
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const newUser = new User({
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password: hashedPassword,
       role,
-      extraField: extraField.trim(),
+      sections,
+      isApproved: role === "teacher" ? false : true,
+      passwordSet: true
     });
 
     await newUser.save();
-    console.log("✅ Signup successful:", email);
 
-    // Send response (without password)
     res.status(200).json({
-      msg: "Signup successful",
+      msg:
+        role === "teacher"
+          ? "Registration request sent. Wait for admin approval."
+          : "Signup successful",
       user: {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
-        extraField: newUser.extraField,
       },
     });
+
   } catch (error) {
     console.error("❌ Signup error:", error);
-    res.status(500).json({ msg: "Signup failed", error: error.message });
+    res.status(500).json({ msg: "Signup failed" });
   }
 });
-
-// ✅ LOGIN ROUTE
 router.post("/login", async (req, res) => {
-  console.log("🧩 Login attempt:", req.body);
   try {
-    const { email, password, role } = req.body; // ✅ added role here too
+    const { identifier, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ msg: "Please provide email and password" });
+    if (!identifier || !password) {
+      return res.status(400).json({ msg: "Please enter all fields" });
     }
 
-    const user = await User.findOne({ email });
+    const cleanIdentifier = identifier.trim();
+    console.log("LOGIN TRY:", cleanIdentifier);
 
+    const user = await User.findOne({
+      $or: [
+        { email: cleanIdentifier.toLowerCase() },
+        { rollNumber: cleanIdentifier },
+        
+      ],
+    });
+     console.log("USER FOUND:", user);
+     
     if (!user) {
-      console.log("❌ No user found for:", email);
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    // ✅ Compare passwords
-    if (!user.password) {
-      console.log("⚠️ User has no password hash in DB");
-      return res.status(500).json({ msg: "Corrupted user record (missing password)" });
+    if (!user.passwordSet) {
+      return res.status(400).json({ msg: "Please set your password first" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    console.log("🔐 Password match:", isMatch);
+    // ✅ TEACHER APPROVAL CHECK
+if (user.role === "teacher" && !user.isApproved){
+      return res.status(403).json({
+        msg: "Your account is pending admin approval"
+      });
+    }
 
+const isMatch = await bcrypt.compare(password.trim(), user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    // ✅ Optional: verify correct role
-    if (role && user.role !== role) {
-      console.log(`🚫 Role mismatch: tried ${role}, user is ${user.role}`);
-      return res.status(403).json({ msg: `Access denied for ${role} login` });
-    }
+    const token = jwt.sign(
+  { id: user._id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: "1d" }
+);
 
-    console.log("✅ Login successful for:", email);
+res.status(200).json({
+  msg: "Login successful",
+  token,
+  user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    section: user.section,      // for student
+    sections: user.sections     // for teacher
+  },
+});
 
-    res.status(200).json({
-      msg: "Login successful",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        extraField: user.extraField,
-      },
-    });
   } catch (error) {
-    console.error("🔥 Login error:", error);
-    res.status(500).json({ msg: "Login failed", error: error.message });
+    res.status(500).json({ msg: error.message });
   }
 });
+
+// Approve teacher
+router.put("/approve/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || user.role !== "teacher") {
+      return res.status(404).json({ msg: "Teacher not found" });
+    }
+
+user.isApproved = true;
+    await user.save();
+
+    res.json({ msg: "Teacher approved successfully" });
+
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+// Get all pending teachers
+// Get all pending teachers
+router.get("/pending-teachers", async (req, res) => {
+  try {
+    console.log("Fetching pending teachers...");
+
+    const teachers = await User.find({
+      role: "teacher",
+      isApproved: false
+    });
+
+    console.log("Pending teachers found:", teachers.length);
+
+    res.json(teachers);
+  } catch (err) {
+    console.error("Error fetching teachers:", err);
+    res.status(500).json({ msg: err.message });
+  }
+});
+// Get all approved teachers
+router.get("/approved-teachers", async (req, res) => {
+  try {
+    const teachers = await User.find({
+      role: "teacher",
+      isApproved: true
+    });
+
+    res.json(teachers);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+
+
 
 export default router;

@@ -82,20 +82,23 @@ useEffect(() => {
       setIsRunning(true);
       setCanSubmit(false);
 
-      const res = await axios.post("https://fusion0-1.onrender.com/api/code/run", {
-        code,
-        language,
-        questionId: selected._id,
-      });
+  const res = await axios.post(
+  "http://localhost:5000/api/code/run",
+  {
+    code,
+    language,
+    questionId: selected._id,
+  }
+);
 
-      setResult(res.data);
+setResult(res.data);
 
-      if (
-        res.data.success &&
-        res.data.testcasesPassed === res.data.totalTestcases
-      ) {
-        setCanSubmit(true);
-      }
+if (
+  res.data.success &&
+  res.data.testcasesPassed === res.data.totalTestcases
+) {
+  setCanSubmit(true);
+}
     } catch (err) {
       console.error(err);
       alert("Run error");
@@ -105,44 +108,54 @@ useEffect(() => {
   };
 
   // -------------------- SUBMIT CODE --------------------
-  const handleSubmit = async () => {
-    if (!selected) return alert("Select a question first!");
-    if (!result) return alert("Run your code first!");
-    if (!canSubmit) return alert("Submit only after all testcases pass!");
+ const handleSubmit = async () => {
+  if (!selected) return alert("Select a question first!");
+  if (!result) return alert("Run your code first!");
+  if (!canSubmit) return alert("Submit only after all testcases pass!");
 
-    try {
-      setIsSubmitting(true);
+  const user = JSON.parse(localStorage.getItem("fusionUser"));
 
-      const payload = {
-        code,
-        language,
-        questionId: selected._id,
-        userId: localStorage.getItem("userId") || "dummyUser",
-        testcasesPassed: result.testcasesPassed,
-        totalTestcases: result.totalTestcases,
-      };
+  if (!user || !user.id) {
+    alert("Please login first!");
+    return;
+  }
 
-      const res = await axios.post(
-        "https://fusion0-1.onrender.com/api/code/submit",
-        payload
-      );
+  try {
+    setIsSubmitting(true);
 
-      if (res.data.success) {
-        alert("✅ Accepted!");
+    const payload = {
+      code,
+      language,
+      questionId: selected._id,
+      userId: user.id,   // ✅ FIXED HERE
+      testcasesPassed: result.testcasesPassed,
+      totalTestcases: result.totalTestcases,
+    };
 
-        if (res.data.submissionId)
-          window.location.href = `/submission/${res.data.submissionId}`;
-      } else {
-        alert(res.data.message || "Submit failed");
+    console.log("Submitting payload:", payload);
+
+    const res = await axios.post(
+  "http://localhost:5000/api/coding/submit",
+  payload
+);
+
+    if (res.data.success) {
+      alert("✅ Accepted!");
+
+      if (res.data.submissionId) {
+        window.location.href = `/submission/${res.data.submissionId}`;
       }
-    } catch (err) {
-      console.error(err);
-      alert("Submit failed");
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      alert(res.data.message || "Submit failed");
     }
-  };
 
+  } catch (err) {
+    console.error("Submit error:", err);
+    alert("Submit failed");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   const copyCode = () => {
     navigator.clipboard.writeText(code);
     alert("Copied!");
@@ -290,6 +303,28 @@ useEffect(() => {
           </div>
         </div>
       )}
+     {result?.stepResults && (
+  <div className="step-box-clean">
+    <h3>Step Evaluation</h3>
+
+    {result.stepResults.map((step, i) => (
+      <div key={i} className="step-row-clean">
+        <div className="left">
+          <span>{step.passed ? "✅" : "❌"}</span>
+          <span>{step.label}</span>
+        </div>
+
+        <div className="right">
+          {step.marksAwarded}/{step.marksTotal}
+        </div>
+      </div>
+    ))}
+
+    <div className="total-clean">
+      Total Score: {result.totalMarks}
+    </div>
+  </div>
+)}
     </div>
   );
 }
