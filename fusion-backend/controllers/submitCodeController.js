@@ -4,14 +4,14 @@ import CodingQuestion from "../models/CodingQuestion.js";
 export const submitCode = async (req, res) => {
   try {
     const {
-      userId,
+      
       code,
       language,
       questionId,
       testcasesPassed,
       totalTestcases
     } = req.body;
-
+    const userId = req.user.id; 
     if (!userId || !questionId)
       return res.status(400).json({ success: false, message: "Missing data" });
 

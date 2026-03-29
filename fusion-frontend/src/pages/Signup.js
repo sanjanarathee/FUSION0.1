@@ -31,7 +31,7 @@ export default function Signup() {
         extraField,
       });
 
-      const res = await axios.post("http://localhost:5000/api/auth/signup", {
+      const res = await axios.post("https://fusion0-1.onrender.com/api/auth/signup", {
         name: name.trim(),
         email: email.toLowerCase().trim(),
         password: password.trim(),

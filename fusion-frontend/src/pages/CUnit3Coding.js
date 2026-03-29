@@ -82,8 +82,7 @@ useEffect(() => {
       setIsRunning(true);
       setCanSubmit(false);
 
-  const res = await axios.post(
-  "http://localhost:5000/api/code/run",
+  const res = await axios.post("https://fusion0-1.onrender.com/api/code/run",
   {
     code,
     language,
@@ -134,8 +133,7 @@ if (
 
     console.log("Submitting payload:", payload);
 
-    const res = await axios.post(
-  "http://localhost:5000/api/coding/submit",
+    const res = await axios.post("https://fusion0-1.onrender.com/api/coding/submit",
   payload
 );
 
