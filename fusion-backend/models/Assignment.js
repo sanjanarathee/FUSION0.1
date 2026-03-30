@@ -9,12 +9,7 @@ const questionSchema = new mongoose.Schema({
 const assignmentSchema = new mongoose.Schema({
   unit: { type: Number, required: true },
 
-  // 🔑 already present
-  subject: {
-    type: String,
-    enum: ["c", "cpp"],
-    required: true,
-  },
+  
 
   title: { type: String, required: true },
   description: { type: String, default: "" },
