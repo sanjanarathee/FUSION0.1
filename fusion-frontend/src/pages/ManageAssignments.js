@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
-import "./PageStyles.css";
+import { useLocation, useNavigate } from "react-router-dom";import "./PageStyles.css";
 
 export default function ManageAssignments() {
   const location = useLocation();
+  const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
 
   // ✅ Always store UNIT as NUMBER
@@ -13,29 +13,29 @@ export default function ManageAssignments() {
   const [assignments, setAssignments] = useState([]);
 
   useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        const res = await axios.get(
-          `https://fusion0-1.onrender.com/api/assignments/unit/${unit}`
-        );
+  const fetchAssignments = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/assignments/all?unit=${unit}`
+      );
 
-        console.log("Fetched assignments:", res.data.assignments);
+      console.log("FULL RESPONSE:", res.data);
 
-        setAssignments(res.data.assignments || []);
-      } catch (error) {
-        console.error("❌ Error fetching assignments", error);
-      }
-    };
+      setAssignments(res.data.assignments || []);
+    } catch (error) {
+      console.error("❌ Error fetching assignments", error);
+    }
+  };
 
-    fetchAssignments();
-  }, [unit]);
+  fetchAssignments();
+}, [unit]);
 
   const deleteAssignment = async (id) => {
     if (!window.confirm("Are you sure you want to delete this assignment?"))
       return;
 
     try {
-      await axios.delete(`https://fusion0-1.onrender.com/api/assignments/${id}`);
+      await axios.delete(`http://localhost:5000/api/assignments/${id}`);
       alert("Assignment deleted!");
 
       setAssignments(assignments.filter((a) => a._id !== id));
@@ -72,6 +72,12 @@ export default function ManageAssignments() {
             >
               ❌ Delete Assignment
             </button>
+            <button
+  className="view-btn"
+  onClick={() => navigate(`/teacher/assignment-results/${a._id}`)}
+>
+  📊 View Results
+</button>
           </div>
         ))
       )}

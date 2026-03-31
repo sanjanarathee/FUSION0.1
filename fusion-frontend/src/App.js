@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import SetPassword from "./pages/SetPassword";
 
+import AssignmentResultTable from "./pages/AssignmentResultTable";
+
 
 
 
@@ -142,7 +144,6 @@ import TeacherCppUnit4Coding from "./pages/TeacherCppUnit4Coding";
 import CreateAssignment from "./pages/CreateAssignment";
 import ManageAssignments from "./pages/ManageAssignments";
 import AssignmentResults from "./pages/AssignmentResults";
-import AssignmentResultTable from "./pages/AssignmentResultTable";
 
 /* ===========================
    🔹 FILE UPLOADS
@@ -181,6 +182,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/set-password" element={<SetPassword />} />
+
+        <Route path="/teacher/assignment-results/:assignmentId" element={<AssignmentResultTable />} />
         
 
 

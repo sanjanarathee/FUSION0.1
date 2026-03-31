@@ -10,6 +10,8 @@ const performanceSchema = new mongoose.Schema({
 
   unit: { type: String, default: "Unit 1" },
 
+  section: { type: String, required: true }, // ✅ ADD THIS
+
   date: { type: Date, default: Date.now }
 });
 

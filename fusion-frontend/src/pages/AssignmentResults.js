@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom"; // ✅ NEW
 import "./PageStyles.css";
 
 export default function AssignmentResults() {
@@ -13,12 +14,38 @@ export default function AssignmentResults() {
   const [dateFilter, setDateFilter] = useState("");
   const [unitFilter, setUnitFilter] = useState("");
 
+  const location = useLocation(); // ✅ NEW
+
+  // ✅ Extract unit dynamically from URL
+  const unit = Number(location.pathname.match(/unit(\d+)/)?.[1]);
+
   useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        const res = await axios.get(
-          "https://fusion0-1.onrender.com/api/assignments/performance"
-        );
+  const fetchResults = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("fusionUser"));
+
+      if (!user) {
+        console.error("❌ USER NOT FOUND");
+        return;
+      }
+
+      // ✅ 👉 YAHI ADD KARNA THA (STEP 3 DEBUG)
+      console.log("Sending →", {
+        teacherId: user.id,
+        section: user.sections[0],
+        unit: unit,
+      });
+
+      const res = await axios.get(
+        "http://localhost:5000/api/assignments/performance",
+        {
+          params: {
+            teacherId: user.id,
+            section: user.sections[0],
+            unit: unit,
+          },
+        }
+      );
 
         console.log("API response →", res.data);
 
@@ -28,8 +55,6 @@ export default function AssignmentResults() {
           dataArray = res.data.performances;
         } else if (Array.isArray(res.data)) {
           dataArray = res.data;
-        } else {
-          dataArray = [];
         }
 
         // Normalize date
@@ -46,7 +71,7 @@ export default function AssignmentResults() {
     };
 
     fetchResults();
-  }, []);
+  }, [unit]); // ✅ re-run when unit changes
 
   // APPLY FILTERS
   const applyFilters = () => {
@@ -75,7 +100,7 @@ export default function AssignmentResults() {
     }
 
     if (unitFilter !== "") {
-      data = data.filter((r) => r.unit === unitFilter);
+      data = data.filter((r) => String(r.unit) === unitFilter.replace("Unit ", ""));
     }
 
     setFiltered(data);
@@ -93,7 +118,7 @@ export default function AssignmentResults() {
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">📊 Student Assignment Results</h1>
+      <h1 className="learn-title">📊 Unit {unit} – Assignment Results</h1>
 
       {/* FILTER BAR */}
       <div className="filter-container">

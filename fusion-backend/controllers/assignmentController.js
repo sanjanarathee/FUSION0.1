@@ -10,7 +10,7 @@ export const createAssignment = async (req, res) => {
   try {
     const { unit, subject, title, description, questions, deadline, teacherId, section } = req.body;
 
-    if (!title || !unit || !subject || !section)
+    if (!title || !unit  || !section)
       return res.status(400).json({
         success: false,
         message: "Unit, subject, title and section are required!",
@@ -46,14 +46,13 @@ export const createAssignment = async (req, res) => {
 
     const newAssignment = new Assignment({
       unit: Number(unit),
-      subject,
       title,
       description: description || "",
       deadline: new Date(deadline),
       questions: formattedQuestions,
 
       // ⭐ MOST IMPORTANT
-      section: section,
+      section: section.toUpperCase().trim(),
       createdBy: teacherId,
 
       createdAt: new Date(),
@@ -81,11 +80,12 @@ export const createAssignment = async (req, res) => {
 ================================================================ */
 export const getAllAssignments = async (req, res) => {
   try {
-    const { unit, subject } = req.query;
+    const { unit, section } = req.query;
 
     const filter = {};
     if (unit) filter.unit = Number(unit);
-    if (subject) filter.subject = subject;
+    if (section) filter.section = section;
+    
 
     const assignments = await Assignment.find(filter).sort({
       createdAt: -1,
@@ -111,29 +111,23 @@ export const getAllAssignments = async (req, res) => {
 export const getAssignmentsByUnit = async (req, res) => {
   try {
     const unit = Number(req.params.unit);
-    const subject = req.query.subject;
 
-    if (isNaN(unit))
+    if (isNaN(unit)) {
       return res.status(400).json({
         success: false,
         message: "Invalid unit number",
       });
-
-    if (!subject)
-      return res.status(400).json({
-        success: false,
-        message: "Subject (c/cpp) is required",
-      });
+    }
 
     const assignments = await Assignment.find({
       unit,
-      subject,
     }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
       assignments,
     });
+
   } catch (error) {
     console.error("❌ Error fetching assignments by unit:", error);
     res.status(500).json({
@@ -143,15 +137,12 @@ export const getAssignmentsByUnit = async (req, res) => {
     });
   }
 };
-
 /* ================================================================
    👩‍🎓 STUDENT: GET ASSIGNMENTS (UNIT + SUBJECT)
 ================================================================ */
 export const getAssignment = async (req, res) => {
   try {
-    const { rollNumber } = req.query;
-    const unit = Number(req.query.unit);
-    const subject = req.query.subject;
+    const { unit, rollNumber } = req.query;
 
     if (!rollNumber) {
       return res.status(400).json({
@@ -160,8 +151,12 @@ export const getAssignment = async (req, res) => {
       });
     }
 
-    // ✅ Find student & get his section
-    const student = await User.findOne({ rollNumber });
+    const numericUnit = Number(unit);
+
+    // ✅ VERY IMPORTANT
+    const student = await User.findOne({
+      rollNumber: rollNumber.trim()
+    });
 
     if (!student) {
       return res.status(404).json({
@@ -170,16 +165,16 @@ export const getAssignment = async (req, res) => {
       });
     }
 
-    const filter = {
-      section: student.section,   // ⭐ MOST IMPORTANT LINE
-    };
+    console.log("Student section:", student.section);
 
-    if (!isNaN(unit)) filter.unit = unit;
-    if (subject) filter.subject = subject;
-
-    const assignments = await Assignment.find(filter).sort({
-      createdAt: -1,
+    const assignments = await Assignment.find({
+      unit: numericUnit,
+      section: { 
+  $regex: new RegExp(`^${student.section.trim()}$`, "i") 
+}
     });
+
+    console.log("Assignments:", assignments);
 
     res.status(200).json({
       success: true,
@@ -187,6 +182,7 @@ export const getAssignment = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("❌ Error in getAssignment:", error);
     res.status(500).json({
       success: false,
       message: "Error fetching assignments",
@@ -195,13 +191,12 @@ export const getAssignment = async (req, res) => {
   }
 };
 
-
 /* ================================================================
    🧠 STUDENT: SAVE PERFORMANCE (UNIT + SUBJECT SAFE)
 ================================================================ */
 export const savePerformance = async (req, res) => {
   try {
-    const { studentName, rollNumber, answers, unit, subject } = req.body;
+    const { studentName, rollNumber, answers, unit,  } = req.body;
     const numericUnit = Number(unit);
 
     // ✅ Get student section
@@ -217,7 +212,6 @@ export const savePerformance = async (req, res) => {
     // ✅ Find assignment ONLY of that section
     const assignment = await Assignment.findOne({
       unit: numericUnit,
-      subject,
       section: student.section,   // ⭐ LOCK
     });
 
@@ -231,7 +225,7 @@ export const savePerformance = async (req, res) => {
     const alreadyAttempted = await Performance.findOne({
       rollNumber,
       unit: numericUnit,
-      subject,
+    
     });
 
     if (alreadyAttempted)
@@ -259,7 +253,6 @@ export const savePerformance = async (req, res) => {
     const performance = new Performance({
       studentName,
       rollNumber,
-      subject,
       correct,
       wrong,
       accuracy,
@@ -288,41 +281,29 @@ export const savePerformance = async (req, res) => {
 ================================================================ */
 export const getAllPerformances = async (req, res) => {
   try {
-    const { unit, subject, teacherId, section } = req.query;
+    const { unit, section } = req.query;
 
-    if (!teacherId || !section) {
-      return res.status(400).json({
-        success: false,
-        message: "Teacher and section required",
-      });
-    }
+    console.log("API HIT ✅");
 
-    // ✅ Verify teacher allowed for this section
-    const teacher = await User.findById(teacherId);
+    // 🔥 SIMPLE QUERY (NO COMPLEX FILTER)
+    const performances = await Performance.find({
+      unit: Number(unit),
+      section: section
+    });
 
-    if (!teacher || !teacher.sections.includes(section)) {
-      return res.status(403).json({
-        success: false,
-        message: "Not allowed to view this section data",
-      });
-    }
-
-    const filter = { section };
-
-    if (unit) filter.unit = Number(unit);
-    if (subject) filter.subject = subject;
-
-    const performances = await Performance.find(filter);
+    console.log("DATA FOUND:", performances);
 
     res.status(200).json({
       success: true,
-      performances,
+      performances
     });
+
   } catch (error) {
+    console.error("ERROR:", error);  // 🔥 IMPORTANT
+
     res.status(500).json({
       success: false,
-      message: "Error fetching performances",
-      error: error.message,
+      message: error.message
     });
   }
 };

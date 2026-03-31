@@ -23,26 +23,24 @@ export default function StudentAssignment() {
         FETCH ASSIGNMENTS  (STUDENT API)
   -------------------------------------------------------- */
   useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        // 🔥 FIX 2: Use CORRECT STUDENT API
-        const res = await axios.get(
-  `http://localhost:5000/api/assignments/student?unit=${selectedUnit}`
-);
+  const fetchAssignments = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/assignments/student?unit=${Number(selectedUnit)}&rollNumber=${rollNumber}`
+      );
 
+      console.log("Student assignments:", res.data);
 
+      setAssignments(res.data.assignments || []);
+    } catch (error) {
+      console.error("❌ Error fetching assignments:", error);
+    }
+  };
 
-        setAssignments(res.data.assignments || []);
-      } catch (err) {
-        console.error("❌ Error fetching assignments:", err);
-      }
-    };
-
-    if (selectedUnit && rollNumber) {
-  fetchAssignments();
-}
-
-  }, [selectedUnit, rollNumber]);
+  if (rollNumber) {
+    fetchAssignments();
+  }
+}, [selectedUnit, rollNumber]);
 
   const handleOptionSelect = (qIndex, option) => {
     setAnswers({ ...answers, [qIndex]: option });
@@ -64,7 +62,7 @@ export default function StudentAssignment() {
 
     try {
       const res = await axios.post(
-        "https://fusion0-1.onrender.com/api/assignments/performance",
+        "http://localhost:5000/api/assignments/performance",
         {
           studentName,
           rollNumber,
