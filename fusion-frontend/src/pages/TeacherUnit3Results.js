@@ -2,21 +2,44 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 export default function TeacherUnit3Results() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    axios.get("https://fusion0-1.onrender.com/api/assignments/performance")
-      .then((res) => {
-        const filtered = res.data.performances.filter(
-          (x) => Number(x.unit) === 3
-        );
-        setResults(filtered);
-      });
-  }, []);
+  const user = JSON.parse(localStorage.getItem("fusionUser"));
 
+  if (!user) {
+    console.error("User not found");
+    return;
+  }
+
+  const teacherId = user.id;              // ✅ FIXED
+  const section = user.sections?.[0];     // ✅ FIXED (first section)
+
+  console.log("Sending:", { teacherId, section });
+
+  axios.get("http://localhost:5000/api/assignments/performance", {
+    params: {
+      unit: 3,
+      teacherId,
+      section
+    }
+  })
+  .then((res) => {
+  console.log("FULL RESPONSE:", res.data);   // 👈 ADD THIS
+
+  const data = res.data.performances ?? res.data ?? [];
+
+  console.log("FINAL DATA:", data);          // 👈 ADD THIS
+
+  setResults(data);
+})
+  .catch((err) => {
+    console.error("Error fetching results:", err);
+  });
+}, []);
   /* --------------------------------------------------
       EXPORT TO EXCEL
   -------------------------------------------------- */
@@ -33,28 +56,24 @@ export default function TeacherUnit3Results() {
       EXPORT TO PDF
   -------------------------------------------------- */
   const exportToPDF = () => {
-    const doc = new jsPDF();
+  const doc = new jsPDF();
 
-    doc.setFontSize(16);
-    doc.text("Unit 3 – Assignment Results", 14, 20);
+  doc.text("Unit 3 - Assignment Results", 14, 15);
 
-    const tableColumn = ["Name", "Roll Number", "Correct", "Wrong", "Accuracy"];
-    const tableRows = [];
+  autoTable(doc, {
+    startY: 20,
+    head: [['Name', 'Roll Number', 'Correct', 'Wrong', 'Accuracy']],
+    body: results.map(p => [
+      p.studentName,   // ✅ FIXED
+      p.rollNumber,
+      p.correct,
+      p.wrong,
+      `${p.accuracy}%`
+    ])
+  });
 
-    results.forEach((r) => {
-      tableRows.push([
-        r.studentName,
-        r.rollNumber,
-        r.correct,
-        r.wrong,
-        `${r.accuracy}%`,
-      ]);
-    });
-
-    doc.autoTable(tableColumn, tableRows, { startY: 30 });
-    doc.save("Unit_3_Assignment_Results.pdf");
-  };
-
+  doc.save("results.pdf");
+};
   return (
     <div className="learn-container">
 

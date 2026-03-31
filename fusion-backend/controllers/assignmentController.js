@@ -52,7 +52,7 @@ export const createAssignment = async (req, res) => {
       questions: formattedQuestions,
 
       // ⭐ MOST IMPORTANT
-      section: section,
+      section: section.toUpperCase().trim(),
       createdBy: teacherId,
 
       createdAt: new Date(),
@@ -169,7 +169,9 @@ export const getAssignment = async (req, res) => {
 
     const assignments = await Assignment.find({
       unit: numericUnit,
-      section: student.section
+      section: { 
+  $regex: new RegExp(`^${student.section.trim()}$`, "i") 
+}
     });
 
     console.log("Assignments:", assignments);
@@ -279,40 +281,29 @@ export const savePerformance = async (req, res) => {
 ================================================================ */
 export const getAllPerformances = async (req, res) => {
   try {
-    const { unit,  teacherId, section } = req.query;
+    const { unit, section } = req.query;
 
-    if (!teacherId || !section) {
-      return res.status(400).json({
-        success: false,
-        message: "Teacher and section required",
-      });
-    }
+    console.log("API HIT ✅");
 
-    // ✅ Verify teacher allowed for this section
-    const teacher = await User.findById(teacherId);
+    // 🔥 SIMPLE QUERY (NO COMPLEX FILTER)
+    const performances = await Performance.find({
+      unit: Number(unit),
+      section: section
+    });
 
-    if (!teacher || !teacher.sections.includes(section)) {
-      return res.status(403).json({
-        success: false,
-        message: "Not allowed to view this section data",
-      });
-    }
-
-    const filter = { section };
-
-    if (unit) filter.unit = Number(unit);
-
-    const performances = await Performance.find(filter);
+    console.log("DATA FOUND:", performances);
 
     res.status(200).json({
       success: true,
-      performances,
+      performances
     });
+
   } catch (error) {
+    console.error("ERROR:", error);  // 🔥 IMPORTANT
+
     res.status(500).json({
       success: false,
-      message: "Error fetching performances",
-      error: error.message,
+      message: error.message
     });
   }
 };

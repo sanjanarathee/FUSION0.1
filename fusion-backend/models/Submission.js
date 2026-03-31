@@ -13,18 +13,18 @@ const submissionSchema = new mongoose.Schema({
     required: true
   },
 
-  code: { type: String, required: true },
-  language: { type: String, default: "c" },
+  
 
-  status: { type: String, required: true },
+  code: String,
+  language: String,
+  status: String,
+  passed: Number,
+  total: Number,
 
-  passed: { type: Number },
-  total: { type: Number },
+  totalMarks: Number,
+  maxMarks: Number,
 
-  totalMarks: { type: Number, default: 0 },
-  maxMarks: { type: Number, default: 0 },
-
-  stepResults: [   // 🔥🔥 ADD THIS
+  stepResults: [
     {
       label: String,
       passed: Boolean,
