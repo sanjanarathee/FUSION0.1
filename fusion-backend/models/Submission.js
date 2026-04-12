@@ -11,16 +11,17 @@ const submissionSchema = new mongoose.Schema({
   questionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "CodingQuestion",
-    required: false   // ❗ CHANGE HERE
+    required: false
   },
 
   // ✅ for subjective
   assignmentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Assignment",
-    required: false   // ❗ ADD THIS
+    required: false
   },
-    unit: {
+
+  unit: {
     type: Number
   },
 
@@ -49,4 +50,5 @@ const submissionSchema = new mongoose.Schema({
 
   createdAt: { type: Date, default: Date.now }
 });
+
 export default mongoose.model("Submission", submissionSchema);
