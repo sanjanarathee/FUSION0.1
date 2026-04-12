@@ -45,6 +45,17 @@ export default function AdminDashboard() {
       console.log(err);
     }
   };
+  const disapproveTeacher = async (id) => {
+  if (!window.confirm("Are you sure you want to disapprove this teacher?")) return;
+
+  try {
+    await axios.put(`http://localhost:5000/api/auth/disapprove/${id}`);
+    fetchApproved();
+    fetchPending();
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   const handleLogout = () => {
     localStorage.removeItem("fusionUser");
@@ -77,6 +88,7 @@ export default function AdminDashboard() {
               >
                 Approve
               </button>
+              
             </div>
           ))}
         </div>
@@ -98,6 +110,12 @@ export default function AdminDashboard() {
   {teacher.sections?.join(", ") || teacher.extraField}
 </p>
     <p style={{ color: "green" }}>✔ Approved</p>
+    <button
+  className="disapprove-btn"
+  onClick={() => disapproveTeacher(teacher._id)}
+>
+  Disapprove
+</button>
   </div>
 ))}
 

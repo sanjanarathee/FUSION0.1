@@ -69,25 +69,29 @@ export default function TeacherAssignment() {
   };
 
   return (
-    <div className="learn-container">
-      <h1 className="learn-title">🧩 Create C Programming Assignment</h1>
-      <p className="learn-text">
-        Add 10 multiple-choice questions below. Each must have 4 options and 1
-        correct answer.
-      </p>
+  <div className="upload-modern-page">
 
-      <form onSubmit={handleSubmit} className="assignment-form">
-        {questions.map((q, qIndex) => (
-          <div key={qIndex} className="question-card">
-            <h3>Question {qIndex + 1}</h3>
-            <textarea
-              className="question-input"
-              placeholder="Enter question here..."
-              value={q.question}
-              onChange={(e) => handleQuestionChange(qIndex, e.target.value)}
-              required
-            />
+    {/* 🔶 HEADER */}
+    <div className="upload-header">
+      <h1>🧩 Create Assignment</h1>
+      <p>Add 10 MCQs with options & correct answer</p>
+    </div>
 
+    {/* 📦 FORM */}
+    <form onSubmit={handleSubmit} className="assignment-modern-form">
+
+      {questions.map((q, qIndex) => (
+        <div key={qIndex} className="assignment-card">
+
+          <h3>Question {qIndex + 1}</h3>
+
+          <textarea
+            placeholder="Enter question..."
+            value={q.question}
+            onChange={(e) => handleQuestionChange(qIndex, e.target.value)}
+          />
+
+          <div className="options-grid">
             {q.options.map((opt, optIndex) => (
               <input
                 key={optIndex}
@@ -97,39 +101,42 @@ export default function TeacherAssignment() {
                 onChange={(e) =>
                   handleOptionChange(qIndex, optIndex, e.target.value)
                 }
-                required
               />
             ))}
-
-            <input
-              type="text"
-              className="correct-input"
-              placeholder="Enter correct answer exactly as above"
-              value={q.correctAnswer}
-              onChange={(e) => handleCorrectChange(qIndex, e.target.value)}
-              required
-            />
           </div>
-        ))}
 
-        <button type="submit" className="upload-btn">
-          🚀 Publish Assignment
-        </button>
-      </form>
+          <input
+            className="correct-input"
+            placeholder="Correct answer"
+            value={q.correctAnswer}
+            onChange={(e) => handleCorrectChange(qIndex, e.target.value)}
+          />
 
-      <p
-        className="message"
-        style={{ color: msg.includes("✅") ? "limegreen" : "red" }}
-      >
-        {msg}
-      </p>
+        </div>
+      ))}
 
+      <button type="submit" className="upload-btn">
+        🚀 Publish Assignment
+      </button>
+
+      {msg && (
+        <p className="success-msg">
+          {msg}
+        </p>
+      )}
+
+    </form>
+
+    {/* 🔙 BACK */}
+    <div className="upload-actions">
       <button
         className="back-btn"
-        onClick={() => navigate("/teacher-dashboard")}
+        onClick={() => navigate("/teacher/unit3")}
       >
-        ⬅ Back to Dashboard
+        ← Back to Unit 3
       </button>
     </div>
-  );
+
+  </div>
+);
 }

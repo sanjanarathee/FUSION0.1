@@ -31,11 +31,13 @@ export default function Dashboard() {
           <div className="profile-details">
             <h4>{userData?.name}</h4>
             <p>{userData?.email}</p>
+            <p>Roll No: {userData?.rollNumber}</p>
+
             <span className="branch-text">
-              Branch: {userData?.section}
+              Section: {userData?.section}
             </span>
           </div>
-        </div>
+        </div> {/* ✅ YE MISSING THA */}
 
         {/* RIGHT SIDE LOGOUT */}
         <button
@@ -47,6 +49,7 @@ export default function Dashboard() {
         >
           🚪 Logout
         </button>
+
       </div>
 
       {/* 🔽 MAIN CONTENT */}
@@ -56,9 +59,9 @@ export default function Dashboard() {
           Welcome to <span className="fusion-text">Fusion Dashboard</span> 🎓
         </h1>
 
-        <p className="dashboard-subtext">
+        {/* <p className="dashboard-subtext">
           You are logged in as <strong>{role}</strong>.
-        </p>
+        </p> */}
 
         <h3 className="unit-heading">💻 Learn & Practice</h3>
 

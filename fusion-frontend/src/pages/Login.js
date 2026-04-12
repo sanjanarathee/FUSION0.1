@@ -18,8 +18,13 @@ export default function Login() {
         password,
       });
 
-      localStorage.setItem("fusionUser", JSON.stringify(res.data.user));
-localStorage.setItem("token", res.data.token);   // 🔥 STORE TOKEN
+      localStorage.setItem(
+  "fusionUser",
+  JSON.stringify({
+    token: res.data.token,
+    user: res.data.user,
+  })
+);  // 🔥 STORE TOKEN
 
 
       setMsg("✅ Login successful!");

@@ -1,11 +1,12 @@
 import Assignment from "../models/Assignment.js";
 import Performance from "../models/Performance.js";
+import Submission from "../models/Submission.js";
+import { evaluateWithKeywords, evaluateWithAI } from "../utils/evaluate.js";
 
 /* ================================================================
    🧩 TEACHER: CREATE ASSIGNMENT
 ================================================================ */
 import User from "../models/user.js";
-
 export const createAssignment = async (req, res) => {
   try {
     const { unit, subject, title, description, questions, deadline, teacherId, section } = req.body;
@@ -334,5 +335,173 @@ export const deleteAssignment = async (req, res) => {
       message: "Error deleting assignment",
       error: error.message,
     });
+  }
+};
+export const createSubjectiveAssignment = async (req, res) => {
+  try {
+    const { question, keywords, maxMarks, unit, section, deadline } = req.body;
+
+    const newAssignment = await Assignment.create({
+      type: "subjective",
+      question,
+
+      // ✅ keywords safe conversion
+      keywords: Array.isArray(keywords)
+        ? keywords
+        : keywords
+        ? keywords.split(",").map((k) => k.trim())
+        : [],
+
+      maxMarks: Number(maxMarks),
+
+      // ✅ deadline safe
+      deadline: deadline ? new Date(deadline) : null,
+
+      unit: Number(unit),
+
+      // ✅ section safe
+      section: section ? section.toUpperCase().trim() : "",
+
+      // ✅ SAFE USER (no crash)
+      createdBy: req.user?.id || null,
+
+      // ✅ DON'T FORGET COMMA ABOVE 👆
+      isActive: true,
+    });
+
+    res.json({ success: true, data: newAssignment });
+  } catch (err) {
+    console.error("CREATE SUBJECTIVE ERROR:", err); // 🔥 better debug
+    res.status(500).json({ error: "Failed to create assignment" });
+  }
+};
+export const updateSubjectiveAssignment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { deadline } = req.body;
+
+    const updated = await Assignment.findByIdAndUpdate(
+      id,
+      { deadline },
+      { new: true }
+    );
+
+    res.json({ success: true, updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Update failed" });
+  }
+};
+
+
+export const getSubjectiveResults = async (req, res) => {
+  try {
+    const { assignmentId, unit } = req.query;
+
+    const filter = {};
+
+    if (assignmentId) filter.assignmentId = assignmentId;
+    if (unit) filter.unit = Number(unit);   // 🔥 ADD THIS
+
+    const results = await Submission.find(filter)
+      .populate("userId", "name email")
+      .populate("assignmentId", "question maxMarks");
+
+    res.json({ success: true, results });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch results" });
+  }
+};
+export const submitSubjectiveAnswer = async (req, res) => {
+  try {
+    const { assignmentId, answer, userId } = req.body;
+
+    const assignment = await Assignment.findById(assignmentId);
+
+    if (!assignment) {
+      return res.status(404).json({ error: "Assignment not found" });
+    }
+
+    // 🔥 yaha evaluation hona chahiye
+    // ✅ 1. KEYWORD EVALUATION
+const keywordResult = evaluateWithKeywords(
+  answer,
+  assignment.keywords,
+  assignment.maxMarks
+);
+
+// ✅ 2. AI EVALUATION
+const aiResult = await evaluateWithAI(
+  assignment.question,
+  answer,
+  assignment.maxMarks
+);
+
+// extract AI marks
+let aiMarks = 0;
+const match = aiResult.match(/Marks:\s*(\d+)/);
+if (match) aiMarks = parseInt(match[1]);
+
+// ✅ 3. FINAL MARKS (HYBRID)
+const finalMarks = Math.round(
+  keywordResult.marks * 0.4 + aiMarks * 0.6
+);
+
+// ✅ 4. FINAL FEEDBACK (AI priority)
+const feedback =
+  aiResult.split("Feedback:")[1]?.trim() || keywordResult.feedback;
+
+    const submission = await Submission.create({
+      userId,
+      assignmentId,
+      answer,
+      marks: finalMarks,
+      feedback: feedback,    
+      unit: assignment.unit 
+    });
+
+    res.json({ success: true, submission });
+
+  } catch (err) {
+    console.error("🔥 Submit error:", err);
+    res.status(500).json({ error: "Submission failed" });
+  }
+};
+export const getSubjectiveAssignmentsForStudent = async (req, res) => {
+  try {
+    const { unit, section } = req.query;
+
+    const assignments = await Assignment.find({
+      unit: Number(unit),
+      type: "subjective",
+      isActive: true,
+      section: {
+        $regex: new RegExp(`^${section.trim()}$`, "i"),
+      },
+    });
+
+    const uniqueAssignments = Array.from(
+      new Map(assignments.map(a => [a._id.toString(), a])).values()
+    );
+
+    res.json({ assignments: uniqueAssignments });
+
+  } catch (err) {
+    console.error("🔥 Fetch subjective error:", err);
+    res.status(500).json({ error: "Failed to fetch subjective assignments" });
+  }
+};
+export const getStudentSubmissions = async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    const submissions = await Submission.find({ userId });
+
+    res.json({ success: true, submissions });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch submissions" });
   }
 };

@@ -14,10 +14,12 @@ export default function TeacherDashboard() {
       return;
     }
 
-    if (teacher.role !== "teacher") {
-      alert("Access denied! Only teachers can access this dashboard.");
-      navigate("/dashboard");
-    }
+    const data = JSON.parse(localStorage.getItem("fusionUser"));
+
+if (!data || data.user.role !== "teacher") {
+  alert("Access denied! Only teachers can access this dashboard.");
+  navigate("/login");
+}
   }, [teacher, navigate]);
 
   return (
@@ -26,10 +28,10 @@ export default function TeacherDashboard() {
       <h1 className="dashboard-title">
         Welcome to <span className="fusion-text">Teacher Dashboard 🎓</span>
       </h1>
-      <p className="dashboard-subtext">
+      {/* <p className="dashboard-subtext">
         Hello, <b>{teacher?.name}</b>! You are logged in as a{" "}
         <b>{teacher?.role}</b>.
-      </p>
+      </p> */}
 
       {/* ✅ Choose a Subject Section */}
       <h3 className="unit-heading" style={{ marginTop: "30px" }}>

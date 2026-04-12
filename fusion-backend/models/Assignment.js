@@ -1,30 +1,36 @@
 import mongoose from "mongoose";
 
 const questionSchema = new mongoose.Schema({
-  questionText: { type: String, required: true },
-  options: [{ type: String, required: true }],
-  correctAnswer: { type: String, required: true },
+  questionText: { type: String },
+  options: [{ type: String }],
+  correctAnswer: { type: String },
 });
 
 const assignmentSchema = new mongoose.Schema({
   unit: { type: Number, required: true },
 
-  
+  type: {
+    type: String,
+    enum: ["quiz", "subjective"],
+    default: "quiz",
+  },
 
-  title: { type: String, required: true },
+  // ✅ QUIZ
+  title: { type: String, default: "" },
   description: { type: String, default: "" },
-
   deadline: { type: Date, default: null },
-
-  maxMarks: { type: Number, default: 100 },
-  isActive: { type: Boolean, default: true },
-
   questions: [questionSchema],
 
-  // ✅ ADD THESE TWO FIELDS
+  // ✅ SUBJECTIVE 🔥 (CLEAN VERSION)
+  question: { type: String, default: "" },
+  keywords: [{ type: String }],
+  maxMarks: { type: Number, default: 100 },
+
+  isActive: { type: Boolean, default: true },
+
   section: {
     type: String,
-    required: true,
+    default: "",
   },
 
   createdBy: {
@@ -33,7 +39,6 @@ const assignmentSchema = new mongoose.Schema({
   },
 
   createdAt: { type: Date, default: Date.now },
-
 });
 
 export default mongoose.model("Assignment", assignmentSchema);

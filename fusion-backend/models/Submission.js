@@ -7,14 +7,27 @@ const submissionSchema = new mongoose.Schema({
     required: true
   },
 
+  // ✅ for coding
   questionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "CodingQuestion",
-    required: true
+    required: false
   },
 
-  
+  // ✅ for subjective
+  assignmentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Assignment",
+    required: false
+  },
 
+ auth-upgrade
+  unit: {
+    type: Number
+  },
+
+  // 🔥 common fields
+ main
   code: String,
   language: String,
   status: String,
@@ -24,6 +37,13 @@ const submissionSchema = new mongoose.Schema({
   totalMarks: Number,
   maxMarks: Number,
 
+auth-upgrade
+  // ✅ subjective result
+  marks: Number,
+  feedback: String,
+
+
+ main
   stepResults: [
     {
       label: String,
@@ -35,4 +55,5 @@ const submissionSchema = new mongoose.Schema({
 
   createdAt: { type: Date, default: Date.now }
 });
+
 export default mongoose.model("Submission", submissionSchema);

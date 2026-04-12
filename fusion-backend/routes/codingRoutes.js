@@ -1,18 +1,19 @@
 import express from "express";
+
 import {
   addCodingQuestion,
   getCodingQuestions,
   deleteCodingQuestion,
   evaluateCode,
   getAllCodingResults,
-       
-   updateCodingQuestion          // ✅ ADDED
+  updateCodingQuestion
 } from "../controllers/codingController.js";
-import { submitCode } from "../controllers/evaluateCodeController.js";
 
+import { submitCode } from "../controllers/evaluateCodeController.js";
 import { getLeaderboard } from "../controllers/leaderboardController.js";
 import { getSubmissionById } from "../controllers/submitCodeController.js";
 
+import Submission from "../models/Submission.js";   // ✅ IMPORTANT
 
 const router = express.Router();
 
@@ -31,6 +32,7 @@ router.get("/practice", getCodingQuestions);
 // 📄 Get single submission (IMPORTANT 🔥)
 // -------------------------------------------------
 router.get("/submission/:id", getSubmissionById);
+
 // -------------------------------------------------
 // ❌ Delete coding question
 // -------------------------------------------------
@@ -52,9 +54,38 @@ router.post("/submit", submitCode);
 router.get("/leaderboard", getLeaderboard);
 
 // -------------------------------------------------
-// 📊 Teacher – Get all students coding results
+// 📊 Teacher – Get ALL coding results
 // -------------------------------------------------
 router.get("/results", getAllCodingResults);
+
+// -------------------------------------------------
+// ✅ NEW: Get results by QUESTION (VERY IMPORTANT 🔥)
+// -------------------------------------------------
+router.get("/results/:questionId", async (req, res) => {
+  try {
+    const { questionId } = req.params;
+
+    const submissions = await Submission.find({
+      questionId: questionId,
+    }).populate("userId", "name rollNumber");
+
+    res.json({
+      success: true,
+      submissions,
+    });
+
+  } catch (err) {
+    console.error("Error fetching question results:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
+// -------------------------------------------------
+// ✏ Update coding question
+// -------------------------------------------------
 router.put("/update/:id", updateCodingQuestion);
 
 export default router;
