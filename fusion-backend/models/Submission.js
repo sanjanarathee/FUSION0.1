@@ -21,13 +21,11 @@ const submissionSchema = new mongoose.Schema({
     required: false
   },
 
- auth-upgrade
   unit: {
     type: Number
   },
 
   // 🔥 common fields
- main
   code: String,
   language: String,
   status: String,
@@ -37,13 +35,10 @@ const submissionSchema = new mongoose.Schema({
   totalMarks: Number,
   maxMarks: Number,
 
-auth-upgrade
   // ✅ subjective result
   marks: Number,
   feedback: String,
 
-
- main
   stepResults: [
     {
       label: String,

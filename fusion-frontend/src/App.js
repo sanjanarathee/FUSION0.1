@@ -9,11 +9,11 @@ import Dashboard from "./pages/Dashboard";
 import SetPassword from "./pages/SetPassword";
 
 import AssignmentResultTable from "./pages/AssignmentResultTable";
-auth-upgrade
+
 import StudentSubjective from "./pages/StudentSubjective";
 import TeacherSubjectiveAssignment from "./pages/TeacherSubjectiveAssignment";
 
-main
+
 
 
 
@@ -193,12 +193,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/set-password" element={<SetPassword />} />
- auth-upgrade
+ 
 
 
         <Route path="/teacher/assignment-results/:assignmentId" element={<AssignmentResultTable />} />
         
- main
+ 
 
         <Route path="/teacher/assignment-results/:assignmentId" element={<AssignmentResultTable />} />
         <Route
