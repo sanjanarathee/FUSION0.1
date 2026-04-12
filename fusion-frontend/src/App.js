@@ -9,8 +9,10 @@ import Dashboard from "./pages/Dashboard";
 import SetPassword from "./pages/SetPassword";
 
 import AssignmentResultTable from "./pages/AssignmentResultTable";
+
 import StudentSubjective from "./pages/StudentSubjective";
 import TeacherSubjectiveAssignment from "./pages/TeacherSubjectiveAssignment";
+
 
 
 
@@ -191,6 +193,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/set-password" element={<SetPassword />} />
+ 
+
+
+        <Route path="/teacher/assignment-results/:assignmentId" element={<AssignmentResultTable />} />
+        
+ 
 
         <Route path="/teacher/assignment-results/:assignmentId" element={<AssignmentResultTable />} />
         <Route
