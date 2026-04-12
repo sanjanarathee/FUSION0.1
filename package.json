@@ -1,4 +1,8 @@
 {
+  "name": "fusion-project",
+  "version": "1.0.0",
+  "private": true,
+
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
     "axios": "^1.13.2",
@@ -10,11 +14,13 @@
     "openai": "^6.33.0",
     "react-router-dom": "^7.9.5"
   },
+
   "devDependencies": {
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.11",
     "tailwindcss": "^4.1.17"
   },
+
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd fusion-backend && nodemon server.js",
