@@ -20,7 +20,7 @@ export default function TeacherUnit3Results() {
 
   console.log("Sending:", { teacherId, section });
 
-  axios.get("http://localhost:5000/api/assignments/performance", {
+  axios.get("https://fusion-backend.onrender.com/api/assignments/performance", {
     params: {
       unit: 3,
       teacherId,

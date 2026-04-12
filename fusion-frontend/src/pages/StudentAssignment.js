@@ -26,7 +26,7 @@ export default function StudentAssignment() {
   const fetchAssignments = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/assignments/student?unit=${Number(selectedUnit)}&rollNumber=${rollNumber}`
+        `https://fusion-backend.onrender.com/api/assignments/student?unit=${Number(selectedUnit)}&rollNumber=${rollNumber}`
       );
 
       console.log("Student assignments:", res.data);
@@ -62,7 +62,7 @@ export default function StudentAssignment() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/assignments/performance",
+        "https://fusion-backend.onrender.com/api/assignments/performance",
         {
           studentName,
           rollNumber,

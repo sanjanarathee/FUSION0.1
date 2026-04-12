@@ -12,7 +12,7 @@ export default function ManageSubjective() {
   const fetchAssignments = async () => {
   try {
     const res = await axios.get(
-      "http://localhost:5000/api/assignments/unit/3"
+      "https://fusion-backend.onrender.com/api/assignments/unit/3"
     );
 
     console.log("RESPONSE:", res.data);
@@ -30,7 +30,7 @@ export default function ManageSubjective() {
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/assignments/${id}`
+        `https://fusion-backend.onrender.com/api/assignments/${id}`
       );
       fetchAssignments();
     } catch (err) {
