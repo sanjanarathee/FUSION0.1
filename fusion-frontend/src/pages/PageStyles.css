@@ -3261,7 +3261,7 @@ select.clean-input option {
 .disapprove-btn:hover {
   background-color: #d9363e;
 }
-//* 🌈 PAGE */
+/* 🌈 PAGE */
 .unit-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f1f5f9, #e0f2fe);
