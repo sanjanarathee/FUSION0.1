@@ -8,6 +8,7 @@ export const submitCode = async (req, res) => {
       code,
       language,
       questionId,
+      assignmentId,   // ✅ ADD THIS
       testcasesPassed,
       totalTestcases
     } = req.body;
@@ -70,6 +71,7 @@ const maxMarks = question.steps
       status,
       passed: testcasesPassed,
       total: totalTestcases,
+      assignmentId,
 
       totalMarks,
       maxMarks,

@@ -8,6 +8,11 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import SetPassword from "./pages/SetPassword";
 
+import AssignmentResultTable from "./pages/AssignmentResultTable";
+import StudentSubjective from "./pages/StudentSubjective";
+import TeacherSubjectiveAssignment from "./pages/TeacherSubjectiveAssignment";
+
+
 
 
 
@@ -48,6 +53,7 @@ import CCodingPractice from "./pages/CCodingPractices";
 import StudentNotes from "./pages/StudentNotes";
 
 
+
 /* ===========================
    🔹 TEACHER – DASHBOARD
 =========================== */
@@ -59,6 +65,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import ManageCLanguage from "./pages/ManageCLanguage";
 import ManageCppLanguage from "./pages/ManageCppLanguage";
+
+import TeacherCodingResults from "./pages/TeacherCodingResults";
 
 
 
@@ -127,7 +135,7 @@ import TeacherCppUnit4UploadPPT from "./pages/TeacherCppUnit4UploadPPT";
 import TeacherCppUnit4Assignment from "./pages/TeacherCppUnit4Assignment";
 import TeacherCppUnit4Coding from "./pages/TeacherCppUnit4Coding";
 
-
+import TeacherCodingQuestionResults from "./pages/TeacherCodingQuestionResults";
 
 
 
@@ -142,7 +150,6 @@ import TeacherCppUnit4Coding from "./pages/TeacherCppUnit4Coding";
 import CreateAssignment from "./pages/CreateAssignment";
 import ManageAssignments from "./pages/ManageAssignments";
 import AssignmentResults from "./pages/AssignmentResults";
-import AssignmentResultTable from "./pages/AssignmentResultTable";
 
 /* ===========================
    🔹 FILE UPLOADS
@@ -163,6 +170,9 @@ import StudentAssignment from "./pages/StudentAssignment";
 import SubmissionResult from "./pages/SubmissionResult";
 import SubmissionHistory from "./pages/SubmissionHistory";
 
+import CreateSubjective from "./pages/CreateSubjective";
+import ManageSubjective from "./pages/ManageSubjective";
+import SubjectiveResults from "./pages/SubjectiveResults";
 /* ===========================
    🔹 MISC
 =========================== */
@@ -181,10 +191,15 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/set-password" element={<SetPassword />} />
+
+        <Route path="/teacher/assignment-results/:assignmentId" element={<AssignmentResultTable />} />
+        <Route
+ path="/teacher/unit3/subjective"
+  element={<TeacherSubjectiveAssignment />}
+/>
         
 
-
-        {/* ======================
+<Route path="/learn-c/unit/:unit/subjective" element={<StudentSubjective />} />   {/* ======================
             STUDENT
         ====================== */}
         <Route path="/dashboard" element={<Dashboard />} />
@@ -192,7 +207,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/teacher-signup" element={<TeacherSignup />} />
 
-
+<Route 
+  path="/teacher/unit/:unit/coding/results/:questionId" 
+  element={<TeacherCodingQuestionResults />} 
+/>
 
         <Route path="/learn-c" element={<LearnC />} />
         <Route path="/learn-cpp" element={<LearnCpp />} />
@@ -210,7 +228,14 @@ function App() {
   path="/learn-cpp/unit1/notes"
   element={<Navigate to="/student/notes/cpp/1" replace />}
 />
+<Route path="/teacher/unit3/subjective/create" element={<CreateSubjective />} />
+<Route path="/teacher/unit3/subjective/manage" element={<ManageSubjective />} />
 
+
+  <Route
+    path="/teacher/unit/:unit/subjective/results"
+    element={<SubjectiveResults />}
+  />
 {/* PPT */}
 <Route path="/learn-c/unit1/ppt" element={<CUnit1Ppt />} />
 <Route path="/learn-cpp/unit1/ppt" element={<CUnit1Ppt />} />
@@ -310,7 +335,16 @@ function App() {
         <Route path="/teacher/unit3/assignments" element={<TeacherUnit3Assignment />} />
         <Route path="/teacher/unit3/manage-assignments" element={<TeacherUnit3ManageAssignments />} />
         <Route path="/teacher/unit3/results" element={<TeacherUnit3Results />} />
-        <Route path="/teacher/unit3/coding" element={<TeacherUnit3Coding />} />
+
+<Route 
+  path="/teacher/unit/:unit/coding/add" 
+  element={<TeacherUnit3Coding />} 
+/>
+
+<Route 
+  path="/teacher/unit/:unit/coding/results" 
+  element={<TeacherCodingResults />} 
+/>
 
         <Route
           path="/teacher/unit3/uploadNotes"

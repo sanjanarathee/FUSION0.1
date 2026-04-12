@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
-import "./PageStyles.css";
+import { useLocation, useNavigate } from "react-router-dom";import "./PageStyles.css";
 
 export default function ManageAssignments() {
   const location = useLocation();
+  const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
 
   // ✅ Always store UNIT as NUMBER
@@ -72,6 +72,12 @@ export default function ManageAssignments() {
             >
               ❌ Delete Assignment
             </button>
+            <button
+  className="view-btn"
+  onClick={() => navigate(`/teacher/assignment-results/${a._id}`)}
+>
+  📊 View Results
+</button>
           </div>
         ))
       )}

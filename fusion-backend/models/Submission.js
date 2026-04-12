@@ -7,24 +7,38 @@ const submissionSchema = new mongoose.Schema({
     required: true
   },
 
+  // ✅ for coding
   questionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "CodingQuestion",
-    required: true
+    required: false   // ❗ CHANGE HERE
   },
 
-  code: { type: String, required: true },
-  language: { type: String, default: "c" },
+  // ✅ for subjective
+  assignmentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Assignment",
+    required: false   // ❗ ADD THIS
+  },
+    unit: {
+    type: Number
+  },
 
-  status: { type: String, required: true },
+  // 🔥 common fields
+  code: String,
+  language: String,
+  status: String,
+  passed: Number,
+  total: Number,
 
-  passed: { type: Number },
-  total: { type: Number },
+  totalMarks: Number,
+  maxMarks: Number,
 
-  totalMarks: { type: Number, default: 0 },
-  maxMarks: { type: Number, default: 0 },
+  // ✅ subjective result
+  marks: Number,
+  feedback: String,
 
-  stepResults: [   // 🔥🔥 ADD THIS
+  stepResults: [
     {
       label: String,
       passed: Boolean,

@@ -53,6 +53,13 @@ export default function CUnit3() {
         >
           🎯 Take Unit 3 Quiz
         </button>
+
+        <button
+  className="dashboard-btn pink"
+  onClick={() => navigate("/learn-c/unit/3/subjective")}   // ✅ CORRECT
+>
+  📝 Subjective Assignment
+</button>
       </div>
 
       <button

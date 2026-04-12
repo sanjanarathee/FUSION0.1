@@ -205,8 +205,24 @@ router.get("/approved-teachers", async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 });
+// ❌ DISAPPROVE TEACHER
+router.put("/disapprove/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
 
+    if (!user || user.role !== "teacher") {
+      return res.status(404).json({ msg: "Teacher not found" });
+    }
 
+    user.isApproved = false;
+    await user.save();
+
+    res.json({ msg: "Teacher disapproved successfully" });
+
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
 
 
 export default router;

@@ -82,7 +82,7 @@ useEffect(() => {
       setIsRunning(true);
       setCanSubmit(false);
 
-  const res = await axios.post("https://fusion0-1.onrender.com/api/code/run",
+  const res = await axios.post("http://localhost:5000/api/code/run",
   {
     code,
     language,
@@ -112,9 +112,9 @@ if (
   if (!result) return alert("Run your code first!");
   if (!canSubmit) return alert("Submit only after all testcases pass!");
 
-  const user = JSON.parse(localStorage.getItem("fusionUser"));
+  const data = JSON.parse(localStorage.getItem("fusionUser"));
 
-  if (!user || !user.id) {
+  if (!data || !data.user) {
     alert("Please login first!");
     return;
   }
@@ -126,16 +126,22 @@ if (
       code,
       language,
       questionId: selected._id,
-      userId: user.id,   // ✅ FIXED HERE
+      userId: data.user.id,
       testcasesPassed: result.testcasesPassed,
       totalTestcases: result.totalTestcases,
     };
 
     console.log("Submitting payload:", payload);
 
-    const res = await axios.post("https://fusion0-1.onrender.com/api/coding/submit",
-  payload
-);
+    const res = await axios.post(
+      "http://localhost:5000/api/coding/submit",
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
+      }
+    ); // ✅ VERY IMPORTANT semicolon
 
     if (res.data.success) {
       alert("✅ Accepted!");
@@ -146,7 +152,6 @@ if (
     } else {
       alert(res.data.message || "Submit failed");
     }
-
   } catch (err) {
     console.error("Submit error:", err);
     alert("Submit failed");

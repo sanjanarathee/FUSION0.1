@@ -1,3 +1,4 @@
+import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -5,16 +6,52 @@ import User from "../models/user.js";
 
 dotenv.config();
 
+const router = express.Router();
+
+// =================== SET PASSWORD ===================
+router.post("/set-password", async (req, res) => {
+  try {
+    const { rollNumber, email, password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ msg: "Password required" });
+    }
+
+    const user = await User.findOne({
+      $or: [{ rollNumber }, { email }],
+    });
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    if (user.passwordSet) {
+      return res.status(400).json({ msg: "Password already set. Please login." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 8); // 🔥 reduced cost for performance
+
+    user.password = hashedPassword;
+    user.passwordSet = true;
+
+    await user.save();
+
+    res.status(200).json({ msg: "Password set successfully" });
+
+  } catch (error) {
+    console.error("Set Password Error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 
 // =================== SIGNUP ===================
-export const signup = async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password, role, sections, rollNumber, section } = req.body;
-
-    console.log("📥 Signup Request Received:", req.body);
+    const { name, email, password, role, sections } = req.body;
 
     if (!name || !email || !password || !role) {
-      return res.status(400).json({ msg: "All required fields must be filled" });
+      return res.status(400).json({ msg: "All fields are required" });
     }
 
     if (role === "admin") {
@@ -28,36 +65,27 @@ export const signup = async (req, res) => {
       return res.status(400).json({ msg: "User already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const finalRole =
-  process.env.TEST_MODE === "true" && role === "student"
-    ? "test_student"
-    : role;
+    const hashedPassword = await bcrypt.hash(password, 8); // 🔥 optimized
 
-const newUser = new User({
-  name,
-  email: normalizedEmail,
-  password: hashedPassword,
-  role: finalRole,
-  sections: finalRole === "teacher" ? sections : undefined,
-  rollNumber:
-    finalRole === "student" || finalRole === "test_student"
-      ? rollNumber
-      : undefined,
-  section:
-    finalRole === "student" || finalRole === "test_student"
-      ? section
-      : undefined,
-});
+    const newUser = new User({
+      name: name.trim(),
+      email: normalizedEmail,
+      password: hashedPassword,
+      role,
+      sections,
+      isApproved: role === "teacher" ? false : true,
+      passwordSet: true,
+    });
 
     await newUser.save();
 
-    return res.status(200).json({
-      msg: role === "teacher"
-        ? "Registration request sent. Wait for admin approval."
-        : "Signup successful!",
+    res.status(200).json({
+      msg:
+        role === "teacher"
+          ? "Registration request sent. Wait for admin approval."
+          : "Signup successful",
       user: {
-        _id: newUser._id,
+        id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
@@ -65,18 +93,14 @@ const newUser = new User({
     });
 
   } catch (error) {
-    console.error("🔥 Signup Error:", error);
-    return res.status(500).json({
-      msg: "Signup failed, try again!",
-      error: error.message,
-    });
+    console.error("Signup Error:", error);
+    res.status(500).json({ msg: "Signup failed" });
   }
-};
-
+});
 
 
 // =================== LOGIN ===================
-export const login = async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
@@ -86,54 +110,132 @@ export const login = async (req, res) => {
 
     const cleanIdentifier = identifier.trim();
 
-    console.log("LOGIN TRY:", cleanIdentifier);
+    // 🔥 optimized query (no $or)
+    const query = cleanIdentifier.includes("@")
+      ? { email: cleanIdentifier.toLowerCase() }
+      : { rollNumber: cleanIdentifier };
 
-
-    const user = await User.findOne({
-      $or: [
-        { email: cleanIdentifier.toLowerCase() },
-        { rollNumber: cleanIdentifier }
-      ]
-    });
+    const user = await User.findOne(query);
 
     if (!user) {
-      return res.status(400).json({ msg: "User not found!" });
+      return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    // ✅ STUDENT: password set nahi hai
-    if (user.role === "student" && !user.password) {
-      return res.status(400).json({
-        msg: "Please set your password first"
-      });
+    if (!user.passwordSet) {
+      return res.status(400).json({ msg: "Please set your password first" });
     }
 
-    // ✅ TEACHER: approval required
+    // Teacher approval check
     if (user.role === "teacher" && !user.isApproved) {
       return res.status(403).json({
-        msg: "Wait for admin approval"
+        msg: "Your account is pending admin approval",
       });
     }
 
     const isMatch = await bcrypt.compare(password.trim(), user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid credentials!" });
+      return res.status(400).json({ msg: "Invalid credentials" });
     }
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
-    res.json({
+    res.status(200).json({
       msg: "Login successful",
       token,
-      user
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        rollNumber: user.rollNumber,
+        section: user.section,
+        sections: user.sections,
+      },
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Login failed" });
+    console.error("Login Error:", error);
+    res.status(500).json({ msg: "Server error" });
   }
-};
+});
+
+
+// =================== APPROVE TEACHER ===================
+router.put("/approve/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || user.role !== "teacher") {
+      return res.status(404).json({ msg: "Teacher not found" });
+    }
+
+    user.isApproved = true;
+    await user.save();
+
+    res.json({ msg: "Teacher approved successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+
+// =================== GET PENDING TEACHERS ===================
+router.get("/pending-teachers", async (req, res) => {
+  try {
+    const teachers = await User.find({
+      role: "teacher",
+      isApproved: false,
+    });
+
+    res.json(teachers);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+
+// =================== GET APPROVED TEACHERS ===================
+router.get("/approved-teachers", async (req, res) => {
+  try {
+    const teachers = await User.find({
+      role: "teacher",
+      isApproved: true,
+    });
+
+    res.json(teachers);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+
+// =================== DISAPPROVE TEACHER ===================
+router.put("/disapprove/:id", async (req, res) => {
+  try {
+    const teacher = await User.findById(req.params.id);
+
+    if (!teacher) {
+      return res.status(404).json({ msg: "Teacher not found" });
+    }
+
+    teacher.isApproved = false;
+    await teacher.save();
+
+    res.status(200).json({ msg: "Teacher disapproved successfully" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+export default router;

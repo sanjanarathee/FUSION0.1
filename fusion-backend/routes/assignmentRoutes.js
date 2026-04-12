@@ -1,17 +1,24 @@
 import express from "express";
 import {
   createAssignment,
-  getAssignment,        // Student fetch (with ?unit= )
-  getAllAssignments,    // Teacher fetch all
+  getAssignment,
+  getAllAssignments,
   deleteAssignment,
   savePerformance,
   getAllPerformances,
-  getAssignmentsByUnit  // Teacher fetch by unit
+  getAssignmentsByUnit,
+  createSubjectiveAssignment,
+  updateSubjectiveAssignment,
+  getSubjectiveResults  // ✅ yahi add karo upar
 } from "../controllers/assignmentController.js";
 
 import Performance from "../models/Performance.js";
-
+import { getSubjectiveAssignmentsForStudent } from "../controllers/assignmentController.js";
+import { submitSubjectiveAnswer } from "../controllers/assignmentController.js";
+import { getStudentSubmissions } from "../controllers/assignmentController.js";
+import { protect } from "../middleware/authmiddleware.js";
 const router = express.Router();
+
 
 /* -------------------------------------------------------------------------- */
 /* 🧩 TEACHER ROUTES */
@@ -22,14 +29,21 @@ router.post("/create", createAssignment);
 
 /* 📘 Get all assignments (Teacher panel) */
 router.get("/all", getAllAssignments);
+router.get("/subjective/submissions", getStudentSubmissions);
 
 /* 🔍 Teacher: Get assignments by UNIT */
 router.get("/unit/:unit", getAssignmentsByUnit);
 
 /* 🗑 Delete an assignment */
+router.put("/subjective/:id", updateSubjectiveAssignment);
 router.delete("/:id", deleteAssignment);
+router.get("/subjective/results", getSubjectiveResults);
+router.post("/subjective/submit", submitSubjectiveAnswer);
+router.get("/subjective/student", getSubjectiveAssignmentsForStudent);
 
+router.post("/subjective", protect, createSubjectiveAssignment);
 
+router.get("/unit/:unit", getAssignmentsByUnit);
 
 /* -------------------------------------------------------------------------- */
 /* 👩‍🎓 STUDENT ROUTES */
@@ -47,6 +61,8 @@ router.post("/performance", savePerformance);
 
 /* 📊 Get all performances */
 router.get("/performance", getAllPerformances);
+
+router.post("/subjective", createSubjectiveAssignment);
 
 
 

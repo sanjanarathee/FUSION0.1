@@ -32,4 +32,19 @@ router.get("/unit/3", async (req, res) => {
   }
 });
 
+/* ----------------------------------------------------
+   🔹 GET – Get Submissions by Assignment ID
+---------------------------------------------------- */
+router.get("/assignment/:assignmentId", async (req, res) => {
+  try {
+    const { assignmentId } = req.params;
+
+    const submissions = await Submission.find({ assignmentId });
+
+    res.json(submissions);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
 export default router;

@@ -1,55 +1,48 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
 import "./PageStyles.css";
 
 export default function TeacherCodingResults() {
-  const [results, setResults] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const navigate = useNavigate();
+  const { unit } = useParams();   // ✅ dynamic unit
 
   useEffect(() => {
     axios
-      .get("https://fusion0-1.onrender.com/api/coding/results")
-      .then((res) => setResults(res.data.results || []))
-      .catch((err) => console.error("Fetch results error:", err));
+      .get("http://localhost:5000/api/coding/practice", {
+        params: { language: "c" },
+      })
+      .then((res) => {
+        console.log("Questions:", res.data.questions);
+        setQuestions(res.data.questions || []);
+      })
+      .catch((err) => console.error("Fetch error:", err));
   }, []);
 
   return (
     <div className="learn-container">
-      <h1 className="learn-title">📊 All Coding Practice Results</h1>
+      <h1 className="learn-title">
+        📊 Unit {unit} - Coding Questions
+      </h1>
 
-      {results.length === 0 ? (
-        <p>No student submissions yet.</p>
+      {questions.length === 0 ? (
+        <p>No coding questions found.</p>
       ) : (
-        <table className="result-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Student</th>
-              <th>Email</th>
-              <th>Question</th>
-              <th>Score</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {results.map((r, i) => (
-              <tr key={r._id}>
-                <td>{i + 1}</td>
-                <td>{r.userId?.name}</td>
-                <td>{r.userId?.email}</td>
-                <td>{r.questionId?.title}</td>
-                <td>{r.totalMarks}/{r.maxMarks}</td>
-                <td>
-                  <span className={r.status === "Accepted" ? "badge-pass" : "badge-fail"}>
-                    {r.status}
-                  </span>
-                </td>
-                <td>{new Date(r.createdAt).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="question-list">
+          {questions.map((q) => (
+            <div
+              key={q._id}
+              className="question-card"
+              onClick={() =>
+                navigate(`/teacher/unit/${unit}/coding/results/${q._id}`)
+              }
+            >
+              <h3>{q.title}</h3>
+              <p>{q.description?.substring(0, 100)}...</p>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
