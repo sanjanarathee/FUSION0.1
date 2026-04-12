@@ -14,7 +14,6 @@ export default function Dashboard() {
 
   if (!userData) return null;
 
-  const role = userData?.role || "student";
 
   return (
     <div className="dashboard-container">
