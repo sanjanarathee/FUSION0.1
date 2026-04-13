@@ -6,8 +6,6 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 
 // ------------------------------
-// ✅ Import Routes
-// ------------------------------
 import fileRoutes from "./routes/fileRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import assignmentRoutes from "./routes/assignmentRoutes.js";
@@ -23,40 +21,47 @@ dotenv.config();
 const app = express();
 
 // ------------------------------
-// ✅ Security Middleware
+// ✅ Security
 // ------------------------------
-app.use(helmet()); // 🔥 security + performance
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 
 // ------------------------------
-// ✅ Rate Limiting (CRITICAL)
+// ✅ Rate Limiting
 // ------------------------------
 const limiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 120, // 🔥 allow 120 requests per minute per IP
+  windowMs: 60 * 1000,
+  max: 120,
   message: "Too many requests, please try again later.",
 });
 
 app.use("/api", limiter);
 
 // ------------------------------
-// ✅ CORS
+// ✅ CORS (FINAL FIX)
 // ------------------------------
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://fusion-0-1.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
+// ❌ REMOVE THIS LINE (important)
+// app.options("*", cors());
 
 // ------------------------------
-// ✅ CORS (FIXED)
+// ✅ Body Parser
 // ------------------------------
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-
-// ------------------------------
-// ✅ Body Parser (optimized)
-// ------------------------------
-app.use(express.json({ limit: "1mb" })); // 🔥 prevent heavy payload crash
+app.use(express.json({ limit: "1mb" }));
 
 // ------------------------------
 // ✅ Routes
@@ -72,12 +77,12 @@ app.use("/api/code", evaluatecodeRoutes);
 app.use("/api/submit", submitRoutes);
 
 // ------------------------------
-// ✅ MongoDB Connection (OPTIMIZED)
+// ✅ MongoDB
 // ------------------------------
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      maxPoolSize: 10, // 🔥 prevents overload
+      maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
     });
 
@@ -90,9 +95,6 @@ const connectDB = async () => {
 
 connectDB();
 
-// ------------------------------
-// ✅ MongoDB Events (minimal logs)
-// ------------------------------
 mongoose.connection.on("connected", () => {
   console.log("📦 DB Ready");
 });
@@ -102,22 +104,16 @@ mongoose.connection.on("error", (err) => {
 });
 
 // ------------------------------
-// ✅ Root Route
-// ------------------------------
 app.get("/", (req, res) => {
   res.send("🚀 Fusion Backend Running");
 });
 
-// ------------------------------
-// ✅ Global Error Handler
 // ------------------------------
 app.use((err, req, res, next) => {
   console.error("Global Error:", err.message);
   res.status(500).json({ msg: "Internal Server Error" });
 });
 
-// ------------------------------
-// ✅ Start Server
 // ------------------------------
 const PORT = process.env.PORT || 5000;
 
