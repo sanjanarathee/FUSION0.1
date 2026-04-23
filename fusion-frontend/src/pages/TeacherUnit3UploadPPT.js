@@ -23,7 +23,7 @@ export default function TeacherUnit3UploadPPT({ course = "c" }) {
     formData.append("file", file);
 
     await axios.post(
-"http://localhost:5000/api/files/upload",
+"https://fusion0-1.onrender.com/api/files/upload",
       formData
     );
 

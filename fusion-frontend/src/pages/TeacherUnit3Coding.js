@@ -24,7 +24,7 @@ export default function TeacherUnit3Coding() {
   const fetchQuestions = async () => {
     try {
       const res = await axios.get(
-  "http://localhost:5000/api/coding/practice",
+  "https://fusion0-1.onrender.com/api/coding/practice",
   { params: { language: "c" } }
 );
       setAllQuestions(res.data.questions || []);
@@ -97,7 +97,7 @@ export default function TeacherUnit3Coding() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/coding/add", {
+      await axios.post("https://fusion0-1.onrender.com/api/coding/add", {
 
         
 
@@ -151,7 +151,7 @@ export default function TeacherUnit3Coding() {
 
     try {
       await axios.delete(
-        `http://localhost:5000/api/coding/delete/${id}`
+        `https://fusion0-1.onrender.com/api/coding/delete/${id}`
       );
 
       fetchQuestions();

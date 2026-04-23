@@ -10,7 +10,7 @@ export default function TeacherCodingResults() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/coding/practice", {
+      .get("https://fusion0-1.onrender.com/api/coding/practice", {
         params: { language: "c" },
       })
       .then((res) => {

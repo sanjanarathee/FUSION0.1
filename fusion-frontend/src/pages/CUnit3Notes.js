@@ -13,7 +13,7 @@ const [loading,setLoading] = useState(true);
 useEffect(()=>{
 
 axios.get(
-"http://localhost:5000/api/notes/filter",
+"https://fusion0-1.onrender.com/api/notes/filter",
 {
 params:{
 subject:"c",
@@ -143,7 +143,7 @@ key={index}
 <div className="note-actions">
 
 <a
-href={`http://localhost:5000/api/notes/file/${note.filename}`}
+href={`https://fusion0-1.onrender.com/api/notes/file/${note.filename}`}
 target="_blank"
 rel="noreferrer"
 className="note-btn"
@@ -152,7 +152,7 @@ View
 </a>
 
 <a
-href={`http://localhost:5000/api/notes/file/${note.filename}`}
+href={`https://fusion0-1.onrender.com/api/notes/file/${note.filename}`}
 download
 className="note-btn"
 >

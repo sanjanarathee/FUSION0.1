@@ -28,7 +28,7 @@ const fetchAssignments = async()=>{
 try{
 
 const res=await axios.get(
-`http://localhost:5000/api/assignments/student?unit=${Number(selectedUnit)}&rollNumber=${rollNumber}`
+`https://fusion0-1.onrender.com/api/assignments/student?unit=${Number(selectedUnit)}&rollNumber=${rollNumber}`
 );
 
 setAssignments(res.data.assignments || []);
@@ -88,7 +88,7 @@ accuracy
 try{
 
 await axios.post(
-"http://localhost:5000/api/assignments/performance",
+"https://fusion0-1.onrender.com/api/assignments/performance",
 {
 studentName,
 rollNumber,
@@ -120,7 +120,7 @@ return;
 try{
 
 const res=await axios.post(
-"http://localhost:5000/api/assignments/check",
+"https://fusion0-1.onrender.com/api/assignments/check",
 {
 rollNumber,
 unit:assignment.unit

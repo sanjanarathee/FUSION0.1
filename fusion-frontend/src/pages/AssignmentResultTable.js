@@ -7,7 +7,7 @@ export default function AssignmentResultTable() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/submissions/assignment/${assignmentId}`)
+    axios.get(`https://fusion0-1.onrender.com/api/submissions/assignment/${assignmentId}`)
       .then((res) => setResults(res.data))
       .catch((err) => console.log(err));
   }, [assignmentId]);

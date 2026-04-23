@@ -14,7 +14,7 @@ export default function TeacherUnit3Results() {
   -------------------------------------------------- */
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/assignments/unit/3")
+      .get("https://fusion0-1.onrender.com/api/assignments/unit/3")
       .then((res) => {
 setAssignments(res.data.assignments || []);      })
       .catch((err) => console.error(err));
@@ -29,7 +29,7 @@ setAssignments(res.data.assignments || []);      })
     const user = JSON.parse(localStorage.getItem("fusionUser"));
 
     axios
-      .get("http://localhost:5000/api/assignments/performance", {
+      .get("https://fusion0-1.onrender.com/api/assignments/performance", {
         params: {
           unit: 3,
           assignmentId: selectedAssignment._id, // 🔥 IMPORTANT

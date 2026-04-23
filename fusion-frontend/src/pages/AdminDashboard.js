@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   const fetchPending = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/auth/pending-teachers"
+        "https://fusion0-1.onrender.com/api/auth/pending-teachers"
       );
       setPendingTeachers(res.data);
     } catch (err) {
@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   const fetchApproved = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/auth/approved-teachers"
+        "https://fusion0-1.onrender.com/api/auth/approved-teachers"
       );
       setApprovedTeachers(res.data);
     } catch (err) {
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
 
   const approveTeacher = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/auth/approve/${id}`);
+      await axios.put(`https://fusion0-1.onrender.com/api/auth/approve/${id}`);
       fetchPending();
       fetchApproved();
     } catch (err) {
@@ -50,7 +50,7 @@ export default function AdminDashboard() {
     if (!window.confirm("Are you sure you want to disapprove this teacher?")) return;
 
     try {
-      await axios.put(`http://localhost:5000/api/auth/disapprove/${id}`);
+      await axios.put(`https://fusion0-1.onrender.com/api/auth/disapprove/${id}`);
       fetchApproved();
       fetchPending();
     } catch (err) {
