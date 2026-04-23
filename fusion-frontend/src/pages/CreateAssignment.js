@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./PageStyles.css";
-const user = JSON.parse(localStorage.getItem("fusionUser"));
+import "../styles/teacher.css";   // ✅ FIXED
 
+// ✅ SAFE USER FETCH
+const rawUser = JSON.parse(localStorage.getItem("fusionUser")) || {};
+const user = rawUser?.user || rawUser;   // handle both structures
+const sections = user?.sections || [];
 
 export default function CreateAssignment() {
   const navigate = useNavigate();
@@ -18,16 +21,18 @@ export default function CreateAssignment() {
   const [description, setDescription] = useState("");
   const [section, setSection] = useState("");
 
-
-  const [questions, setQuestions] = useState(
+  // ✅ SAFE QUESTIONS INIT
+  const [questions, setQuestions] = useState(() =>
     Array.from({ length: 10 }, () => ({
       questionText: "",
-      options: ["", "", "", ""], 
+      options: ["", "", "", ""],
       correctAnswer: "",
     }))
   );
 
   const [msg, setMsg] = useState("");
+
+  // ================= HANDLERS =================
 
   const handleQuestionChange = (index, value) => {
     const updated = [...questions];
@@ -47,7 +52,8 @@ export default function CreateAssignment() {
     setQuestions(updated);
   };
 
-  // ⭐ Updated validation with space-trim + lowercase matching
+  // ================= VALIDATION =================
+
   const validateForm = () => {
     if (!title.trim()) return "❌ Assignment title cannot be empty!";
     if (!description.trim()) return "❌ Assignment description cannot be empty!";
@@ -56,32 +62,34 @@ export default function CreateAssignment() {
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
 
-      if (!q.questionText.trim()) {
+      if (!q?.questionText?.trim()) {
         return `❌ Question ${i + 1} is empty!`;
       }
 
-      // Validate options
-      for (let j = 0; j < q.options.length; j++) {
-        if (!q.options[j].trim()) {
+      for (let j = 0; j < (q?.options || []).length; j++) {
+        if (!q.options[j]?.trim()) {
           return `❌ Option ${j + 1} of Question ${i + 1} is empty!`;
         }
       }
 
-      if (!q.correctAnswer.trim()) {
+      if (!q?.correctAnswer?.trim()) {
         return `❌ Correct answer missing in Question ${i + 1}!`;
       }
 
-      // ⭐ Normalize spaces + lowercase for perfect matching
-      const normalizedOptions = q.options.map(o => o.trim().toLowerCase());
+      const normalizedOptions = (q.options || []).map(o =>
+        o.trim().toLowerCase()
+      );
       const normalizedAnswer = q.correctAnswer.trim().toLowerCase();
 
       if (!normalizedOptions.includes(normalizedAnswer)) {
-        return `❌ Correct answer in Question ${i + 1} must exactly match one of the options (case-insensitive)!`;
+        return `❌ Correct answer in Question ${i + 1} must match options!`;
       }
     }
 
     return null;
   };
+
+  // ================= SUBMIT =================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -94,165 +102,140 @@ export default function CreateAssignment() {
     }
 
     try {
-        await axios.post("https://fusion-backend.onrender.com/api/assignments/create", {
-
-  unit: Number(unit),
-  title,
-  description,
-  deadline,
-  questions,
-  teacherId: user.id,
-  section: section,
-});
-
+      await axios.post("http://localhost:5000/api/assignments/create", {
+        unit: Number(unit),
+        type: "quiz",
+        title,
+        description,
+        deadline,
+        questions,
+        teacherId: user?._id || user?.id,
+        section,
+      });
 
       setMsg("✅ Assignment published successfully!");
 
-      setTimeout(() => navigate("/teacher/manage-c"), 1500);
+      setTimeout(() => {
+        navigate(`/teacher/unit/${unit}/assignments`);
+      }, 1500);
 
     } catch (error) {
       console.error("Error:", error);
-      setMsg("❌ Failed to publish assignment. Try again!");
+      setMsg("❌ Failed to publish assignment");
     }
   };
 
-  return (
-    <div className="learn-container">
-      <h1 className="learn-title">🧩 Create C Programming Assignment</h1>
-      <p style={{ color: "white" }}>
-        Add 10 questions — each with 4 options and 1 correct answer.
-      </p>
+  // ================= UI =================
 
-      {/* UNIT */}
-      <div style={{ marginTop: 20, marginBottom: 30 }}>
-        <label style={{ color: "white", fontWeight: "bold" }}>📘 Unit:</label>
-        <select
-          value={unit}
-          onChange={(e) => setUnit(Number(e.target.value))}
-          className="dropdown"
-          style={{ marginLeft: 10 }}
-        >
-          <option value={1}>Unit 1</option>
-          <option value={2}>Unit 2</option>
-          <option value={3}>Unit 3</option>
-          <option value={4}>Unit 4</option>
-        </select>
-      </div>
-      {/* SECTION */}
-<div style={{ marginTop: 20, marginBottom: 30 }}>
-  <label style={{ color: "white", fontWeight: "bold" }}>
-    🏫 Section:
-  </label>
-  <select
-    value={section}
-    onChange={(e) => setSection(e.target.value)}
-    className="dropdown"
-    style={{ marginLeft: 10 }}
-    required
-  >
-    <option value="">Select Section</option>
-    {user.sections.map((sec) => (
-      <option key={sec} value={sec}>
-        {sec}
-      </option>
-    ))}
-  </select>
+  if (!questions || questions.length === 0) {
+    return <p>Loading...</p>;
+  }
+
+  
+    return (
+  <div className="unit-page">
+
+    {/* HEADER */}
+    <div className="unit-header">
+      <h2>🧩 Create MCQ Assignment</h2>
+    </div>
+
+    <div className="section">
+      <div className="form-wrapper">
+
+        <form className="modern-form" onSubmit={handleSubmit}>
+
+          {/* UNIT + SECTION */}
+          <div style={{ display: "flex", gap: "10px" }}>
+            <select
+              className="modern-input"
+              value={unit}
+              onChange={(e) => setUnit(Number(e.target.value))}
+            >
+              <option value={1}>Unit 1</option>
+              <option value={2}>Unit 2</option>
+              <option value={3}>Unit 3</option>
+              <option value={4}>Unit 4</option>
+            </select>
+
+            <select
+              className="modern-input"
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+            >
+              <option value="">Select Section</option>
+              {sections.map((sec) => (
+                <option key={sec} value={sec}>{sec}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* TITLE */}
+          <input
+            className="modern-input"
+            type="text"
+            placeholder="Assignment Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+
+          {/* DEADLINE */}
+          <input
+            className="modern-input"
+            type="datetime-local"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+          />
+
+          {/* DESCRIPTION */}
+          <textarea
+            className="modern-input"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+
+          {/* QUESTIONS */}
+          {questions.map((q, i) => (
+            <div key={i} className="question-block">
+              <h3>Q{i + 1}</h3>
+
+              <textarea
+                className="modern-input"
+                placeholder="Enter Question"
+                value={q.questionText}
+                onChange={(e) => handleQuestionChange(i, e.target.value)}
+              />
+
+             <div className="options-grid">
+  {q.options.map((opt, j) => (
+    <input
+      key={j}
+      className="modern-input"
+      placeholder={`Option ${j + 1}`}
+      value={opt}
+      onChange={(e) => handleOptionChange(i, j, e.target.value)}
+    />
+  ))}
 </div>
 
-
-      {/* TITLE */}
-      <div style={{ marginBottom: 25 }}>
-        <label style={{ color: "white", fontWeight: "bold" }}>
-          📝 Assignment Title:
-        </label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter assignment title..."
-          style={{ width: "100%", marginTop: 10, padding: 10, borderRadius: 8 }}
-        />
-      </div>
-
-      {/* DEADLINE */}
-      <div style={{ marginBottom: 25 }}>
-        <label style={{ color: "white", fontWeight: "bold" }}>
-          ⏳ Deadline:
-        </label>
-        <input
-          type="datetime-local"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          style={{ marginLeft: 10, padding: 10, borderRadius: 8 }}
-        />
-      </div>
-
-      {/* DESCRIPTION */}
-      <div style={{ marginBottom: 25 }}>
-        <label style={{ color: "white", fontWeight: "bold" }}>
-          📝 Description:
-        </label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Short description..."
-          style={{ width: "100%", marginTop: 10, padding: 10, minHeight: 70 }}
-        />
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        {questions.map((q, i) => (
-          <div key={i} className="assignment-question">
-            <h3>Question {i + 1}</h3>
-
-            <textarea
-              placeholder="Enter question..."
-              value={q.questionText}
-              onChange={(e) => handleQuestionChange(i, e.target.value)}
-            />
-
-            {q.options.map((opt, j) => (
               <input
-                key={j}
-                type="text"
-                placeholder={`Option ${j + 1}`}
-                value={opt}
-                onChange={(e) => handleOptionChange(i, j, e.target.value)}
+                className="modern-input"
+                placeholder="Correct Answer"
+                value={q.correctAnswer}
+                onChange={(e) => handleCorrectAnswerChange(i, e.target.value)}
               />
-            ))}
+            </div>
+          ))}
 
-            <input
-              type="text"
-              placeholder="Correct answer (must match one option)"
-              value={q.correctAnswer}
-              onChange={(e) => handleCorrectAnswerChange(i, e.target.value)}
-            />
-          </div>
-        ))}
+          <button className="submit-btn">🚀 Publish Assignment</button>
 
-        <button type="submit" className="upload-btn">
-          🚀 Publish Assignment
-        </button>
-      </form>
+        </form>
 
-      {msg && (
-        <p
-          style={{
-            color: msg.includes("✅") ? "limegreen" : "red",
-            fontWeight: 600,
-            marginTop: 15,
-          }}
-        >
-          {msg}
-        </p>
-      )}
+        <p className="form-msg">{msg}</p>
 
-      <button
-        className="back-btn"
-        onClick={() => navigate("/teacher/manage-c")}
-      >
-        ⬅ Back to Units
-      </button>
+      </div>
     </div>
-  );
+  </div>
+);
 }

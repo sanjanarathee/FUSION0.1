@@ -1,73 +1,88 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/teacher.css";   // ✅ FIXED
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
-  const teacher = JSON.parse(localStorage.getItem("fusionUser"));
+  const teacherData = JSON.parse(localStorage.getItem("fusionUser"));
 
   // ✅ Route protection
   useEffect(() => {
-    if (!teacher) {
+    if (!teacherData) {
       alert("Please login first!");
       navigate("/login");
       return;
     }
 
-    const data = JSON.parse(localStorage.getItem("fusionUser"));
+    if (!teacherData.user || teacherData.user.role !== "teacher") {
+      alert("Access denied! Only teachers can access this dashboard.");
+      navigate("/login");
+    }
+  }, [teacherData, navigate]);
 
-if (!data || data.user.role !== "teacher") {
-  alert("Access denied! Only teachers can access this dashboard.");
-  navigate("/login");
-}
-  }, [teacher, navigate]);
+ return (
+  <div className="unit-page">
 
-  return (
-    <div className="teacher-dashboard">
-      {/* ✅ Header */}
-      <h1 className="dashboard-title">
-        Welcome to <span className="fusion-text">Teacher Dashboard 🎓</span>
-      </h1>
-      {/* <p className="dashboard-subtext">
-        Hello, <b>{teacher?.name}</b>! You are logged in as a{" "}
-        <b>{teacher?.role}</b>.
-      </p> */}
+    {/* HEADER */}
+    <div className="unit-header">
+      <h1>🎓 Teacher Dashboard</h1>
+    </div>
 
-      {/* ✅ Choose a Subject Section */}
-      <h3 className="unit-heading" style={{ marginTop: "30px" }}>
-        📚 Manage Courses
-      </h3>
-      <p className="dashboard-subtext">
-        Select a programming language to manage units, assignments, and student performance.
-      </p>
+    {/* BG TEXT */}
+    <div className="fusion-bg-text">FUSION</div>
 
-      <div className="button-container">
-        <button
-          className="learn-btn c-btn"
-          onClick={() => navigate("/teacher/manage-c")}
-        >
-          Manage C Language
-        </button>
+    {/* CONTENT */}
+    <div className="unit-content">
 
-        <button
-          className="learn-btn cpp-btn"
-          onClick={() => navigate("/teacher/manage-cpp")}
-        >
-          Manage C++ Language
-        </button>
+      <div className="section">
+        <h2>📚 Manage Courses</h2>
+
+        <div className="section-grid">
+
+          <div
+            className="section-card"
+            onClick={() => navigate("/teacher/manage-c")}
+          >
+            <div className="card-left">
+              <span className="card-icon">💻</span>
+              <div>
+                <h3>C Language</h3>
+                <p>Manage units, assignments & results</p>
+              </div>
+            </div>
+            <div className="arrow">➜</div>
+          </div>
+
+          <div
+            className="section-card"
+            onClick={() => navigate("/teacher/manage-cpp")}
+          >
+            <div className="card-left">
+              <span className="card-icon">⚡</span>
+              <div>
+                <h3>C++ Language</h3>
+                <p>Advanced programming & evaluation</p>
+              </div>
+            </div>
+            <div className="arrow">➜</div>
+          </div>
+
+        </div>
       </div>
 
-      {/* ✅ Logout Button */}
-      <button
-        className="logout-btn"
-        style={{ marginTop: "40px" }}
-        onClick={() => {
-          localStorage.clear();
-          navigate("/login");
-        }}
-      >
-        🚪 Logout
-      </button>
     </div>
-  );
+
+    {/* LOGOUT */}
+    <button
+      className="back-btn"
+      onClick={() => {
+        localStorage.clear();
+        navigate("/login");
+      }}
+    >
+      🚪 Logout
+    </button>
+
+  </div>
+);
 }

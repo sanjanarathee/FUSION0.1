@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";import "./PageStyles.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../styles/teacher.css";   // ✅ FIXED
 
 export default function ManageAssignments() {
   const location = useLocation();
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
 
-  // ✅ Always store UNIT as NUMBER
   const unit = Number(query.get("unit")) || 1;
 
   const [assignments, setAssignments] = useState([]);
@@ -16,12 +16,12 @@ export default function ManageAssignments() {
   const fetchAssignments = async () => {
     try {
       const res = await axios.get(
-        `https://fusion-backend.onrender.com/api/assignments/all?unit=${unit}`
+        `http://localhost:5000/api/assignments/unit/${unit}`
       );
 
-      console.log("FULL RESPONSE:", res.data);
+      console.log("🔥 API RESPONSE:", res.data);
 
-      setAssignments(res.data.assignments || []);
+setAssignments(res.data || []);
     } catch (error) {
       console.error("❌ Error fetching assignments", error);
     }
@@ -35,7 +35,10 @@ export default function ManageAssignments() {
       return;
 
     try {
-      await axios.delete(`https://fusion-backend.onrender.com/api/assignments/${id}`);
+      await axios.delete(
+        `http://localhost:5000/api/assignments/${id}`
+      );
+
       alert("Assignment deleted!");
 
       setAssignments(assignments.filter((a) => a._id !== id));
@@ -45,42 +48,58 @@ export default function ManageAssignments() {
   };
 
   return (
-    <div className="learn-container">
-      <h1 className="learn-title">📁 Manage Unit {unit} Assignments</h1>
-
-      {assignments.length === 0 ? (
-        <p style={{ color: "white" }}>No assignments found for Unit {unit}.</p>
-      ) : (
-        assignments.map((a) => (
-          <div key={a._id} className="file-card">
-            <h2 style={{ color: "#00e0ff" }}>{a.title}</h2>
-
-            <p style={{ color: "white" }}>
-              <strong>Description:</strong> {a.description}
-            </p>
-
-            <p style={{ color: "white" }}>
-              <strong>Deadline:</strong>{" "}
-              {a.deadline
-                ? new Date(a.deadline).toLocaleString()
-                : "No deadline set"}
-            </p>
-
-            <button
-              className="delete-btn"
-              onClick={() => deleteAssignment(a._id)}
-            >
-              ❌ Delete Assignment
-            </button>
-            <button
-  className="view-btn"
-  onClick={() => navigate(`/teacher/assignment-results/${a._id}`)}
->
-  📊 View Results
-</button>
-          </div>
-        ))
-      )}
+  <div className="unit-page">
+    <div className="unit-header">
+      📁 Manage Assignments – Unit {unit}
     </div>
-  );
+
+    {assignments.length === 0 ? (
+      <div className="empty-state">
+        No assignments found for Unit {unit}.
+      </div>
+    ) : (
+      <div className="assignments-grid">
+        {assignments.map((a) => (
+          <div key={a._id} className="section-card">
+            
+            {/* LEFT SIDE */}
+            <div className="card-left">
+              <div className="card-icon">📄</div>
+
+              <div>
+                <h3>{a.title}</h3>
+                <p>{a.description}</p>
+                <p>
+                  <strong>Deadline:</strong>{" "}
+                  {a.deadline
+                    ? new Date(a.deadline).toLocaleDateString()
+                    : "No deadline"}
+                </p>
+              </div>
+            </div>
+
+            {/* RIGHT SIDE */}
+            <div className="manage-actions">
+              <button
+                className="view-btn"
+                onClick={() =>
+                  navigate(`/teacher/assignment-results/${a._id}`)
+                }
+              >
+                📊 Results
+              </button>
+
+              <button
+                className="delete-btn"
+                onClick={() => deleteAssignment(a._id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
 }

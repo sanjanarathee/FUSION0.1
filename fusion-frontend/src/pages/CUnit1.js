@@ -1,81 +1,174 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/student.css";
 
-export default function CUnit1() {
-  const navigate = useNavigate();
-  const location = useLocation();
+export default function CUnit1(){
 
-  // 🔥 Detect language from URL
-  const isCpp = location.pathname.includes("learn-cpp");
-  const language = isCpp ? "cpp" : "c";
+const navigate = useNavigate();
+const location = useLocation();
 
-  const user = JSON.parse(localStorage.getItem("fusionUser"));
-  const role = user?.role || "student";
+const isCpp = location.pathname.includes("learn-cpp");
+const language = isCpp ? "cpp" : "c";
 
-  return (
-    <div className="learn-container">
-      <h1 className="learn-title">📘 Unit 1 Resources</h1>
-      <p className="learn-text">
-        Explore detailed materials for all {language.toUpperCase()} programming concepts in Unit 1.
-      </p>
+return(
 
-      <h3 className="unit-heading" style={{ marginTop: "40px" }}>
-        📁 View Study Materials
-      </h3>
+<div className="student-page">
 
-      <div className="button-container">
-        <button
-          className="unit-btn"
-          onClick={() => navigate(`/learn-${language}/unit1/notes`)}
-        >
-          📝 Notes
-        </button>
+{/* HEADER */}
+<div className="student-header">
+<h1 style={{margin:"0 auto"}}>
+Unit 1
+</h1>
+</div>
 
-        <button
-          className="unit-btn"
-          onClick={() => navigate(`/learn-${language}/unit1/ppt`)}
-        >
-          📊 PPTs
-        </button>
 
-        {role === "teacher" && (
-          <button
-            className="unit-btn"
-            onClick={() => navigate(`/learn-${language}/unit1/assignments`)}
-          >
-            📂 Assignments
-          </button>
-        )}
+{/* FUSION */}
+<div className="student-fusion-bg">
+FUSION
+</div>
 
-        <button
-          className="unit-btn"
-          onClick={() => navigate(`/learn-${language}/unit1/coding`)}
-        >
-          💻 Coding Practice
-        </button>
-      </div>
 
-      <h3 className="unit-heading" style={{ marginTop: "40px" }}>
-        🧠 Attempt Unit 1 Assignment Quiz
-      </h3>
+<div className="student-content">
 
-      <div className="button-container">
-        <button
-          className="dashboard-btn purple"
-          onClick={() => navigate(`/student-assignment?unit=1`)}
-        >
-          🎯 Take Unit 1 Assignment Quiz
-        </button>
-      </div>
 
-      <button
-        className="back-btn"
-        onClick={() => navigate(`/learn-${language}`)}
-        style={{ marginTop: "40px" }}
-      >
-        ⬅ Back to Unit Selection
-      </button>
-    </div>
-  );
+{/* STUDY MATERIAL */}
+<div className="student-learn-section">
+
+<h2>📘 Study Material</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate(`/student/notes/${language}/1`)}
+>
+<div className="student-learn-left">
+<div className="student-learn-icon">📝</div>
+
+<div>
+<h3>View Notes</h3>
+<p>Access study notes</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">➡</div>
+</div>
+
+
+
+<div
+className="student-learn-card"
+onClick={()=>navigate(`/learn-${language}/unit1/ppt`)}
+>
+<div className="student-learn-left">
+<div className="student-learn-icon">📄</div>
+
+<div>
+<h3>View PPTs</h3>
+<p>Access presentation files</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">➡</div>
+</div>
+
+</div>
+
+</div>
+
+
+
+{/* ASSIGNMENTS */}
+<div className="student-learn-section">
+
+<h2>🧠 Assignments</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate(`/student-assignment?unit=1`)}
+>
+<div className="student-learn-left">
+<div className="student-learn-icon">🎯</div>
+
+<div>
+<h3>Assignment Quiz</h3>
+<p>Attempt Quiz</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">➡</div>
+</div>
+
+
+
+<div
+className="student-learn-card"
+onClick={()=>navigate(`/learn-${language}/unit/1/subjective`)}
+>
+<div className="student-learn-left">
+<div className="student-learn-icon">📝</div>
+
+<div>
+<h3>Subjective Assignment</h3>
+<p>Submit written answers</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">➡</div>
+</div>
+
+</div>
+
+</div>
+
+
+
+{/* CODING PRACTICE */}
+<div className="student-learn-section">
+
+<h2>💻 Coding Practice</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate(`/learn-${language}/unit1/coding`)}
+>
+<div className="student-learn-left">
+<div className="student-learn-icon">💻</div>
+
+<div>
+<h3>Coding Practice</h3>
+<p>Solve programming questions</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">➡</div>
+</div>
+
+</div>
+
+</div>
+
+
+
+<button
+className="student-back-btn"
+onClick={()=>navigate(`/learn-${language}`)}
+>
+⬅ Back to Units
+</button>
+
+</div>
+</div>
+
+);
+
 }

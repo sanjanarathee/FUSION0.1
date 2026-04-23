@@ -79,7 +79,7 @@ if __name__ == "__main__":
     setIsRunning(true);
     setCanSubmit(false);
 
-    const res = await axios.post("https://fusion-backend.onrender.com/api/coding/run", {
+    const res = await axios.post("http://localhost:5000/api/coding/run", {
       code,
       language,
       questionId: selected._id,
@@ -140,7 +140,7 @@ total: result.totalTestcases,
         maxMarks: result.maxMarks,
       };
 
-const res = await axios.post("https://fusion-backend.onrender.com/api/code/submit", payload);
+const res = await axios.post("http://localhost:5000/api/code/submit", payload);
       if (res.data && res.data.success) {
         alert("✅ Accepted! All testcases passed.");
 

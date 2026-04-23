@@ -37,7 +37,7 @@ export default function AssignmentResults() {
       });
 
       const res = await axios.get(
-        "https://fusion-backend.onrender.com/api/assignments/performance",
+        "http://localhost:5000/api/assignments/performance",
         {
           params: {
             teacherId: user.id,

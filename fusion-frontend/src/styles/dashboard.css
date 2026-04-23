@@ -1,0 +1,125 @@
+/* ===== DASHBOARD ===== */
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b132b, #1c2541, #3a506b);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  color: #e0e0e0;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #f5f5f5;
+}
+
+.fusion-text {
+  color: #5bc0be;
+}
+
+.dashboard-subtext {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+}
+
+/* ✅ FIXED BUTTON CONTAINER */
+.dashboard-button-container {
+  display: flex;
+  gap: 20px;
+}
+
+/* ✅ FIXED BUTTON */
+.dashboard-learn-btn {
+  background-color: #1c7ed6;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dashboard-learn-btn:hover {
+  transform: translateY(-3px);
+  background-color: #228be6;
+}
+
+/* language buttons */
+.dashboard-learn-btn.c-btn {
+  background-color: #3a86ff;
+}
+
+.dashboard-learn-btn.cpp-btn {
+  background-color: #8338ec;
+}/* ===== HEADER ===== */
+.dashboard-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+/* ===== PROFILE SECTION ===== */
+.header-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Avatar circle */
+.profile-avatar {
+  width: 45px;
+  height: 45px;
+  background: #5bc0be;
+  color: #0b132b;
+  font-weight: 700;
+  font-size: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* User info */
+.profile-details h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.profile-details p {
+  margin: 0;
+  font-size: 13px;
+  color: #cfd8dc;
+}
+
+.branch-text {
+  font-size: 12px;
+  color: #5bc0be;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.header-logout {
+  background: #ef476f;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.header-logout:hover {
+  background: #d62828;
+  transform: translateY(-2px);
+}

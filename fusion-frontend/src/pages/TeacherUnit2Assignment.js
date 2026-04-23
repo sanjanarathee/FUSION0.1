@@ -1,48 +1,82 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/teacher.css";   // ✅ USE SAME CSS
 
 export default function TeacherUnit2Assignment() {
   const navigate = useNavigate();
+  const unit = 2;
 
   return (
-    <div className="teacher-dashboard">
-      <h1 className="dashboard-title">🧠 Unit 2 – Assignments</h1>
-      <p className="dashboard-subtext">
-        Create, manage, and review student performance for Unit 2 assignments.
-      </p>
+    <div className="unit-page">
 
-      <div className="button-container">
-        <button
-          className="dashboard-btn purple"
-          onClick={() => navigate("/teacher/create-assignment?unit=2")}
-        >
-          ✳ Create Assignment
-        </button>
-
-        <button
-  className="dashboard-btn blue"
-  onClick={() => navigate("/teacher/unit2/assignment-manage?unit=2")}
->
-  📁 Manage Assignments
-</button>
-
-
-        <button
-          className="dashboard-btn green"
-          onClick={() => navigate("/teacher/unit2/results")}
-        >
-          📊 View Assignment Results
-        </button>
+      {/* HEADER */}
+      <div className="unit-header">
+        <h1>MCQ Assignments</h1>
       </div>
 
-      <button
-        className="back-btn"
-        style={{ marginTop: "40px" }}
-        onClick={() => navigate("/teacher/unit2")}
-      >
-        ⬅ Back to Unit 2
-      </button>
+      {/* SECTION */}
+      <div className="section">
+
+        <div className="section-grid assignments-grid">
+
+          {/* CREATE */}
+          <div
+            className="section-card"
+            onClick={() => navigate(`/teacher/unit/${unit}/create-assignment`)}
+          >
+            <div className="card-left">
+              <div className="card-icon">📝</div>
+              <div>
+                <h3>MCQ Assignment</h3>
+                <p>Create objective assignments</p>
+              </div>
+            </div>
+            <div className="arrow">➜</div>
+          </div>
+
+          {/* MANAGE */}
+          <div
+            className="section-card"
+            onClick={() => navigate(`/teacher/unit${unit}/assignment-manage?unit=${unit}`)}
+          >
+            <div className="card-left">
+              <div className="card-icon">📁</div>
+              <div>
+                <h3>Manage Assignments</h3>
+                <p>Edit / delete assignments</p>
+              </div>
+            </div>
+            <div className="arrow">➜</div>
+          </div>
+
+          {/* RESULTS */}
+          <div
+            className="section-card"
+            onClick={() => navigate(`/teacher/unit${unit}/results`)}
+          >
+            <div className="card-left">
+              <div className="card-icon">📊</div>
+              <div>
+                <h3>Results</h3>
+                <p>View student performance</p>
+              </div>
+            </div>
+            <div className="arrow">➜</div>
+          </div>
+
+        </div>
+
+        {/* BACK BUTTON */}
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
+          <button
+            className="view-btn"
+            onClick={() => navigate("/teacher/unit2")}
+          >
+            ⬅ Back
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/student.css";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -14,84 +14,110 @@ export default function Dashboard() {
 
   if (!userData) return null;
 
-
   return (
-    <div className="dashboard-container">
+    <div className="student-page">
 
-      {/* 🔥 HEADER BAR */}
-      <div className="dashboard-header">
+      <div className="student-header">
 
-        {/* LEFT SIDE PROFILE */}
-        <div className="header-profile">
-          <div className="profile-avatar">
-            {userData?.name?.charAt(0).toUpperCase()}
+  {/* LEFT SIDE (PROFILE) */}
+  <div className="header-left">
+    <div className="header-profile">
+      <div className="profile-avatar">
+        {userData?.user?.name?.charAt(0).toUpperCase()}
+      </div>
+
+      <div className="profile-info">
+        <h4>{userData?.user?.name}</h4>
+        <p>{userData?.user?.email}</p>
+        <span>
+          {userData?.user?.rollNumber} | {userData?.user?.section}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  {/* CENTER TITLE */}
+  <h1 className="header-title">🎓 Student Dashboard</h1>
+
+  {/* RIGHT SIDE (LOGOUT) */}
+  <div className="header-right">
+    <button
+      className="header-logout"
+      onClick={() => {
+        localStorage.clear();
+        navigate("/login");
+      }}
+    >
+      🚪 Logout
+    </button>
+  </div>
+
+</div>
+      {/* CONTENT */}
+      <div className="student-content">
+
+        {/* LEARN */}
+        <div className="section">
+          <h2>💻 Learn & Practice</h2>
+
+          <div className="section-grid">
+
+            <div
+              className="section-card"
+              onClick={() => navigate("/learn-c")}
+            >
+              <div className="card-left">
+                <span className="card-icon">💻</span>
+                <div>
+                  <h3>C Language</h3>
+                  <p>Start learning and practice C</p>
+                </div>
+              </div>
+              <div className="arrow">➜</div>
+            </div>
+
+            <div
+              className="section-card"
+              onClick={() => navigate("/learn-cpp")}
+            >
+              <div className="card-left">
+                <span className="card-icon">⚡</span>
+                <div>
+                  <h3>C++ Language</h3>
+                  <p>Advanced concepts & coding</p>
+                </div>
+              </div>
+              <div className="arrow">➜</div>
+            </div>
+
           </div>
+        </div>
 
-          <div className="profile-details">
-            <h4>{userData?.name}</h4>
-            <p>{userData?.email}</p>
-            <p>Roll No: {userData?.rollNumber}</p>
+        {/* PERFORMANCE */}
+        <div className="section">
+          <h2>🏆 Coding Performance</h2>
 
-            <span className="branch-text">
-              Section: {userData?.section}
-            </span>
+          <div className="section-grid">
+
+            <div
+              className="section-card"
+              onClick={() => navigate("/leaderboard")}
+            >
+              <div className="card-left">
+                <span className="card-icon">🏆</span>
+                <div>
+                  <h3>Leaderboard</h3>
+                  <p>Track your ranking</p>
+                </div>
+              </div>
+              <div className="arrow">➜</div>
+            </div>
+
           </div>
-        </div> {/* ✅ YE MISSING THA */}
-
-        {/* RIGHT SIDE LOGOUT */}
-        <button
-          className="header-logout"
-          onClick={() => {
-            localStorage.removeItem("fusionUser");
-            navigate("/login");
-          }}
-        >
-          🚪 Logout
-        </button>
+        </div>
 
       </div>
 
-      {/* 🔽 MAIN CONTENT */}
-      <div className="dashboard-content">
-
-        <h1 className="dashboard-title">
-          Welcome to <span className="fusion-text">Fusion Dashboard</span> 🎓
-        </h1>
-
-        {/* <p className="dashboard-subtext">
-          You are logged in as <strong>{role}</strong>.
-        </p> */}
-
-        <h3 className="unit-heading">💻 Learn & Practice</h3>
-
-        <div className="button-container">
-          <button
-            className="learn-btn c-btn"
-            onClick={() => navigate("/learn-c")}
-          >
-            Learn C Language
-          </button>
-
-          <button
-            className="learn-btn cpp-btn"
-            onClick={() => navigate("/learn-cpp")}
-          >
-            Learn C++
-          </button>
-        </div>
-
-        <h3 className="unit-heading">🏆 Coding Performance</h3>
-
-        <div className="button-container">
-          <button
-            className="learn-btn"
-            onClick={() => navigate("/leaderboard")}
-          >
-            🏆 View Leaderboard
-          </button>
-        </div>
-
-      </div>
     </div>
   );
 }

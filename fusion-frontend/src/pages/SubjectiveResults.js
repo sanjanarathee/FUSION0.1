@@ -8,19 +8,28 @@ export default function TeacherSubjectiveResults() {
 
   // 📥 get assignments (unit-wise filter optional later)
   useEffect(() => {
-    axios.get("/api/assignments/subjective")
-      .then(res => {
-        setAssignments(res.data.assignments || []);
-      })
-      .catch(err => console.error(err));
-  }, []);
+  if (!unit) return;
+
+
+ axios.get(`http://localhost:5000/api/assignments/unit/${unit}`)
+  .then((res) => {
+    console.log("TEACHER ASSIGNMENTS:", res.data);
+
+    // 🔥 IMPORTANT FILTER
+    const subjectiveOnly = (res.data.assignments || []).filter(
+      (a) => a.type === "subjective"
+    );
+
+    setAssignments(subjectiveOnly);
+  })
+  .catch((err) => console.error(err));
+}, [unit]);
 
   // 📥 get results (NOW WITH UNIT 🔥)
   const fetchResults = (assignmentId) => {
     if (!assignmentId) return;
 
-    axios
-      .get(`/api/assignments/subjective/results?assignmentId=${assignmentId}&unit=${unit}`)
+    axios.get(`http://localhost:5000/api/assignments/subjective/results?assignmentId=${assignmentId}&unit=${unit}`)
       .then((res) => {
         console.log("RESULTS:", res.data);
 
@@ -31,72 +40,85 @@ export default function TeacherSubjectiveResults() {
   };
 
   return (
-    <div style={{ padding: "20px", color: "white" }}>
+  <div className="unit-page">
+
+    {/* 🔶 Header */}
+    <div className="unit-header">
       <h2>📊 Subjective Results</h2>
-
-      {/* 🔽 UNIT DROPDOWN */}
-      <select onChange={(e) => setUnit(e.target.value)} style={{ marginRight: "10px" }}>
-        <option value="">Select Unit</option>
-        <option value="1">Unit 1</option>
-        <option value="2">Unit 2</option>
-        <option value="3">Unit 3</option>
-        <option value="4">Unit 4</option>
-      </select>
-
-      {/* 🔽 ASSIGNMENT DROPDOWN */}
-      <select onChange={(e) => fetchResults(e.target.value)}>
-        <option value="">Select Assignment</option>
-        {assignments.map((a) => (
-          <option key={a._id} value={a._id}>
-            {a.question}
-          </option>
-        ))}
-      </select>
-
-      {/* 📊 TABLE */}
-      <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ background: "#1e2a47" }}>
-            <th style={th}>Student</th>
-            <th style={th}>Answer</th>
-            <th style={th}>Marks</th>
-            <th style={th}>Feedback</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {results.length === 0 ? (
-            <tr>
-              <td colSpan="4" style={{ textAlign: "center", padding: "20px" }}>
-                No results found
-              </td>
-            </tr>
-          ) : (
-            results.map((r, i) => (
-              <tr key={i} style={{ background: "#2c3e66" }}>
-                <td style={td}>{r.userId?.name}</td>
-                <td style={td}>{r.answer}</td>
-
-                <td style={{ ...td, color: "lightgreen", fontWeight: "bold" }}>
-                  {r.marks} {r.marks > 8 && "🏆"}
-                </td>
-
-                <td style={td}>{r.feedback}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
     </div>
-  );
+
+    {/* 🔷 Section */}
+    <div className="section">
+
+      {/* 🔽 Filters */}
+      <div className="results-filters">
+
+        <select
+          className="modern-input"
+          onChange={(e) => setUnit(e.target.value)}
+        >
+          <option value="">Select Unit</option>
+          <option value="1">Unit 1</option>
+          <option value="2">Unit 2</option>
+          <option value="3">Unit 3</option>
+          <option value="4">Unit 4</option>
+        </select>
+
+        <select
+          className="modern-input"
+          onChange={(e) => fetchResults(e.target.value)}
+        >
+          <option value="">Select Assignment</option>
+          {assignments.map((a) => (
+            <option key={a._id} value={a._id}>
+              {a.question}
+            </option>
+          ))}
+        </select>
+
+      </div>
+
+      {/* 📊 Table */}
+      <div className="table-container">
+
+        <table className="styled-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Answer</th>
+              <th>Marks</th>
+              <th>Feedback</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {results.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="empty-state">
+                  No results found
+                </td>
+              </tr>
+            ) : (
+              results.map((r, i) => (
+                <tr key={i}>
+                  <td>{r.userId?.name}</td>
+                  <td>{r.answer}</td>
+
+                  <td className="marks-cell">
+                    {r.marks} {r.marks > 8 && "🏆"}
+                  </td>
+
+                  <td>{r.feedback}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+  </div>
+);
 }
 
-const th = {
-  padding: "10px",
-  border: "1px solid #444",
-};
-
-const td = {
-  padding: "10px",
-  border: "1px solid #444",
-};

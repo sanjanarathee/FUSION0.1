@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./PageStyles.css";
+import "../styles/teacher.css";   // ✅ FIXED
 
 export default function TeacherUnit3Coding() {
 
@@ -24,7 +24,7 @@ export default function TeacherUnit3Coding() {
   const fetchQuestions = async () => {
     try {
       const res = await axios.get(
-  "https://fusion0-1.onrender.com/api/coding/practice",
+  "http://localhost:5000/api/coding/practice",
   { params: { language: "c" } }
 );
       setAllQuestions(res.data.questions || []);
@@ -97,7 +97,7 @@ export default function TeacherUnit3Coding() {
     }
 
     try {
-      await axios.post("https://fusion0-1.onrender.com/api/coding/add", {
+      await axios.post("http://localhost:5000/api/coding/add", {
 
         
 
@@ -151,7 +151,7 @@ export default function TeacherUnit3Coding() {
 
     try {
       await axios.delete(
-        `https://fusion0-1.onrender.com/api/coding/delete/${id}`
+        `http://localhost:5000/api/coding/delete/${id}`
       );
 
       fetchQuestions();
@@ -165,10 +165,8 @@ export default function TeacherUnit3Coding() {
   };
 
   return (
-    <div className="learn-container">
-
-      <h1 className="learn-title">
-        💻 Add Coding Practice Question (Unit 3)
+<div className="unit-page coding-page">      <h1 className="unit-header">
+        💻 Add Coding Practice Question 
       </h1>
 
       {/* ---------- TITLE ---------- */}
@@ -308,12 +306,14 @@ export default function TeacherUnit3Coding() {
             }
           />
 
-          <button
-            className="back-btn"
-            onClick={() => removeStep(index)}
-          >
-            🗑 Remove Step
-          </button>
+          <div className="step-actions">
+  <button
+    className="remove-btn"
+    onClick={() => removeStep(index)}
+  >
+    🗑 Remove Step
+  </button>
+</div>
 
         </div>
       ))}
@@ -332,49 +332,53 @@ export default function TeacherUnit3Coding() {
       </button>
 
       {/* ---------- ALL QUESTIONS ---------- */}
-       <h2 style={{ marginTop: "40px" }}>📋 All Global Coding Practice Questions</h2>
-
+<div className="all-questions">
+  <h2>📋 All Global Coding Practice Questions</h2>
+  {/* <p>No questions added yet.</p> */}
+</div>
       {allQuestions.length === 0 ? (
         <p>No questions added yet.</p>
       ) : (
         <div className="questions-grid">
-          {allQuestions.map((q) => (
-            <div className="question-card" key={q._id}>
-              <h3>{q.title}</h3>
+  {allQuestions.map((q) => (
+    <div className="question-card-light" key={q._id}>
 
-              <p><b>Description:</b> {q.description}</p>
+      <h3>{q.title}</h3>
 
-              <b>Testcases:</b>
-              {q.testcases?.map((tc, i) => (
-                <p key={i}>
-                  <b>TC {i + 1}:</b> <br />
-                  <b>Input:</b> {tc.input} <br />
-                  <b>Expected:</b> {tc.expected}
-                </p>
-              ))}
+      <p className="desc">
+        {q.description}
+      </p>
 
-              {q.evaluationSteps?.length > 0 && (
-                <>
-                  <b>Steps:</b>
-                  {q.evaluationSteps.map((s, i) => (
-                    <p key={i}>
-                      <b>Step {i + 1}:</b> {s.label} ({s.type}) – Marks:{" "}
-                      {s.marks}
-                    </p>
-                  ))}
-                </>
-              )}
+      <div className="tc-section">
+        <b>Testcases:</b>
+        {q.testcases?.map((tc, i) => (
+          <p key={i}>
+            <b>TC {i + 1}:</b> {tc.input} → {tc.expected}
+          </p>
+        ))}
+      </div>
 
-              <button
-                className="back-btn"
-                style={{ background: "#ff4d4d", color: "white" }}
-                onClick={() => deleteQuestion(q._id)}
-              >
-                🗑 Delete
-              </button>
-            </div>
+      {q.evaluationSteps?.length > 0 && (
+        <div className="steps-section">
+          <b>Steps:</b>
+          {q.evaluationSteps.map((s, i) => (
+            <p key={i}>
+              Step {i + 1}: {s.label} ({s.type}) – {s.marks} marks
+            </p>
           ))}
         </div>
+      )}
+
+      <button
+        className="delete-btn"
+        onClick={() => deleteQuestion(q._id)}
+      >
+        🗑 Delete
+      </button>
+
+    </div>
+  ))}
+</div>
       )}
     </div>
   );

@@ -13,6 +13,8 @@ import AssignmentResultTable from "./pages/AssignmentResultTable";
 import StudentSubjective from "./pages/StudentSubjective";
 import TeacherSubjectiveAssignment from "./pages/TeacherSubjectiveAssignment";
 
+// import "./styles/common.css";
+
 
 
 
@@ -252,7 +254,7 @@ function App() {
 <Route path="/learn-c/unit1/assignments" element={<CUnit1Assignments />} />
 
 {/* Coding */}
-<Route path="/learn-c/unit1/coding" element={<CUnit1Coding />} />
+<Route path="/learn-c/unit1/coding" element={<CUnit3Coding />} />
 <Route path="/learn-cpp/unit1/coding" element={<CUnit1Coding />} />
 
         {/* ----- Unit 2 ----- */}
@@ -260,8 +262,7 @@ function App() {
         <Route path="/learn-cpp/unit2" element={<CUnit2 />} />
 
         <Route path="/learn-c/unit2/ppt" element={<CUnit2Ppt />} />
-        <Route path="/learn-c/unit2/coding" element={<CUnit2Coding />} />
-
+<Route path="/learn-c/unit2/coding" element={<CUnit3Coding />} />
         {/* ----- Unit 3 ----- */}
         <Route path="/learn-c/unit3" element={<CUnit3 />} />
         <Route path="/learn-cpp/unit3" element={<CUnit3 />} />
@@ -274,8 +275,7 @@ function App() {
         <Route path="/learn-cpp/unit4" element={<CUnit4 />} />
 
         <Route path="/learn-c/unit4/ppt" element={<CUnit4Ppt />} />
-        <Route path="/learn-c/unit4/coding" element={<CUnit4Coding />} />
-        <Route path="/unit4/coding" element={<Navigate to="/learn-c/unit4/coding" replace />} />
+<Route path="/learn-c/unit4/coding" element={<CUnit3Coding />} />        <Route path="/unit4/coding" element={<Navigate to="/learn-c/unit4/coding" replace />} />
 
         <Route path="/learn-cpp/unit2/ppt" element={<CUnit2Ppt />} />
         <Route path="/learn-cpp/unit2/coding" element={<CUnit2Coding />} />
@@ -406,6 +406,10 @@ function App() {
 
 
         {/* Assignments */}
+        <Route
+  path="/teacher/unit/:unit/create-assignment"
+  element={<CreateAssignment />}
+/>
         <Route path="/teacher/create-assignment" element={<CreateAssignment />} />
 
         {/* Performance */}

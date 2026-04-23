@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/teacher.css";
 
 export default function TeacherUnit2UploadNotes({ course = "c" }) {
   const navigate = useNavigate();
@@ -18,67 +18,126 @@ export default function TeacherUnit2UploadNotes({ course = "c" }) {
     formData.append("title", title);
     formData.append("description", desc);
     formData.append("category", "Notes");
-    formData.append("unit", "2");
-
-    // 🔥 MOST IMPORTANT LINE
-    formData.append("subject", course);   // "c" or "cpp"
-
+    formData.append("unit", "2");   // 🔥 CHANGE ONLY THIS
+    formData.append("subject", course);
     formData.append("file", file);
 
-    console.log("Uploading:", {
-      subject: course,
-      unit: "2",
-      category: "Notes",
-    });
-
-    await axios.post("https://fusion0-1.onrender.com/api/files/upload", formData);
+    await axios.post(
+"http://localhost:5000/api/files/upload",
+      formData
+    );
 
     setSuccess(true);
   };
 
   return (
-    <div className="upload-page">
-      <h1 className="unit-title">📘 Upload Notes (Unit 2)</h1>
+    <div className="upload-modern-page">
 
-      <div className="upload-form">
-        <input
-          type="text"
-          placeholder="Enter Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <textarea
-          placeholder="Enter Description"
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-        />
-
-        <select value="Notes" disabled>
-          <option>Notes</option>
-        </select>
-
-        <select value="2" disabled>
-          <option>Unit 2</option>
-        </select>
-
-        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-
-        <button onClick={handleUpload}>Upload</button>
+      {/* 🔶 HEADER */}
+      <div className="unit-header">
+        <h1>📘 Upload Study Material</h1>
       </div>
 
-      {success && (
-        <p style={{ color: "#00ff00", marginTop: "15px", fontWeight: "bold" }}>
-          ✔ Upload successful!
-        </p>
-      )}
+      {/* 📦 FORM CARD */}
+      <div className="upload-card">
 
-      <button
-        className="back-button"
-        onClick={() => navigate("/teacher/unit2")}
-      >
-        ⬅ Back to Unit 2
-      </button>
+        <div className="form-group">
+          <label>Title</label>
+          <input
+            type="text"
+            placeholder="Enter title..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Description</label>
+          <textarea
+            placeholder="Enter description..."
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+          />
+        </div>
+
+        <div className="form-row">
+          <div className="form-group small">
+            <label>Category</label>
+            <select value="Notes" disabled>
+              <option>Notes</option>
+            </select>
+          </div>
+
+          <div className="form-group small">
+            <label>Unit</label>
+            <select value="2" disabled>
+              <option>Unit 2</option>
+            </select>
+          </div>
+        </div>
+
+        {/* FILE UPLOAD */}
+        <div className="form-group">
+          <label>Upload File</label>
+
+          <div className="custom-file-upload">
+            <label htmlFor="fileUpload" className="file-label">
+              <div className="file-content">
+                <div className="file-icon">📂</div>
+
+                {file ? (
+                  <div>
+                    <p className="file-main">Selected File</p>
+                    <p className="file-sub">{file.name}</p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="file-main">Click to upload</p>
+                  </div>
+                )}
+              </div>
+            </label>
+
+            <input
+              id="fileUpload"
+              type="file"
+              onChange={(e) => setFile(e.target.files[0])}
+              hidden
+            />
+          </div>
+        </div>
+
+        <button className="upload-btn" onClick={handleUpload}>
+          🚀 Upload
+        </button>
+
+        {success && (
+          <p className="success-msg">
+            ✔ Upload successful!
+          </p>
+        )}
+      </div>
+
+      {/* BUTTONS */}
+      <div className="upload-actions">
+
+        {success && (
+          <button
+            className="secondary-btn"
+            onClick={() => navigate("/view-uploads")}
+          >
+            📂 View Uploads
+          </button>
+        )}
+
+        <button
+          className="back-btn"
+          onClick={() => navigate("/teacher/unit2")}
+        >
+          ← Back to Unit 2
+        </button>
+      </div>
+
     </div>
   );
 }

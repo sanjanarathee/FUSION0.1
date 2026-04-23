@@ -1,83 +1,190 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/student.css";
 
 export default function StudentNotes() {
-  const { subject, unitId } = useParams();
-  const navigate = useNavigate();
 
-  const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
+const { subject, unitId } = useParams();
+const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        console.log("📡 Fetching notes:", subject, unitId);
+const [files,setFiles] = useState([]);
+const [loading,setLoading] = useState(true);
 
-        const res = await axios.get(
-          "https://fusion0-1.onrender.com/api/files/filter",
-          {
-            params: {
-              subject,          // c / cpp
-              unit: unitId,     // 1
-              category: "notes" // REQUIRED
-            }
-          }
-        );
+useEffect(()=>{
 
-        // backend sends { success, files }
-        setFiles(res.data.files || []);
+const fetchNotes = async()=>{
 
-      } catch (err) {
-        console.error("❌ Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+try{
 
-    fetchNotes();
-  }, [subject, unitId]);
+const res = await axios.get(
+"http://localhost:5000/api/files/filter",
+{
+params:{
+subject:subject,
+unit:`unit ${unitId}`,
+category:"notes"
+}
+}
+);
 
-  if (loading) return <p className="learn-text">⏳ Loading notes...</p>;
+setFiles(res.data.files || []);
 
-  return (
-    <div className="learn-container">
-      <h1 className="learn-title">
-        📘 {subject.toUpperCase()} – Unit {unitId} Notes
-      </h1>
+}
+catch(err){
+console.error(err);
+}
+finally{
+setLoading(false);
+}
 
-      {files.length === 0 ? (
-        <p className="learn-text">⚠️ No notes available.</p>
-      ) : (
-        <div className="files-list">
-          {files.map((file) => (
-            <div className="file-card" key={file._id}>
-              <h3>{file.metadata?.title}</h3>
+};
 
-              <p>
-                📂 <b>Category:</b> {file.metadata?.category}<br />
-                👩‍🏫 <b>Uploaded By:</b> {file.metadata?.uploadedBy}<br />
-                📅 <b>Date:</b>{" "}
-                {new Date(file.uploadDate).toLocaleDateString("en-GB")}
-              </p>
+fetchNotes();
 
-              <a
-                className="view-btn"
-                href={`https://fusion0-1.onrender.com/api/files/download/${file.filename}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                📥 View / Download
-              </a>
-            </div>
-          ))}
-        </div>
-      )}
+},[subject,unitId]);
 
-      <button className="back-btn" onClick={() => navigate(-1)}>
-        ⬅ Back
-      </button>
-    </div>
-  );
+
+return(
+
+<div className="student-page">
+
+{/* HEADER */}
+<div className="student-header">
+<h1 style={{margin:"0 auto"}}>
+📘 {subject.toUpperCase()} — Unit {unitId} Notes
+</h1>
+</div>
+
+
+
+
+<div className="student-content">
+
+<div className="student-learn-section">
+
+<h2>
+📚 Study Materials
+</h2>
+
+
+{loading ? (
+
+<div style={{
+textAlign:"center",
+marginTop:"60px",
+fontSize:"22px",
+color:"#64748b"
+}}>
+Loading Notes...
+</div>
+
+)
+
+: files.length===0 ? (
+
+<div
+className="student-learn-card"
+style={{
+justifyContent:"center",
+cursor:"default"
+}}
+>
+
+<div style={{textAlign:"center"}}>
+
+<h3>No Notes Available</h3>
+
+<p>
+Study material has not been uploaded yet.
+</p>
+
+</div>
+
+</div>
+
+)
+
+: (
+
+<div className="notes-grid">
+
+{files.map((file)=>(
+<div
+className="note-card"
+key={file._id}
+>
+
+<h3 className="note-title">
+📘 {file.metadata?.title}
+</h3>
+
+<div className="note-meta">
+
+<div>
+📂 Category:
+{" "}
+{file.metadata?.category}
+</div>
+
+<div>
+👨‍🏫 Uploaded By:
+{" "}
+{file.metadata?.uploadedBy}
+</div>
+
+<div>
+📅
+{" "}
+{new Date(file.uploadDate)
+.toLocaleDateString("en-GB")}
+</div>
+
+</div>
+
+
+<div className="note-actions">
+
+<a
+className="note-btn"
+href={`http://localhost:5000/api/files/download/${file.filename}`}
+target="_blank"
+rel="noreferrer"
+>
+View
+</a>
+
+<a
+className="note-btn"
+href={`http://localhost:5000/api/files/download/${file.filename}`}
+download
+>
+Download
+</a>
+
+</div>
+
+</div>
+))}
+
+</div>
+
+)}
+
+</div>
+
+
+<button
+className="student-back-btn"
+onClick={()=>navigate(-1)}
+>
+⬅ Back
+</button>
+
+</div>
+
+</div>
+
+);
+
 }

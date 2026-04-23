@@ -1,89 +1,136 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./PageStyles.css";
+import { useNavigate } from "react-router-dom";
+import "../styles/teacher.css";   // ✅ FIXED
 
-export default function TeacherUnit1UploadPPT() {
+export default function TeacherUnit3UploadPPT({ course = "c" }) {
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [desc, setDesc] = useState("");
   const [file, setFile] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleUpload = async () => {
-    if (!title || !description || !file) {
-      return alert("Please fill all fields!");
-    }
+    if (!file) return alert("Please select a PPT!");
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("description", description);
-
-    // ⭐ Correct category
+    formData.append("description", desc);
     formData.append("category", "PPT");
-
-    // ⭐ FIXED: Save unit as "1"
-    formData.append("unit", "1");
-
+    formData.append("unit", "3");
+    formData.append("subject", course);
     formData.append("file", file);
 
-    try {
-      // ⭐ FIXED: Correct API endpoint
-      await axios.post("https://fusion0-1.onrender.com/api/files/upload", formData);
+    await axios.post(
+"http://localhost:5000/api/files/upload",
+      formData
+    );
 
-      alert("PPT Uploaded Successfully!");
-      setTitle("");
-      setDescription("");
-      setFile(null);
-    } catch (error) {
-      console.error(error);
-      alert("Upload failed!");
-    }
+    setSuccess(true);
   };
 
   return (
-    <div className="learn-container">
-      <h1 className="learn-title">📤 Upload PPT (Unit 1)</h1>
+    <div className="upload-modern-page">
 
+      {/* 🔶 HEADER */}
+      <div className="upload-header">
+  <h1>📊 Upload PPT</h1>
+</div>
+
+      {/* 📦 FORM CARD */}
       <div className="upload-card">
-        <input
-          type="text"
-          className="clean-input"
-          placeholder="Enter Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
 
-        <textarea
-          className="clean-input"
-          placeholder="Enter Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+        <div className="form-group">
+          <label>Title</label>
+          <input
+            type="text"
+            placeholder="Enter title..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
 
-        <select className="clean-input" disabled>
-          <option>PPT</option>
-        </select>
+        <div className="form-group">
+          <label>Description</label>
+          <textarea
+            placeholder="Enter description..."
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+          />
+        </div>
 
-        <select className="clean-input" disabled>
-          <option>1</option>
-        </select>
+        <div className="form-row">
+          <div className="form-group small">
+            <label>Category</label>
+            <select value="PPT" disabled>
+              <option>PPT</option>
+            </select>
+          </div>
 
-        <input
-          type="file"
-          className="clean-input"
-          accept=".pdf,.ppt,.pptx"
-          onChange={(e) => setFile(e.target.files[0])}
-        />
+          <div className="form-group small">
+            <label>Unit</label>
+            <select value="3" disabled>
+              <option>Unit 3</option>
+            </select>
+          </div>
+        </div>
 
-        <button className="view-btn" onClick={handleUpload}>
-          Upload
+        {/* ✅ FIXED FILE INPUT */}
+        <div className="form-group">
+          <label>Upload File</label>
+
+          <label className="file-upload-box">
+  <span className="file-main">
+    📁 Click to upload
+  </span>
+
+  {/* <span className="file-sub">
+    PPT, PPTX allowed
+  </span> */}
+
+  <input
+    type="file"
+    accept=".ppt,.pptx"
+    onChange={(e) => setFile(e.target.files[0])}
+    hidden
+  />
+</label>
+        </div>
+
+        <button className="upload-btn" onClick={handleUpload}>
+          🚀 Upload
         </button>
+
+        {success && (
+          <p className="success-msg">
+            ✔ PPT uploaded successfully!
+          </p>
+        )}
+
+      </div>
+
+      {/* 🔙 ACTION BUTTONS */}
+      <div className="upload-actions">
+
+        {success && (
+          <button
+            className="secondary-btn"
+            onClick={() => navigate("/view-uploads")}
+          >
+            📂 View Uploaded Materials
+          </button>
+        )}
 
         <button
           className="back-btn"
-          onClick={() => (window.location.href = "/teacher/unit1")}
+          onClick={() => navigate("/teacher/unit3")}
         >
-          ⬅ Back to Unit 1
+          ← Back to Unit 3
         </button>
+
       </div>
+
     </div>
   );
 }

@@ -5,86 +5,124 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 export default function TeacherUnit3Results() {
+  const [assignments, setAssignments] = useState([]);
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [results, setResults] = useState([]);
 
+  /* --------------------------------------------------
+      FETCH ASSIGNMENTS (UNIT 3)
+  -------------------------------------------------- */
   useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("fusionUser"));
+    axios
+      .get("http://localhost:5000/api/assignments/unit/3")
+      .then((res) => {
+setAssignments(res.data.assignments || []);      })
+      .catch((err) => console.error(err));
+  }, []);
 
-  if (!user) {
-    console.error("User not found");
-    return;
-  }
+  /* --------------------------------------------------
+      FETCH RESULTS (WHEN ASSIGNMENT SELECTED)
+  -------------------------------------------------- */
+  useEffect(() => {
+    if (!selectedAssignment) return;
 
-  const teacherId = user.id;              // ✅ FIXED
-  const section = user.sections?.[0];     // ✅ FIXED (first section)
+    const user = JSON.parse(localStorage.getItem("fusionUser"));
 
-  console.log("Sending:", { teacherId, section });
+    axios
+      .get("http://localhost:5000/api/assignments/performance", {
+        params: {
+          unit: 3,
+          assignmentId: selectedAssignment._id, // 🔥 IMPORTANT
+          teacherId: user?.id,
+          section: user?.sections?.[0],
+        },
+      })
+      .then((res) => {
+        const data = res.data.performances ?? res.data ?? [];
+        setResults(data);
+      })
+      .catch((err) => console.error(err));
+  }, [selectedAssignment]);
 
-  axios.get("https://fusion-backend.onrender.com/api/assignments/performance", {
-    params: {
-      unit: 3,
-      teacherId,
-      section
-    }
-  })
-  .then((res) => {
-  console.log("FULL RESPONSE:", res.data);   // 👈 ADD THIS
-
-  const data = res.data.performances ?? res.data ?? [];
-
-  console.log("FINAL DATA:", data);          // 👈 ADD THIS
-
-  setResults(data);
-})
-  .catch((err) => {
-    console.error("Error fetching results:", err);
-  });
-}, []);
   /* --------------------------------------------------
       EXPORT TO EXCEL
   -------------------------------------------------- */
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(results);
     const workbook = XLSX.utils.book_new();
-
     XLSX.utils.book_append_sheet(workbook, worksheet, "Results");
-
-    XLSX.writeFile(workbook, "Unit_3_Assignment_Results.xlsx");
+    XLSX.writeFile(workbook, `${selectedAssignment.title}_results.xlsx`);
   };
 
   /* --------------------------------------------------
       EXPORT TO PDF
   -------------------------------------------------- */
   const exportToPDF = () => {
-  const doc = new jsPDF();
+    const doc = new jsPDF();
 
-  doc.text("Unit 3 - Assignment Results", 14, 15);
+    doc.text(`Results - ${selectedAssignment.title}`, 14, 15);
 
-  autoTable(doc, {
-    startY: 20,
-    head: [['Name', 'Roll Number', 'Correct', 'Wrong', 'Accuracy']],
-    body: results.map(p => [
-      p.studentName,   // ✅ FIXED
-      p.rollNumber,
-      p.correct,
-      p.wrong,
-      `${p.accuracy}%`
-    ])
-  });
+    autoTable(doc, {
+      startY: 20,
+      head: [["Name", "Roll Number", "Correct", "Wrong", "Accuracy"]],
+      body: results.map((r) => [
+        r.studentName,
+        r.rollNumber,
+        r.correct,
+        r.wrong,
+        `${r.accuracy}%`,
+      ]),
+    });
 
-  doc.save("results.pdf");
-};
+    doc.save(`${selectedAssignment.title}_results.pdf`);
+  };
+
+  /* --------------------------------------------------
+      UI
+  -------------------------------------------------- */
   return (
-    <div className="learn-container">
+  <div className="unit-page">
+    <div className="unit-header">
+      Assignment Results
+    </div>
 
-      <div className="glass-card" style={{ padding: "25px", width: "80%", margin: "auto" }}>
-        <h1 className="dashboard-title" style={{ textAlign: "center" }}>
-          📊 Unit 3 – Assignment Results
-        </h1>
+    {/* 🔹 STEP 1: SHOW ASSIGNMENTS */}
+    {!selectedAssignment ? (
+      <div className="assignments-grid">
+        {assignments.map((a) => (
+          <div
+            key={a._id}
+            className="section-card"
+            onClick={() => setSelectedAssignment(a)}
+          >
+            <div className="card-left">
+              <div className="card-icon">📄</div>
 
-        {/* Buttons */}
+              <div>
+                <h3>{a.title}</h3>
+                <p>{a.description}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      /* 🔹 STEP 2: SHOW RESULTS */
+      <div
+        className="glass-card"
+        style={{ padding: "25px", marginTop: "20px" }}
+      >
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+          📊 Results – {selectedAssignment.title}
+        </h2>
+
+        {/* EXPORT BUTTONS */}
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <button className="view-btn" onClick={exportToExcel} style={{ marginRight: "15px" }}>
+          <button
+            className="view-btn"
+            onClick={exportToExcel}
+            style={{ marginRight: "10px" }}
+          >
             📘 Export Excel
           </button>
 
@@ -93,8 +131,8 @@ export default function TeacherUnit3Results() {
           </button>
         </div>
 
-        {/* Results Table */}
-        <table className="styled-table" style={{ margin: "auto" }}>
+        {/* TABLE */}
+        <table className="styled-table">
           <thead>
             <tr>
               <th>Name</th>
@@ -106,18 +144,34 @@ export default function TeacherUnit3Results() {
           </thead>
 
           <tbody>
-            {results.map((item, i) => (
+            {results.map((r, i) => (
               <tr key={i}>
-                <td>{item.studentName}</td>
-                <td>{item.rollNumber}</td>
-                <td>{item.correct}</td>
-                <td>{item.wrong}</td>
-                <td>{item.accuracy}%</td>
+                <td>{r.studentName}</td>
+                <td>{r.rollNumber}</td>
+                <td>{r.correct}</td>
+                <td>{r.wrong}</td>
+                <td>{r.accuracy}%</td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        {/* 🔻 BACK BUTTON AT BOTTOM */}
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "25px",
+          }}
+        >
+          <button
+            className="view-btn"
+            onClick={() => setSelectedAssignment(null)}
+          >
+            ⬅ Back
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    )}
+  </div>
+);
 }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/teacher.css";   // ✅ FIXED
 
 export default function TeacherUnit3UploadNotes({ course = "c" }) {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function TeacherUnit3UploadNotes({ course = "c" }) {
     formData.append("file", file);
 
     await axios.post(
-      "https://fusion0-1.onrender.com/api/files/upload",
+"http://localhost:5000/api/files/upload",
       formData
     );
 
@@ -34,9 +34,9 @@ export default function TeacherUnit3UploadNotes({ course = "c" }) {
     <div className="upload-modern-page">
 
       {/* 🔶 HEADER */}
-      <div className="upload-header">
-        <h1>📘 Upload Study Material</h1>
-      </div>
+      <div className="unit-header">
+  <h1>📘 Upload Study Material</h1>
+</div>
 
       {/* 📦 FORM CARD */}
       <div className="upload-card">

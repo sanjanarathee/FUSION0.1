@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Editor from "@monaco-editor/react";
-import "./PageStyles.css";
+import "../styles/student.css";
 
 export default function CUnit3Coding() {
-  const [questions, setQuestions] = useState([]);
-  const [selected, setSelected] = useState(null);
 
+const navigate = useNavigate();
+
+const [questions, setQuestions] = useState([]);
+const [selected, setSelected] = useState(null);
   const [language, setLanguage] = useState("c");
   const [code, setCode] = useState("");
 
@@ -40,7 +43,7 @@ int main() {
   // 🔥 Fetch GLOBAL coding questions (C language)
 useEffect(() => {
   axios
-    .get("https://fusion0-1.onrender.com/api/coding/practice", {
+    .get("http://localhost:5000/api/coding/practice", {
       params: { language: "c" },
     })
     .then((res) => {
@@ -82,7 +85,7 @@ useEffect(() => {
       setIsRunning(true);
       setCanSubmit(false);
 
-  const res = await axios.post("https://fusion-backend.onrender.com/api/code/run",
+  const res = await axios.post("http://localhost:5000/api/code/run",
   {
     code,
     language,
@@ -134,7 +137,7 @@ if (
     console.log("Submitting payload:", payload);
 
     const res = await axios.post(
-      "https://fusion-backend.onrender.com/api/coding/submit",
+      "http://localhost:5000/api/coding/submit",
       payload,
       {
         headers: {
@@ -178,156 +181,310 @@ if (
     setCode(templates[language]);
   };
 
-  return (
-    <div className="coding-container">
-      {/* Question List */}
-      {!selected && (
-        <div className="question-list">
-          <h1 className="learn-title">💻 Coding Practice — C Unit 3</h1>
+ return (
+<>
 
-          {questions.map((q) => (
-            <div
-              key={q._id}
-              className="question-card"
-              onClick={() => {
-                setSelected(q);
-                setLanguage(q.language || "c");
-                setResult(null);
-                setCanSubmit(false);
-              }}
-            >
-              <h3>{q.title}</h3>
-              <p>{q.description.substring(0, 100)}...</p>
-            </div>
-          ))}
-        </div>
-      )}
+{/* QUESTION LIST SCREEN */}
+{!selected && (
 
-      {/* Coding UI */}
-      {selected && (
-        <div className="leetcode-layout">
-          {/* LEFT */}
-          <div className="left-panel">
-            <h2>{selected.title}</h2>
-            <p className="question-desc">{selected.description}</p>
+<div className="student-page">
 
-            <h3>🧪 Testcases</h3>
-            {selected.testcases?.map((tc, i) => (
-              <div key={i} className="sample-box">
-                <p>
-                  <b>Testcase {i + 1}</b>
-                </p>
-                <p>Input: {tc.input}</p>
-                <p>Expected: {tc.expected}</p>
-              </div>
-            ))}
-          </div>
+<div className="student-header">
+<h1 style={{margin:"0 auto"}}>
+💻 Coding Practice 
+</h1>
+</div>
 
-          {/* RIGHT */}
-          <div className="right-panel">
-            <div className="editor-top-row">
-              <select
-                className="language-select"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-              >
-                <option value="c">C</option>
-                <option value="cpp">C++</option>
-              </select>
+{/* <div className="student-fusion-bg">
+FUSION
+</div> */}
 
-              <button className="editor-utility-btn" onClick={resetTemplate}>
-                Reset
-              </button>
-              <button className="editor-utility-btn" onClick={copyCode}>
-                Copy
-              </button>
-              <button className="editor-utility-btn" onClick={downloadCode}>
-                Download
-              </button>
-            </div>
+<div className="student-content">
 
-            <div style={{ height: "420px" }}>
-              <Editor
-                height="100%"
-                theme="vs-dark"
-                language={language}
-                value={code}
-                onChange={handleCodeChange}
-              />
-            </div>
+<div className="student-learn-section">
 
-            <div className="editor-buttons">
-              <button className="run-btn" onClick={runCode} disabled={isRunning}>
-                {isRunning ? "Running..." : "▶ Run Code"}
-              </button>
+<h2>💻 Choose a Coding Question</h2>
 
-              <button
-                className={
-                  canSubmit ? "submit-btn enabled" : "submit-btn disabled"
-                }
-                disabled={!canSubmit || isSubmitting}
-                onClick={handleSubmit}
-              >
-                {isSubmitting ? "Submitting..." : "Submit"}
-              </button>
+<div className="student-learn-grid">
 
-              <button
-                className="back-btn"
-                onClick={() => {
-                  setSelected(null);
-                  setResult(null);
-                }}
-              >
-                ⬅ Back
-              </button>
-            </div>
+{questions.map((q)=>(
 
-            {/* Results */}
-            {result && (
-              <div className="results-box">
-                <h3>Results</h3>
-                <p>
-                  Passed: {result.testcasesPassed}/{result.totalTestcases}
-                </p>
+<div
+key={q._id}
+className="student-learn-card"
+onClick={()=>{
+setSelected(q);
+setLanguage(q.language || "c");
+setResult(null);
+setCanSubmit(false);
+}}
+>
 
-                {result.results?.map((r, i) => (
-                  <div key={i} className="testcase-card">
-                    <p>
-                      <b>Testcase {i + 1}</b>
-                    </p>
-                    <p>Input: {r.input}</p>
-                    <p>Expected: {r.expected}</p>
-                    <p>Got: {r.got}</p>
-                    <p>Status: {r.status}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-     {result?.stepResults && (
-  <div className="step-box-clean">
-    <h3>Step Evaluation</h3>
+<div className="student-learn-left">
 
-    {result.stepResults.map((step, i) => (
-      <div key={i} className="step-row-clean">
-        <div className="left">
-          <span>{step.passed ? "✅" : "❌"}</span>
-          <span>{step.label}</span>
-        </div>
+<div className="student-learn-icon">
+💻
+</div>
 
-        <div className="right">
-          {step.marksAwarded}/{step.marksTotal}
-        </div>
-      </div>
-    ))}
+<div>
+<h3>{q.title}</h3>
 
-    <div className="total-clean">
-      Total Score: {result.totalMarks}
-    </div>
-  </div>
+<p>
+{q.description?.substring(0,70)}...
+</p>
+
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+{/* THIS WAS MISSING */}
+</div>
+
+<button
+className="student-back-btn"
+onClick={()=>navigate("/learn-c/unit3")}
+>
+⬅ Back to Unit
+</button>
+
+</div>
+
 )}
-    </div>
-  );
+
+
+
+{/* CODING SCREEN */}
+{selected && (
+
+<div className="student-page">
+
+<div className="student-header">
+<h1 style={{margin:"0 auto"}}>
+💻 {selected.title}
+</h1>
+</div>
+{/* 
+<div className="student-fusion-bg">
+FUSION
+</div> */}
+
+<div className="student-content">
+
+<div className="leetcode-layout">
+
+<div className="left-panel">
+
+<h2>{selected.title}</h2>
+
+<p className="question-desc">
+{selected.description}
+</p>
+
+<h3 style={{marginTop:"30px"}}>
+🧪 Testcases
+</h3>
+
+{selected.testcases?.map((tc,i)=>(
+
+<div key={i} className="sample-box">
+<p><b>Testcase {i+1}</b></p>
+<p>Input: {tc.input}</p>
+<p>Expected: {tc.expected}</p>
+</div>
+
+))}
+
+</div>
+
+
+
+<div className="right-panel">
+
+<div className="editor-top-row">
+
+<select
+className="language-select"
+value={language}
+onChange={(e)=>setLanguage(e.target.value)}
+>
+<option value="c">C</option>
+<option value="cpp">C++</option>
+</select>
+
+<button
+className="editor-utility-btn"
+onClick={resetTemplate}
+>
+Reset
+</button>
+
+<button
+className="editor-utility-btn"
+onClick={copyCode}
+>
+Copy
+</button>
+
+<button
+className="editor-utility-btn"
+onClick={downloadCode}
+>
+Download
+</button>
+
+</div>
+
+
+<div style={{height:"420px"}}>
+
+<Editor
+height="100%"
+theme="vs-dark"
+language={language}
+value={code}
+onChange={handleCodeChange}
+/>
+
+</div>
+
+
+<div
+className="editor-top-row"
+style={{marginTop:"20px"}}
+>
+
+<button
+className="run-btn"
+onClick={runCode}
+disabled={isRunning}
+>
+{isRunning ? "Running..." : "▶ Run Code"}
+</button>
+
+
+<button
+className={
+canSubmit
+? "submit-btn enabled"
+: "submit-btn disabled"
+}
+disabled={!canSubmit || isSubmitting}
+onClick={handleSubmit}
+>
+{isSubmitting ? "Submitting..." : "Submit"}
+</button>
+
+
+{/* <button
+className="back-btn"
+onClick={()=>{
+setSelected(null);
+setResult(null);
+}}
+>
+⬅ Back
+</button> */}
+
+</div>
+
+
+
+{result && (
+<div className="bottom-evaluation-row">
+
+{/* Step Evaluation Left */}
+{result?.stepResults && (
+<div className="step-box-clean">
+
+<h3>📊 Step Evaluation</h3>
+
+{result.stepResults.map((step,i)=>(
+
+<div
+key={i}
+className="step-row-clean"
+>
+<div>
+{step.passed ? "✅" : "❌"} {step.label}
+</div>
+
+<div>
+{step.marksAwarded}/{step.marksTotal}
+</div>
+
+</div>
+
+))}
+
+<div className="total-clean">
+Total Score: {result.totalMarks}
+</div>
+
+</div>
+)}
+
+
+{/* Results Right */}
+<div className="results-box">
+
+<h3>📋 Results</h3>
+
+<p>
+Passed: {result.testcasesPassed}/{result.totalTestcases}
+</p>
+
+{result.results?.map((r,i)=>(
+
+<div
+key={i}
+className="testcase-card"
+>
+
+<p><b>Testcase {i+1}</b></p>
+<p>Input: {r.input}</p>
+<p>Expected: {r.expected}</p>
+<p>Got: {r.got}</p>
+<p>Status: {r.status}</p>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+)}
+</div>
+
+</div>
+
+</div>
+
+</div>
+/* <button
+className="back-btn"
+onClick={()=>{
+setSelected(null);
+setResult(null);
+}}
+>
+⬅ Back
+</button> */
+
+)}
+
+</>
+);
 }
