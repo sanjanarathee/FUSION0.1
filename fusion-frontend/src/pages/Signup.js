@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/auth.css";   // ✅ UPDATED (important change)
 
 export default function Signup() {
   const [role, setRole] = useState("student");
@@ -23,30 +23,22 @@ export default function Signup() {
     }
 
     try {
-      console.log("➡️ Sending signup data:", {
-        name,
-        email,
-        password,
-        role,
-        extraField,
-      });
+      const res = await axios.post(
+        "https://fusion0-1.onrender.com/api/auth/signup",
+        {
+          name: name.trim(),
+          email: email.toLowerCase().trim(),
+          password: password.trim(),
+          role,
+          extraField: extraField.trim(),
+        }
+      );
 
-      const res = await axios.post("https://fusion0-1.onrender.com/api/auth/signup", {
-        name: name.trim(),
-        email: email.toLowerCase().trim(),
-        password: password.trim(),
-        role,
-        extraField: extraField.trim(),
-      });
-
-      console.log("✅ Signup successful:", res.data);
-
-      // ✅ Save user directly in localStorage (same as login)
+      // Save user
       localStorage.setItem("fusionUser", JSON.stringify(res.data.user));
 
       setMsg("✅ Signup successful! Redirecting...");
 
-      // ✅ Redirect automatically based on role
       setTimeout(() => {
         if (res.data.user.role === "teacher") {
           navigate("/teacher-dashboard");
@@ -55,7 +47,6 @@ export default function Signup() {
         }
       }, 1000);
     } catch (err) {
-      console.error("❌ Signup Error:", err.response?.data || err.message);
       setMsg(err.response?.data?.msg || "Signup failed, try again!");
     }
   };
@@ -80,7 +71,7 @@ export default function Signup() {
         </button>
       </div>
 
-      {/* Signup Form */}
+      {/* Form */}
       <div className="form-card">
         <h2>{role === "student" ? "Student Signup" : "Teacher Signup"}</h2>
 
@@ -118,6 +109,7 @@ export default function Signup() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+
           <input
             type="password"
             placeholder="Password"
@@ -125,6 +117,7 @@ export default function Signup() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
           <input
             type="password"
             placeholder="Confirm Password"

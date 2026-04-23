@@ -1,42 +1,98 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./PageStyles.css";  // ⭐ Same styling as C page
+import "../styles/teacher.css";   // ✅ IMPORTANT
 
 export default function ManageCppLanguage() {
   const navigate = useNavigate();
 
   return (
-    <div className="learn-container">
-      <h1 className="learn-title">📘 Manage C++ Language</h1>
-      <p>Manage your C++ language units, assignments, and student progress below.</p>
+    <div className="unit-page">
 
-      {/* 🧩 Manage Units Section */}
-      <h3 className="unit-heading" style={{ marginTop: "40px" }}>
-        📘 Manage C++ Language Units
-      </h3>
-
-      <div className="button-container">
-        <button className="unit-btn" onClick={() => navigate("/teacher/cpp/unit1")}>
-          Unit 1
-        </button>
-        <button className="unit-btn" onClick={() => navigate("/teacher/cpp/unit2")}>
-          Unit 2
-        </button>
-        <button className="unit-btn" onClick={() => navigate("/teacher/cpp/unit3")}>
-          Unit 3
-        </button>
-        <button className="unit-btn" onClick={() => navigate("/teacher/cpp/unit4")}>
-          Unit 4
-        </button>
+      {/* HEADER */}
+      <div className="unit-header">
+        <h1>📘 Manage C++ Language</h1>
       </div>
 
+      {/* BG TEXT */}
+      <div className="fusion-bg-text">FUSION</div>
+
+      {/* CONTENT */}
+      <div className="unit-content">
+
+        <div className="section">
+          <h2>📘 Manage Units</h2>
+
+          <div className="section-grid">
+
+            <div
+              className="section-card"
+              onClick={() => navigate("/teacher/cpp/unit1")}
+            >
+              <div className="card-left">
+                <span className="card-icon">1️⃣</span>
+                <div>
+                  <h3>Unit 1</h3>
+                  <p>Manage Unit 1 content</p>
+                </div>
+              </div>
+              <div className="arrow">➜</div>
+            </div>
+
+            <div
+              className="section-card"
+              onClick={() => navigate("/teacher/cpp/unit2")}
+            >
+              <div className="card-left">
+                <span className="card-icon">2️⃣</span>
+                <div>
+                  <h3>Unit 2</h3>
+                  <p>Manage Unit 2 content</p>
+                </div>
+              </div>
+              <div className="arrow">➜</div>
+            </div>
+
+            <div
+              className="section-card"
+              onClick={() => navigate("/teacher/cpp/unit3")}
+            >
+              <div className="card-left">
+                <span className="card-icon">3️⃣</span>
+                <div>
+                  <h3>Unit 3</h3>
+                  <p>Manage Unit 3 content</p>
+                </div>
+              </div>
+              <div className="arrow">➜</div>
+            </div>
+
+            <div
+              className="section-card"
+              onClick={() => navigate("/teacher/cpp/unit4")}
+            >
+              <div className="card-left">
+                <span className="card-icon">4️⃣</span>
+                <div>
+                  <h3>Unit 4</h3>
+                  <p>Manage Unit 4 content</p>
+                </div>
+              </div>
+              <div className="arrow">➜</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      {/* BACK */}
       <button
         className="back-btn"
         onClick={() => navigate("/teacher-dashboard")}
-        style={{ marginTop: "50px" }}
       >
-        ⬅ Back to Teacher Dashboard
+        ← Back to Teacher Dashboard
       </button>
+
     </div>
   );
 }

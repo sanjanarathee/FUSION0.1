@@ -1,65 +1,204 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/student.css";
 
-export default function CUnit2() {
-  const navigate = useNavigate();
+export default function CUnit2(){
 
-  return (
-    <div className="learn-container">
-      <h1 className="learn-title">📘 Unit 2 Resources</h1>
+const navigate = useNavigate();
 
-      <p className="learn-text">
-        Explore detailed materials for all C programming concepts in Unit 2.
-      </p>
+return(
 
-      {/* 📁 View Study Materials */}
-      <h3 className="unit-heading" style={{ marginTop: "40px" }}>
-        📁 View Study Materials
-      </h3>
+<div className="student-page">
 
-      <div
-        className="button-container"
-        style={{ gap: "20px", flexWrap: "wrap", justifyContent: "center" }}
-      >
-        {/* ✅ FIXED NOTES BUTTON */}
-        <button
-          className="unit-btn"
-          onClick={() => navigate("/student/notes/c/2")}
-        >
-          📝 Notes
-        </button>
+{/* HEADER */}
+<div className="student-header">
+<h1 style={{margin:"0 auto"}}>
+Unit 2
+</h1>
+</div>
 
-        <button
-          className="unit-btn"
-          onClick={() => navigate("/learn-c/unit2/ppt")}
-        >
-          📊 PPTs
-        </button>
 
-        <button
-          className="unit-btn"
-          onClick={() => navigate("/learn-c/unit2/coding")}
-        >
-          💻 Coding Practice
-        </button>
+{/* FUSION */}
+<div className="student-fusion-bg">
+FUSION
+</div>
 
-        <button
-          className="unit-btn"
-          onClick={() => navigate("/student-assignment?unit=2")}
-        >
-          🎯 Take Unit 2 Quiz
-        </button>
-      </div>
 
-      {/* 🔙 Back Button */}
-      <button
-        className="back-btn"
-        onClick={() => navigate("/learn-c")}
-        style={{ marginTop: "40px" }}
-      >
-        ⬅ Back to Unit Selection
-      </button>
-    </div>
-  );
+<div className="student-content">
+
+
+{/* STUDY MATERIAL */}
+
+<div className="student-learn-section">
+
+<h2>📘 Study Material</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/student/notes/c/2")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+📝
+</div>
+
+<div>
+<h3>View Notes</h3>
+<p>Access study notes</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/learn-c/unit2/ppt")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+📄
+</div>
+
+<div>
+<h3>View PPTs</h3>
+<p>Access presentation files</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+{/* ASSIGNMENTS */}
+
+<div className="student-learn-section">
+
+<h2>🧠 Assignments</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/student-assignment?unit=2")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+🎯
+</div>
+
+<div>
+<h3>Assignment Quiz</h3>
+<p>Attempt Quiz</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/learn-c/unit/2/subjective")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+📝
+</div>
+
+<div>
+<h3>Subjective Assignment</h3>
+<p>Submit written answers</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+{/* CODING PRACTICE */}
+
+<div className="student-learn-section">
+
+<h2>💻 Coding Practice</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/learn-c/unit2/coding")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+💻
+</div>
+
+<div>
+<h3>Coding Practice</h3>
+<p>Solve programming questions</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<button
+className="student-back-btn"
+onClick={()=>navigate("/learn-c")}
+>
+⬅ Back to Units
+</button>
+
+
+</div>
+</div>
+
+);
+
 }

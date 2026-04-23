@@ -1,55 +1,204 @@
 import React from "react";
-import "./PageStyles.css";
+import { useNavigate } from "react-router-dom";
+import "../styles/student.css";
 
-export default function CUnit4() {
-  return (
-    <div className="learn-container">
-      <h1 className="learn-title">📘 Unit 4 Resources</h1>
-      <p className="learn-text">
-        Explore detailed materials for all C programming concepts in Unit 4.
-      </p>
+export default function CUnit4(){
 
-      <h3 className="learn-subtitle">📁 View Study Materials</h3>
+const navigate = useNavigate();
 
-      <div className="unit-buttons">
-        <button
-          className="unit-btn blue-btn"
-          onClick={() => window.location.href = "/student/notes/c/4"}
+return(
 
-        >
-          📝 Notes
-        </button>
+<div className="student-page">
 
-        <button
-          className="unit-btn blue-btn"
-          onClick={() => window.location.href = "/learn-c/unit4/ppt"}
+{/* HEADER */}
+<div className="student-header">
+<h1 style={{margin:"0 auto"}}>
+Unit 4
+</h1>
+</div>
 
-        >
-          📄 PPTs
-        </button>
 
-        <button
-          className="unit-btn blue-btn"
-          onClick={() => (window.location.href = "/unit4/coding")}
-        >
-          💻 Coding Practice
-        </button>
+{/* FUSION */}
+<div className="student-fusion-bg">
+FUSION
+</div>
 
-        <button
-  className="unit-btn blue-btn"
-  onClick={() => (window.location.href = "/student-assignment?unit=4")}
+
+<div className="student-content">
+
+
+{/* STUDY MATERIAL */}
+
+<div className="student-learn-section">
+
+<h2>📘 Study Material</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/student/notes/c/4")}
 >
-  🎯 Take Unit 4 Quiz
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+📝
+</div>
+
+<div>
+<h3>View Notes</h3>
+<p>Access study notes</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/learn-c/unit4/ppt")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+📄
+</div>
+
+<div>
+<h3>View PPTs</h3>
+<p>Access presentation files</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+{/* ASSIGNMENTS */}
+
+<div className="student-learn-section">
+
+<h2>🧠 Assignments</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/student-assignment?unit=4")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+🎯
+</div>
+
+<div>
+<h3>Assignment Quiz</h3>
+<p>Attempt Quiz</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/learn-c/unit/4/subjective")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+📝
+</div>
+
+<div>
+<h3>Subjective Assignment</h3>
+<p>Submit written answers</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+{/* CODING PRACTICE */}
+
+<div className="student-learn-section">
+
+<h2>💻 Coding Practice</h2>
+
+<div className="student-learn-grid">
+
+<div
+className="student-learn-card"
+onClick={()=>navigate("/learn-c/unit4/coding")}
+>
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+💻
+</div>
+
+<div>
+<h3>Coding Practice</h3>
+<p>Solve programming questions</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<button
+className="student-back-btn"
+onClick={()=>navigate("/learn-c")}
+>
+⬅ Back to Units
 </button>
 
-      </div>
 
-      <button
-        className="back-btn"
-        onClick={() => (window.location.href = "/learn-c")}
-      >
-        ⬅ Back to Unit Selection
-      </button>
-    </div>
-  );
+</div>
+</div>
+
+);
+
 }

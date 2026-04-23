@@ -1,229 +1,352 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/student.css";
 
 export default function StudentAssignment() {
-  const location = useLocation();
 
-  // 🔥 FIX 1: Read unit from query params
-  const query = new URLSearchParams(location.search);
-  const selectedUnit = query.get("unit");
+const location = useLocation();
 
-  const [assignments, setAssignments] = useState([]);
-  const [selectedAssignment, setSelectedAssignment] = useState(null);
-  const [answers, setAnswers] = useState({});
-  const [result, setResult] = useState(null);
+const query = new URLSearchParams(location.search);
+const selectedUnit = query.get("unit");
 
-  const [studentName, setStudentName] = useState("");
-  const [rollNumber, setRollNumber] = useState("");
-  const [detailsFilled, setDetailsFilled] = useState(false);
+const [assignments,setAssignments]=useState([]);
+const [selectedAssignment,setSelectedAssignment]=useState(null);
+const [answers,setAnswers]=useState({});
+const [result,setResult]=useState(null);
 
-  /* -------------------------------------------------------
-        FETCH ASSIGNMENTS  (STUDENT API)
-  -------------------------------------------------------- */
-  useEffect(() => {
-  const fetchAssignments = async () => {
-    try {
-      const res = await axios.get(
-        `https://fusion-backend.onrender.com/api/assignments/student?unit=${Number(selectedUnit)}&rollNumber=${rollNumber}`
-      );
+const [studentName,setStudentName]=useState("");
+const [rollNumber,setRollNumber]=useState("");
+const [detailsFilled,setDetailsFilled]=useState(false);
 
-      console.log("Student assignments:", res.data);
 
-      setAssignments(res.data.assignments || []);
-    } catch (error) {
-      console.error("❌ Error fetching assignments:", error);
-    }
-  };
 
-  if (rollNumber) {
-    fetchAssignments();
-  }
-}, [selectedUnit, rollNumber]);
+useEffect(()=>{
 
-  const handleOptionSelect = (qIndex, option) => {
-    setAnswers({ ...answers, [qIndex]: option });
-  };
+const fetchAssignments = async()=>{
 
-  const handleSubmit = async () => {
-    let correct = 0;
+try{
 
-    selectedAssignment.questions.forEach((q, i) => {
-      const chosen = answers[i]?.toString().trim().toLowerCase();
-      const actual = q.correctAnswer?.toString().trim().toLowerCase();
-      if (chosen === actual) correct++;
-    });
+const res=await axios.get(
+`http://localhost:5000/api/assignments/student?unit=${Number(selectedUnit)}&rollNumber=${rollNumber}`
+);
 
-    const wrong = selectedAssignment.questions.length - correct;
-    const accuracy = ((correct / selectedAssignment.questions.length) * 100).toFixed(2);
+setAssignments(res.data.assignments || []);
 
-    setResult({ correct, wrong, accuracy });
+}catch(err){
+console.error(err);
+}
 
-    try {
-      const res = await axios.post(
-        "https://fusion-backend.onrender.com/api/assignments/performance",
-        {
-          studentName,
-          rollNumber,
-          answers: Object.values(answers),
-          unit: selectedAssignment.unit,
-        }
-      );
+};
 
-      if (!res.data.success) {
-        alert(res.data.message);
-        return;
-      }
-    } catch (err) {
-      if (err.response?.data?.message) {
-        alert(err.response.data.message);
-        return;
-      }
-      console.error("❌ Error saving performance:", err);
-    }
-  };
+if(rollNumber){
+fetchAssignments();
+}
 
-  const handleAssignmentClick = async (assignment) => {
-    if (!rollNumber) return alert("Please enter your details first.");
-    if (new Date() > new Date(assignment.deadline)) {
-      return alert("Deadline is over! You cannot attempt this assignment.");
-    }
+},[selectedUnit,rollNumber]);
 
-    try {
-      const res = await axios.post(
-        "https://fusion0-1.onrender.com/api/assignments/check",
-        {
-          rollNumber,
-          unit: assignment.unit,
-        }
-      );
 
-      if (res.data.attempted) {
-        alert("You have already attempted this assignment!");
-        return;
-      }
 
-      setSelectedAssignment(assignment);
-    } catch (err) {
-      console.log("❌ Error checking attempt:", err);
-    }
-  };
+const handleOptionSelect=(qIndex,option)=>{
+setAnswers({
+...answers,
+[qIndex]:option
+});
+};
 
-  return (
-    <div className="learn-container">
-      <h1 className="learn-title">🧩 MCQ Assignments – Unit {selectedUnit}</h1>
 
-      {/* DETAIL FORM */}
-      {!detailsFilled && (
-        <div className="file-card" style={{ padding: "25px" }}>
-          <h2>Enter Your Details</h2>
 
-          <div className="input-wrapper">
-            <input
-              type="text"
-              placeholder="Enter your Name"
-              value={studentName}
-              onChange={(e) => setStudentName(e.target.value)}
-              className="clean-input"
-              required
-            />
+const handleSubmit = async()=>{
 
-            <input
-              type="text"
-              placeholder="Enter your Roll Number"
-              value={rollNumber}
-              onChange={(e) => setRollNumber(e.target.value)}
-              className="clean-input"
-              required
-            />
-          </div>
+let correct=0;
 
-          <button
-            className="view-btn"
-            onClick={() => {
-              if (!studentName || !rollNumber)
-                return alert("Please enter both name and roll number!");
-              setDetailsFilled(true);
-            }}
-          >
-            Continue 🚀
-          </button>
-        </div>
-      )}
+selectedAssignment.questions.forEach((q,i)=>{
 
-      {/* ASSIGNMENTS LIST */}
-      {detailsFilled && !selectedAssignment && (
-        <div>
-          <h2>📚 Choose an Assignment</h2>
+const chosen=answers[i]?.toString().trim().toLowerCase();
 
-          {assignments.length === 0 && <p>No assignments available for this unit.</p>}
+const actual=q.correctAnswer?.toString().trim().toLowerCase();
 
-          {assignments.map((a, i) => {
-            const deadline = new Date(a.deadline);
-            const expired = new Date() > deadline;
+if(chosen===actual){
+correct++;
+}
 
-            return (
-              <div
-                key={i}
-                className="file-card"
-                style={{ cursor: "pointer" }}
-                onClick={() => handleAssignmentClick(a)}
-              >
-                <h3>📘 {a.title}</h3>
-                <p>📝 {a.description}</p>
-                <p>🔢 Questions: {a.questions.length}</p>
-                <p>⏳ Deadline: {deadline.toLocaleString()}</p>
+});
 
-                <p style={{ color: expired ? "red" : "lightgreen" }}>
-                  {expired ? "❌ Deadline Over" : "✔ Available"}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      )}
+const wrong=
+selectedAssignment.questions.length-correct;
 
-      {/* SHOW QUESTIONS */}
-      {selectedAssignment && !result && (
-        <>
-          <h2>📘 Unit {selectedAssignment.unit} – Assignment</h2>
+const accuracy=
+((correct/selectedAssignment.questions.length)*100).toFixed(2);
 
-          {selectedAssignment.questions.map((q, index) => (
-            <div key={index} className="file-card">
-              <h3>{index + 1}. {q.questionText}</h3>
+setResult({
+correct,
+wrong,
+accuracy
+});
 
-              {q.options.map((opt, oIndex) => (
-                <label key={oIndex} className="option-label">
-                  <input
-                    type="radio"
-                    name={`q-${index}`}
-                    onChange={() => handleOptionSelect(index, opt)}
-                  />
-                  {opt}
-                </label>
-              ))}
-            </div>
-          ))}
 
-          <button className="view-btn" onClick={handleSubmit}>
-            Submit Assignment
-          </button>
-        </>
-      )}
+try{
 
-      {/* RESULT */}
-      {result && (
-        <div className="result-card">
-          <h3>📊 Your Performance</h3>
-          <p>🧑‍🎓 Name: {studentName}</p>
-          <p>📌 Roll No: {rollNumber}</p>
-          <p>📘 Unit: {selectedAssignment.unit}</p>
-          <p>✅ Correct: {result.correct}</p>
-          <p>❌ Wrong: {result.wrong}</p>
-          <p>🎯 Accuracy: {result.accuracy}%</p>
-        </div>
-      )}
-    </div>
-  );
+await axios.post(
+"http://localhost:5000/api/assignments/performance",
+{
+studentName,
+rollNumber,
+answers:Object.values(answers),
+unit:selectedAssignment.unit
+}
+);
+
+}catch(err){
+console.error(err);
+}
+
+};
+
+
+
+const handleAssignmentClick = async(assignment)=>{
+
+if(!rollNumber){
+alert("Please enter details first");
+return;
+}
+
+if(new Date()>new Date(assignment.deadline)){
+alert("Deadline is over");
+return;
+}
+
+try{
+
+const res=await axios.post(
+"http://localhost:5000/api/assignments/check",
+{
+rollNumber,
+unit:assignment.unit
+}
+);
+
+if(res.data.attempted){
+alert("Already attempted");
+return;
+}
+
+setSelectedAssignment(assignment);
+
+}catch(err){
+console.error(err);
+}
+
+};
+
+
+
+return(
+
+<div className="student-page">
+
+{/* HEADER */}
+
+<div className="student-header">
+<h1 style={{margin:"0 auto"}}>
+🧩 MCQ Assignments — Unit {selectedUnit}
+</h1>
+</div>
+
+
+{/* FUSION */}
+<div className="student-fusion-bg">
+FUSION
+</div>
+
+
+<div className="student-content">
+
+{/* DETAILS FORM */}
+
+{!detailsFilled && (
+
+<div className="mcq-box">
+
+<h2 style={{marginBottom:"25px"}}>
+Enter Your Details
+</h2>
+
+<input
+className="mcq-input"
+placeholder="Enter your Name"
+value={studentName}
+onChange={(e)=>setStudentName(e.target.value)}
+/>
+
+
+<input
+className="mcq-input"
+placeholder="Enter your Roll Number"
+value={rollNumber}
+onChange={(e)=>setRollNumber(e.target.value)}
+/>
+
+
+<button
+className="mcq-btn"
+onClick={()=>{
+
+if(!studentName || !rollNumber){
+alert("Fill all details");
+return;
+}
+
+setDetailsFilled(true);
+
+}}
+>
+Continue 🚀
+</button>
+
+</div>
+
+)}
+
+
+
+{/* ASSIGNMENT LIST */}
+
+{detailsFilled && !selectedAssignment && (
+
+<div className="student-learn-section">
+
+<h2>📚 Choose Assignment</h2>
+
+<div className="student-learn-grid">
+
+{assignments.map((a)=>(
+
+<div
+key={a._id}
+className="student-learn-card"
+onClick={()=>handleAssignmentClick(a)}
+>
+
+<div className="student-learn-left">
+
+<div className="student-learn-icon">
+📝
+</div>
+
+<div>
+<h3>{a.title}</h3>
+<p>{a.description}</p>
+</div>
+
+</div>
+
+<div className="student-learn-arrow">
+➡
+</div>
+
+</div>
+
+))}
+
+</div>
+
+</div>
+
+)}
+
+
+
+{/* QUESTIONS */}
+
+{selectedAssignment && !result && (
+
+<div>
+
+<h2 style={{
+textAlign:"center",
+marginBottom:"30px"
+}}>
+📘 Assignment Questions
+</h2>
+
+{selectedAssignment.questions.map((q,index)=>(
+
+<div
+key={index}
+className="mcq-assignment-card"
+>
+
+<h3>
+{index+1}. {q.questionText}
+</h3>
+
+{q.options.map((opt,oIndex)=>(
+
+<label key={oIndex} className="option-label">
+  <input
+    type="radio"
+    name={`q-${index}`}
+    value={opt}
+    checked={answers[index] === opt}
+    onChange={() => handleOptionSelect(index, opt)}
+  />
+  <span>{opt}</span>
+</label>
+
+))}
+
+</div>
+
+))}
+
+
+<div style={{textAlign:"center"}}>
+
+<button
+className="mcq-btn"
+onClick={handleSubmit}
+>
+Submit Assignment
+</button>
+
+</div>
+
+</div>
+
+)}
+
+
+
+{/* RESULT */}
+
+{result && (
+
+<div className="mcq-result">
+
+<h2>
+📊 Performance
+</h2>
+
+<p>🧑‍🎓 {studentName}</p>
+
+<p>📌 {rollNumber}</p>
+
+<p>✅ Correct: {result.correct}</p>
+
+<p>❌ Wrong: {result.wrong}</p>
+
+<p>🎯 Accuracy: {result.accuracy}%</p>
+
+</div>
+
+)}
+
+
+</div>
+</div>
+
+);
+
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./PageStyles.css";
+import "../styles/teacher.css";   // ✅ FIXED
 
 export default function ManageSubjective() {
   const [assignments, setAssignments] = useState([]);
@@ -12,7 +12,7 @@ export default function ManageSubjective() {
   const fetchAssignments = async () => {
   try {
     const res = await axios.get(
-      "https://fusion-backend.onrender.com/api/assignments/unit/3"
+      "http://localhost:5000/api/assignments/unit/3"
     );
 
     console.log("RESPONSE:", res.data);
@@ -30,7 +30,7 @@ export default function ManageSubjective() {
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `https://fusion-backend.onrender.com/api/assignments/${id}`
+        `http://localhost:5000/api/assignments/${id}`
       );
       fetchAssignments();
     } catch (err) {
@@ -39,44 +39,59 @@ export default function ManageSubjective() {
   };
 
   return (
-    <div className="teacher-dashboard">
-      <h1 className="dashboard-title">📋 Manage Assignments</h1>
+  <div className="unit-page">
 
-      <div className="card-container">
-        {assignments.length === 0 ? (
-          <p>No assignments found</p>
-        ) : (
-          assignments.map((a) => (
-            <div key={a._id} className="assignment-card">
-              
-              <h3>{a.question}</h3>
+    {/* 🔶 Header */}
+    <div className="unit-header">
+      <h2>📋 Manage Assignments</h2>
+    </div>
 
-              <p>Marks: {a.maxMarks}</p>
+    {/* 🔷 Section */}
+    <div className="section">
 
-              <p>
-                Deadline:{" "}
-                {a.deadline
-                  ? new Date(a.deadline).toLocaleDateString()
-                  : "No deadline"}
-              </p>
+      {assignments.length === 0 ? (
+        <p className="empty-state">No assignments found</p>
+      ) : (
+        <div className="section-grid">
 
-              <div className="btn-group">
+          {assignments.map((a) => (
+            <div key={a._id} className="section-card">
+
+              <div className="card-left">
+                <span className="card-icon">📝</span>
+                <div>
+                  <h3>{a.question}</h3>
+                  <p>Marks: {a.maxMarks}</p>
+                  <p>
+                    Deadline:{" "}
+                    {a.deadline
+                      ? new Date(a.deadline).toLocaleDateString()
+                      : "No deadline"}
+                  </p>
+                </div>
+              </div>
+
+              {/* 🔥 Buttons */}
+              <div className="manage-actions">
                 <button
-                  className="dashboard-btn red"
+                  className="delete-btn"
                   onClick={() => handleDelete(a._id)}
                 >
                   Delete
                 </button>
 
-                <button className="dashboard-btn blue">
+                <button className="edit-btn">
                   Edit
                 </button>
               </div>
 
             </div>
-          ))
-        )}
-      </div>
+          ))}
+
+        </div>
+      )}
+
     </div>
-  );
+  </div>
+);
 }

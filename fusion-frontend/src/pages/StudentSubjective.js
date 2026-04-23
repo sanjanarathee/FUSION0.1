@@ -33,7 +33,7 @@ export default function StudentSubjective() {
 
         // ✅ FETCH ASSIGNMENTS
         const assignmentsRes = await axios.get(
-          `https://fusion-backend.onrender.com/api/assignments/subjective/student?unit=${unit}&section=${section}`,
+          `http://localhost:5000/api/assignments/subjective/student?unit=${unit}&section=${section}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ export default function StudentSubjective() {
 
         // ✅ FETCH SUBMISSIONS
         const submissionsRes = await axios.get(
-          `https://fusion-backend.onrender.com/api/assignments/subjective/submissions?userId=${userId}`,
+          `http://localhost:5000/api/assignments/subjective/submissions?userId=${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ export default function StudentSubjective() {
   const handleSubmit = async (assignment) => {
     try {
       const res = await axios.post(
-        "https://fusion-backend.onrender.com/api/assignments/subjective/submit",
+        "http://localhost:5000/api/assignments/subjective/submit",
         {
           assignmentId: assignment._id,
           answer: answers[assignment._id],
@@ -107,74 +107,83 @@ userId: user?.user?.id           },
 
   // ✅ STYLES (FIXED ERROR)
   const styles = {
-  container: {
-    minHeight: "100vh",
-    background: "#1e2a47", // 🔥 same fusion dark blue
-    padding: "40px",
-    fontFamily: "Segoe UI",
-  },
 
-  title: {
-    textAlign: "center",
-    color: "#ffffff",
-    marginBottom: "40px",
-    fontSize: "28px",
-    fontWeight: "600",
-  },
+container:{
+minHeight:"100vh",
+background:"#eef2f7",
+padding:"20px"
+},
 
-  noData: {
-    textAlign: "center",
-    color: "#ccc",
-    fontSize: "18px",
-  },
+title:{
+background:"linear-gradient(135deg,#ff7a00,#ff9f43)",
+color:"white",
+padding:"30px",
+borderRadius:"18px",
+textAlign:"center",
+fontSize:"34px",
+fontWeight:"700",
+marginBottom:"50px",
+boxShadow:"0 6px 20px rgba(0,0,0,0.08)"
+},
 
-  card: {
-    background: "#24345a", // 🔥 fusion card color
-    padding: "25px",
-    borderRadius: "15px",
-    marginBottom: "25px",
-    maxWidth: "700px",
-    marginLeft: "auto",
-    marginRight: "auto",
-    boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
-  },
+noData:{
+textAlign:"center",
+fontSize:"20px",
+color:"#64748b"
+},
 
-  question: {
-    fontSize: "18px",
-    fontWeight: "600",
-    marginBottom: "12px",
-    color: "#ffffff",
-  },
+card:{
+background:"white",
+padding:"30px",
+borderRadius:"18px",
+marginBottom:"30px",
+maxWidth:"1100px",
+marginLeft:"auto",
+marginRight:"auto",
 
-  textarea: {
-    width: "100%",
-    padding: "12px",
-    borderRadius: "10px",
-    border: "none",
-    marginTop: "10px",
-    background: "#1b2745",
-    color: "#fff",
-    outline: "none",
-  },
+boxShadow:"0 6px 20px rgba(0,0,0,.06)"
+},
 
-  button: {
-    marginTop: "15px",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "8px",
-    color: "white",
-    cursor: "pointer",
-    fontWeight: "500",
-    background: "#00c9a7", // 🔥 fusion green button
-  },
+question:{
+fontSize:"28px",
+fontWeight:"700",
+marginBottom:"20px",
+color:"#0f172a"
+},
 
-  resultBox: {
-    marginTop: "15px",
-    padding: "12px",
-    background: "#1f3d2b",
-    borderRadius: "8px",
-    color: "#a5f3c7",
-  },
+textarea:{
+width:"100%",
+padding:"20px",
+borderRadius:"14px",
+border:"1px solid #dbe3ef",
+fontSize:"18px",
+background:"#f8fafc",
+color:"#111827",
+outline:"none"
+},
+
+button:{
+marginTop:"20px",
+padding:"14px 30px",
+border:"none",
+borderRadius:"12px",
+fontSize:"16px",
+fontWeight:"600",
+color:"white",
+cursor:"pointer",
+background:"#6366f1"
+},
+
+resultBox:{
+marginTop:"20px",
+padding:"20px",
+background:"#ecfdf3",
+border:"1px solid #bbf7d0",
+borderRadius:"14px",
+color:"#166534",
+fontSize:"18px"
+}
+
 };
   return (
     <div style={styles.container}>

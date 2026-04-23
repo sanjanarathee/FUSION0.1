@@ -1,29 +1,53 @@
 import { Link } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/home.css";
 
 export default function Home() {
   return (
-    <div className="home-container">
-      <div className="home-content">
-        <h1 className="fusion-title">FUSION</h1>
-        <p className="fusion-tagline">
-          A Teaching learning assessment for programming languages
-        </p>
+    <div className="home-page">
 
-        <div className="fusion-buttons">
-          <Link to="/login">
-            <button className="fusion-btn login-btn">Login</button>
-          </Link>
-
-          {/* 🔑 Replaced Signup with Set Password */}
-         <Link to="/register">
-  <button className="fusion-btn signup-btn">Register</button>
-</Link>
-
-        </div>
+      {/* HEADER */}
+      <div className="home-header">
+        <span>🎓 FUSION</span>
+        <span className="header-right">Welcome 🚀</span>
       </div>
 
-      <div className="fusion-bg-letter">F</div>
+      {/* MAIN CARD */}
+      <div className="home-card">
+
+        {/* LEFT SIDE */}
+        <div className="home-left">
+          <h2>Welcome to</h2>
+          <h1>FUSION</h1>
+          {/* <div className="underline"></div> */}
+
+          <p>
+            The all-in-one platform to manage courses, assignments,
+            students and coding evaluations.
+          </p>
+
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png"
+            alt="fusion"
+          />
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div className="home-right">
+          <h2>Get Started</h2>
+          <p>Choose what you want to do</p>
+
+          <Link to="/login" className="home-option">
+            <span>🔐 Login</span>
+            <span>→</span>
+          </Link>
+
+          <Link to="/register" className="home-option">
+            <span>📝 Register</span>
+            <span>→</span>
+          </Link>
+        </div>
+
+      </div>
     </div>
   );
 }

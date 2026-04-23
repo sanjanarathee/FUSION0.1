@@ -1,37 +1,66 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/teacher.css";   // ✅ FIXED
 
 export default function TeacherSubjectiveAssignment() {
   const navigate = useNavigate();
 
   return (
-    <div className="teacher-dashboard">
-      <h1>📝 Subjective Assignment Panel</h1>
+   <div className="unit-page">
 
-      <div className="button-container">
+  {/* Header */}
+  <div className="unit-header">
+    <h2>Subjective Assignments</h2>
+  </div>
 
-        <button
-          className="dashboard-btn green"
-          onClick={() => navigate("/teacher/unit3/subjective/create")}
-        >
-          ➕ Create Assignment
-        </button>
+  <div className="section"></div>
 
-        <button
-          className="dashboard-btn blue"
-          onClick={() => navigate("/teacher/unit3/subjective/manage")}
-        >
-          📋 Manage Assignments
-        </button>
+  {/* Cards */}
+  <div className="section-grid">
 
-        <button
-          className="dashboard-btn purple"
-          onClick={() => navigate("/teacher/unit3/subjective/results")}
-        >
-          📊 View Results
-        </button>
-
+    <div
+      className="section-card"
+      onClick={() => navigate("/teacher/unit3/subjective/create")}
+    >
+      <div className="card-left">
+        <span className="card-icon">📝</span>
+        <div>
+          <h3>Subjective Assignment</h3>
+          <p>Create subjective assignments</p>
+        </div>
       </div>
+      <div className="arrow">→</div>
     </div>
+
+    <div
+      className="section-card"
+      onClick={() => navigate("/teacher/unit3/subjective/manage")}
+    >
+      <div className="card-left">
+        <span className="card-icon">📁</span>
+        <div>
+          <h3>Manage Assignments</h3>
+          <p>Edit / delete assignments</p>
+        </div>
+      </div>
+      <div className="arrow">→</div>
+    </div>
+
+    <div
+      className="section-card"
+      onClick={() => navigate("/teacher/unit/3/subjective/results")}
+    >
+      <div className="card-left">
+        <span className="card-icon">📊</span>
+        <div>
+          <h3>Results</h3>
+          <p>View student performance</p>
+        </div>
+      </div>
+      <div className="arrow">→</div>
+    </div>
+
+  </div>
+</div>
   );
 }

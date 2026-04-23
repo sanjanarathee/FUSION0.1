@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/teacher.css";   // ✅ FIXED
 
 export default function TeacherUnit3() {
   const navigate = useNavigate();
@@ -8,23 +8,18 @@ export default function TeacherUnit3() {
   return (
     <div className="unit-page">
 
-  {/* 🔶 HEADER */}
-  <div className="unit-header">
-    <h1>Unit 3</h1>
-    {/* <p className="header-sub">
-      Manage all resources, assignments & coding here
-    </p> */}
-  </div>
+      {/* HEADER */}
+      <div className="unit-header">
+        <h1>Unit 3</h1>
+      </div>
 
-  {/* 🔥 ADD HERE (IMPORTANT POSITION) */}
-  <div className="fusion-bg-text">FUSION</div>
+      {/* BG TEXT */}
+      <div className="fusion-bg-text">FUSION</div>
 
-  {/* 📦 CONTENT */}
-  <div className="unit-content">
+      {/* CONTENT */}
+      <div className="unit-content">
 
-        
-
-        {/* 📘 STUDY MATERIAL */}
+        {/* STUDY MATERIAL */}
         <div className="section">
           <h2>📘 Study Material</h2>
 
@@ -55,13 +50,13 @@ export default function TeacherUnit3() {
                   <p>Upload presentation files</p>
                 </div>
               </div>
-               <div className="arrow">➜</div>
+              <div className="arrow">➜</div>
             </div>
 
           </div>
         </div>
 
-        {/* 🧠 ASSIGNMENTS */}
+        {/* ASSIGNMENTS */}
         <div className="section">
           <h2>🧠 Assignments</h2>
 
@@ -78,7 +73,7 @@ export default function TeacherUnit3() {
                   <p>Create objective assignments</p>
                 </div>
               </div>
-               <div className="arrow">➜</div>
+              <div className="arrow">➜</div>
             </div>
 
             <div
@@ -98,7 +93,7 @@ export default function TeacherUnit3() {
           </div>
         </div>
 
-        {/* 💻 CODING PRACTICE */}
+        {/* CODING */}
         <div className="section">
           <h2>💻 Coding Practice</h2>
 
@@ -115,7 +110,7 @@ export default function TeacherUnit3() {
                   <p>Add coding problems</p>
                 </div>
               </div>
-               <div className="arrow">➜</div>
+              <div className="arrow">➜</div>
             </div>
 
             <div
@@ -129,7 +124,7 @@ export default function TeacherUnit3() {
                   <p>View student performance</p>
                 </div>
               </div>
-               <div className="arrow">➜</div>
+              <div className="arrow">➜</div>
             </div>
 
           </div>
@@ -137,12 +132,12 @@ export default function TeacherUnit3() {
 
       </div>
 
-      {/* 🔙 BACK BUTTON */}
+      {/* BACK */}
       <button
-        className="back-btn"
+        className="back-btn"   // ✅ FIXED (reuse teacher style)
         onClick={() => navigate("/teacher/manage-c")}
       >
-        ← Back
+        ← Go Back
       </button>
 
     </div>

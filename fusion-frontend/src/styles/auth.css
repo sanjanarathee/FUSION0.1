@@ -1,0 +1,684 @@
+/* ===== COMMON AUTH PAGE (Signup + Login) ===== */
+
+.signup-page,
+.login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  font-family: "Poppins", sans-serif;
+  color: #ffffff;
+  position: relative;
+}
+
+/* ===== ROLE TOGGLE ===== */
+.role-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.role-toggle button {
+  background: transparent;
+  border: 2px solid #3d5a80;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.role-toggle .active {
+  background: #3d5a80;
+  border-color: #3d5a80;
+  color: white;
+}
+
+.role-toggle button:hover {
+  background: #3d5a80;
+}
+
+/* ===== FORM CARD ===== */
+.form-card {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 40px 30px;
+  border-radius: 20px;
+  width: 350px;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.form-card h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #e0e1dd;
+}
+
+/* ===== INPUTS (FIXED - NO GLOBAL BREAK) ===== */
+.signup-page input,
+.login-page input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 14px;
+}
+
+.signup-page input::placeholder,
+.login-page input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+.signup-page input:focus,
+.login-page input:focus {
+
+  box-shadow: 0 0 5px rgba(152, 193, 217, 0.4);
+}
+
+/* ===== BUTTONS (FIXED) ===== */
+.signup-page button,
+.login-page button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.signup-page button:hover,
+.login-page button:hover {
+  transform: scale(1.03);
+}
+
+
+
+/* Signup success */
+.signup-page .auth-message {
+  color: #90ee90;
+}
+
+/* Login error */
+.login-page .auth-message {
+  color: #ff6b6b;
+}
+
+/* ===== BOTTOM TEXT ===== */
+.auth-bottom-text {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #aab2bf;
+}
+
+.auth-bottom-text a {
+  color: #98c1d9;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-bottom-text a:hover {
+  text-decoration: underline;
+}/* ===== REGISTER BUTTONS ===== */
+.role-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background: #3d5a80;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.role-btn:hover {
+  background: #2c4a6b;
+}
+
+.auth-page .fusion-bg-text {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 180px;
+  font-weight: bold;
+  color: rgba(255,255,255,0.03);
+  letter-spacing: 10px;
+  user-select: none;
+  pointer-events: none;
+}.auth-page.auth-bottom-text span {
+  color: #38bdf8;
+  cursor: pointer;
+}/* LIGHT THEME BACKGROUND */
+.light-theme {
+  background: #eef2f7;
+}
+
+/* CARD STYLE (matches dashboard cards) */
+.light-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 35px 30px;
+  width: 350px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+/* SUBTEXT */
+.subtext {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+.light-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 14px;
+}
+
+/* BUTTON (orange like your header 🔥) */
+.light-card button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #ff7a00, #ff9f43);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.light-card button:hover {
+  transform: translateY(-2px);
+}
+
+/* auth-message */
+.light-card .auth-message {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+/* LINK */
+.light-card .auth-bottom-text span {
+  color: #ff7a00;
+  cursor: pointer;
+}
+
+/* FUSION TEXT */
+.light-theme .auth-page.fusion-bg-text {
+  color: rgba(0,0,0,0.05);
+}
+/* ===== FORCE LIGHT THEME (FINAL FIX) ===== */
+.auth-light {
+  background: #eef2f7 !important;
+}
+
+/* CARD */
+.auth-light .form-card {
+  background: #ffffff !important;
+  color: #111827;
+  border-radius: 20px;
+  padding: 45px 35px;
+  width: 420px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+/* TEXT */
+.auth-light h2 {
+  color: #111827;
+}
+
+.auth-light p {
+  color: #6b7280;
+}
+
+/* INPUTS */
+.auth-light input {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  font-size: 14px;
+}
+
+/* BUTTON */
+.auth-light button {
+  background: linear-gradient(135deg, #ff7a00, #ff9f43) !important;
+  color: white;
+}
+
+/* REGISTER LINK */
+.auth-light .auth-bottom-text span {
+  color: #ff7a00;
+}
+
+/* FUSION TEXT */
+.auth-light .auth-page.fusion-bg-text {
+  color: rgba(0,0,0,0.05);
+}/* ===== PREMIUM LOGIN UPGRADE ===== */
+
+/* CARD IMPROVEMENT */
+.auth-light .form-card {
+  position: relative;
+  overflow: visible;
+  border-radius: 18px;
+  padding: 40px 30px;
+}
+
+/* TOP ORANGE STRIP (like dashboard header 🔥) */
+.auth-light .form-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(135deg, #ff7a00, #ff9f43);
+}
+
+/* TITLE */
+.auth-light h2 {
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+/* SUBTEXT */
+.auth-light .subtext {
+  font-size: 13px;
+  margin-bottom: 22px;
+}
+
+/* INPUT UPGRADE */
+.auth-light input {
+  background: #f3f4f6 !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.2s ease;
+}
+
+.auth-light input:focus {
+  border-color: #ff7a00 !important;
+  box-shadow: 0 0 0 2px rgba(255,122,0,0.2);
+}
+
+/* BUTTON UPGRADE */
+.auth-light button {
+    padding: 14px;
+      border-radius: 12px;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(255,122,0,0.3);
+}
+
+.auth-light button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255,122,0,0.4);
+}
+
+/* CARD HOVER (subtle premium feel) */
+.auth-light .form-card:hover {
+  transform: translateY(-3px);
+  transition: 0.3s;
+}
+
+/* FUSION TEXT IMPROVE */
+.auth-light .auth-page.fusion-bg-text {
+  font-size: 160px;
+  letter-spacing: 15px;
+}.auth-light h2 {
+  color: #111827;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.auth-light .subtext {
+  color: #4b5563;   /* darker = readable */
+  font-size: 14px;
+}
+/* ===== REGISTER PAGE (FUSION THEME) ===== */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ===== REGISTER PAGE ===== */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #eef2f7;
+}
+
+/* HEADER */
+.register-header {
+  width: 90%;
+  margin: 20px auto;
+  padding: 40px 70px;
+  font-size: 34px;
+  font-weight: 700;
+  border-radius: 15px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: linear-gradient(135deg, #ff7a00, #ff9f43);
+  color: white;
+}
+
+/* MAIN CARD */
+.auth-card {
+  display: flex;
+  width: 85%;
+  margin: 40px auto;
+  min-height: 80vh;
+  border-radius: 20px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+/* LEFT SIDE */
+.register-left {
+  flex: 1;
+  background: #f6efe7;
+  padding: 90px 70px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.register-left h2 {
+  font-size: 30px;
+}
+
+.fusion-text {
+  font-size: 70px;
+  font-weight: 900;
+  color: #ff7a00;
+}
+
+.underline {
+  width: 70px;
+  height: 5px;
+  background: #ff7a00;
+  margin: 15px 0 25px;
+  border-radius: 10px;
+}
+
+.register-left p {
+  align-items: flex-start;   /* 🔥 center → left */
+  text-align: left;    
+  font-size: 17px;
+  max-width: 420px;
+  line-height: 1.8;
+}
+
+/* IMAGE */
+.illustration {
+  width: 580px;
+  max-width: 150%;
+  margin-top: 80px;
+}
+
+/* RIGHT SIDE */
+.register-right {
+  flex: 1;
+  background: #f9fafb;
+  padding: 70px 60px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ICON */
+.user-circle {
+  width: 65px;
+  height: 65px;
+  background: #ffe4cc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+/* TITLE */
+.register-right h2 {
+  font-size: 35px;
+  font-weight: 900;
+}
+
+.auth-sub-text {
+  font-size: 25px;
+  color: #6b7280;
+  margin-bottom: 40px;
+}
+
+.auth-center-card {
+  position: relative;
+}
+
+.auth-center-card *::before {
+  content: none !important;
+}
+
+/* OPTION CARD */
+.register-option {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  padding: 25px 28px;
+  margin-top: 35px;
+  border-radius: 20px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.register-option:hover {
+  transform: translateY(-3px);
+  background: #fff3e6;
+}
+.register-option + .register-option {
+  margin-top: 50px;   /* 🔥 extra spacing */
+}
+
+/* LEFT CONTENT */
+.option-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ICON */
+.option-icon {
+  width: 80px;
+  height: 80px;
+   font-size: 40px;
+  background: #ffe4cc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* TEXT */
+.option-left h4 {
+  margin: 0;
+  font-size: 20px;
+  color: #ff7a00;
+}
+
+.option-left p {
+  margin: 2px 0 0;
+  font-size: 20px;
+  color: #6b7280;
+}
+
+/* ARROW */
+.arrow {
+  background: #e5e7eb;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+/* BOTTOM TEXT */
+.auth-bottom-text {
+  text-align: center;
+  margin: 10px 0 25px;
+  font-size: 16px;
+  color: #6b7280;
+}
+
+.auth-bottom-text span {
+  color: #ff7a00;
+  font-weight: 700;
+  cursor: pointer;
+}
+.auth-bottom-text span,
+.auth-bottom-text a {
+  color: #ff7a00;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.auth-bottom-text span:hover,
+.auth-bottom-text a:hover {
+  text-decoration: underline;
+}
+
+
+
+.auth-btn:hover {
+  transform: scale(1.03);
+}
+
+.auth-message {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #ff4d4f;
+}/* CENTER WRAPPER */
+.auth-center-wrapper {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* CARD */
+.auth-center-card {
+  background: #ffffff;
+  padding: 90px 60px;
+
+   min-height: 500px;   
+  
+  width: 650px;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+/* ICON */
+.auth-center-card .user-circle {
+  width: 80px;
+  height: 120px;
+  background: #ffe5d0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  font-size: 24px;
+  min-height: 100px; 
+}
+
+/* INPUT */
+.auth-form input {
+  width: 100%;
+  padding: 18px;
+  margin-top: 15px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+/* BUTTON */
+.auth-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #ff7a00, #ff9f43);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* 💀 KILL ALL ORANGE LINES INSIDE LOGIN CARD */
+.auth-center-card h2::before,
+.auth-center-card h2::after,
+.auth-center-card p::before,
+.auth-center-card p::after,
+.auth-center-card *::before {
+  content: none !important;
+  display: none !important;
+}
+.auth-center-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.auth-center-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+.auth-center-card:hover {
+  border: 1px solid rgba(255,122,0,0.3);
+}
+/* 💀 REMOVE ALL DECORATIVE ORANGE LINES */
+.auth-card h2::before,
+.auth-card h2::after,
+.auth-card p::before,
+.auth-card p::after,
+.auth-card *::before {
+  content: none !important;
+  display: none !important;
+}

@@ -47,11 +47,12 @@ app.use("/api", limiter);
 // ✅ CORS (FINAL FIX)
 // ------------------------------
 app.use(cors({
-  origin: "https://fusion-0-1.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
+origin: [
+"http://localhost:3000",
+"https://fusion-0-1.vercel.app"
+],
+credentials: true
 }));
-
 // ❌ REMOVE THIS LINE (important)
 // app.options("*", cors());
 

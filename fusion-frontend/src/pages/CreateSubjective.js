@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./PageStyles.css";
+import "../styles/teacher.css";   // ✅ FIXED
 
 export default function CreateSubjective() {
   const [question, setQuestion] = useState("");
@@ -23,7 +23,7 @@ export default function CreateSubjective() {
       }
 
       await axios.post(
-        "https://fusion-backend.onrender.com/api/assignments/subjective",
+        "http://localhost:5000/api/assignments/subjective",
         {
           question,
           keywords: keywords.split(",").map((k) => k.trim()),
@@ -56,62 +56,78 @@ export default function CreateSubjective() {
   };
 
   return (
-    <div className="teacher-dashboard">
-      <h1 className="dashboard-title">📝 Create Subjective Assignment</h1>
+  <div className="unit-page">
 
-      <form className="form-container" onSubmit={handleSubmit}>
-        
-        <input
-          className="form-input"
-          type="text"
-          placeholder="Enter Question"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          required
-        />
-
-        <input
-          className="form-input"
-          type="text"
-          placeholder="Keywords (comma separated)"
-          value={keywords}
-          onChange={(e) => setKeywords(e.target.value)}
-          required
-        />
-
-        <input
-          className="form-input"
-          type="number"
-          placeholder="Max Marks"
-          value={marks}
-          onChange={(e) => setMarks(e.target.value)}
-          required
-        />
-
-        {/* 🔥 NEW: UNIT INPUT */}
-        <input
-          className="form-input"
-          type="number"
-          placeholder="Unit Number"
-          value={unit}
-          onChange={(e) => setUnit(e.target.value)}
-          required
-        />
-
-        <input
-          className="form-input"
-          type="date"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          required
-        />
-
-        <button className="dashboard-btn green" type="submit">
-          Create Assignment
-        </button>
-      </form>
-
-      <p style={{ marginTop: "20px" }}>{msg}</p>
+    {/* 🔶 Header */}
+    <div className="unit-header">
+      <h2>📝 Create Subjective Assignment</h2>
     </div>
-  );
+
+    {/* 🔷 Form Section */}
+    <div className="section">
+      
+      <div className="form-wrapper">
+
+        <form className="modern-form" onSubmit={handleSubmit}>
+          
+          <input
+            className="modern-input"
+            type="text"
+            placeholder="Enter Question"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            required
+          />
+
+          <input
+            className="modern-input"
+            type="text"
+            placeholder="Keywords (comma separated)"
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            required
+          />
+
+          <input
+            className="modern-input"
+            type="number"
+            placeholder="Max Marks"
+            value={marks}
+            onChange={(e) => setMarks(e.target.value)}
+            required
+          />
+
+          <input
+            className="modern-input"
+            type="number"
+            placeholder="Unit Number"
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+            required
+          />
+
+          <input
+            className="modern-input"
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            required
+          />
+
+          <button className="submit-btn" type="submit">
+            Create Assignment
+          </button>
+
+          {msg && <p className="form-msg">{msg}</p>}
+
+        </form>
+
+        
+
+      </div>
+
+    </div>
+  </div>
+);
+
 }

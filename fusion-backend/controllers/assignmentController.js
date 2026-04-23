@@ -9,7 +9,7 @@ import { evaluateWithKeywords, evaluateWithAI } from "../utils/evaluate.js";
 import User from "../models/user.js";
 export const createAssignment = async (req, res) => {
   try {
-    const { unit, subject, title, description, questions, deadline, teacherId, section } = req.body;
+    const { unit, type ,subject, title, description, questions, deadline, teacherId, section } = req.body;
 
     if (!title || !unit  || !section)
       return res.status(400).json({
@@ -47,6 +47,7 @@ export const createAssignment = async (req, res) => {
 
     const newAssignment = new Assignment({
       unit: Number(unit),
+      type,
       title,
       description: description || "",
       deadline: new Date(deadline),
@@ -211,17 +212,16 @@ export const savePerformance = async (req, res) => {
     }
 
     // ✅ Find assignment ONLY of that section
-    const assignment = await Assignment.findOne({
-      unit: numericUnit,
-      section: student.section,   // ⭐ LOCK
-    });
+    const { assignmentId } = req.body;  // 🔥 ADD THIS
 
-    if (!assignment) {
-      return res.status(404).json({
-        success: false,
-        message: "No assignment found for your section",
-      });
-    }
+const assignment = await Assignment.findById(assignmentId);
+
+if (!assignment) {
+  return res.status(404).json({
+    success: false,
+    message: "Assignment not found",
+  });
+}
 
     const alreadyAttempted = await Performance.findOne({
       rollNumber,
@@ -258,7 +258,9 @@ export const savePerformance = async (req, res) => {
       wrong,
       accuracy,
       unit: numericUnit,
-      section: student.section,   // ⭐ SAVE SECTION
+      section: student.section,
+        assignmentId: assignmentId,   // 🔥 ADD THIS
+  // ⭐ SAVE SECTION
     });
 
     await performance.save();
@@ -282,17 +284,18 @@ export const savePerformance = async (req, res) => {
 ================================================================ */
 export const getAllPerformances = async (req, res) => {
   try {
-    const { unit, section } = req.query;
+    const { unit, section, assignmentId } = req.query;
 
-    console.log("API HIT ✅");
-
-    // 🔥 SIMPLE QUERY (NO COMPLEX FILTER)
-    const performances = await Performance.find({
+    let filter = {
       unit: Number(unit),
       section: section
-    });
+    };
 
-    console.log("DATA FOUND:", performances);
+    if (assignmentId) {
+      filter.assignmentId = assignmentId;   // 🔥 KEY LINE
+    }
+
+    const performances = await Performance.find(filter);
 
     res.status(200).json({
       success: true,
@@ -300,15 +303,13 @@ export const getAllPerformances = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("ERROR:", error);  // 🔥 IMPORTANT
-
+    console.error("ERROR:", error);
     res.status(500).json({
       success: false,
       message: error.message
     });
   }
 };
-
 /* ================================================================
    ❌ TEACHER: DELETE ASSIGNMENT
 ================================================================ */
@@ -473,14 +474,22 @@ export const getSubjectiveAssignmentsForStudent = async (req, res) => {
   try {
     const { unit, section } = req.query;
 
-    const assignments = await Assignment.find({
+    // 🔥 FIX START
+    const filter = {
       unit: Number(unit),
       type: "subjective",
       isActive: true,
-      section: {
+    };
+
+    // ✅ only apply section if it exists
+    if (section) {
+      filter.section = {
         $regex: new RegExp(`^${section.trim()}$`, "i"),
-      },
-    });
+      };
+    }
+
+    const assignments = await Assignment.find(filter);
+    // 🔥 FIX END
 
     const uniqueAssignments = Array.from(
       new Map(assignments.map(a => [a._id.toString(), a])).values()

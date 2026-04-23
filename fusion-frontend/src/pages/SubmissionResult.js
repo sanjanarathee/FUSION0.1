@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import "./PageStyles.css";
+import "../styles/teacher.css";
 
 export default function SubmissionResult() {
   const { id } = useParams();
@@ -9,11 +9,11 @@ export default function SubmissionResult() {
 
   const [data, setData] = useState(null);
   const [activeTab, setActiveTab] = useState("details");
-  const [isDark, setIsDark] = useState(true);
+  // const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
   axios
-    .get(`https://fusion-backend.onrender.com/api/code/submission/${id}`)
+    .get(`http://localhost:5000/api/code/submission/${id}`)
     .then((res) => {
       console.log("FULL DATA:", res.data);   // 🔥 ADD
       console.log("SUBMISSION:", res.data.submission);   // 🔥 ADD
@@ -35,8 +35,7 @@ export default function SubmissionResult() {
   );
 
   return (
-    <div className={`submission-page ${isDark ? "theme-dark" : "theme-light"}`}>
-      
+<div className="unit-page">      
       {/* TOP BAR */}
       <div className="submission-topbar">
         <h1
@@ -57,12 +56,7 @@ export default function SubmissionResult() {
             View All Submissions
           </button>
 
-          <button
-            className="theme-toggle"
-            onClick={() => setIsDark((prev) => !prev)}
-          >
-            {isDark ? "☀ Light" : "🌙 Dark"}
-          </button>
+          
         </div>
       </div>
 
