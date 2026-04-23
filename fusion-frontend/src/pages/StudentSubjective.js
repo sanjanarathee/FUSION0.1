@@ -33,7 +33,7 @@ export default function StudentSubjective() {
 
         // ✅ FETCH ASSIGNMENTS
         const assignmentsRes = await axios.get(
-          `http://localhost:5000/api/assignments/subjective/student?unit=${unit}&section=${section}`,
+          `https://fusion0-1.onrender.com/api/assignments/subjective/student?unit=${unit}&section=${section}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ export default function StudentSubjective() {
 
         // ✅ FETCH SUBMISSIONS
         const submissionsRes = await axios.get(
-          `http://localhost:5000/api/assignments/subjective/submissions?userId=${userId}`,
+          `https://fusion0-1.onrender.com/api/assignments/subjective/submissions?userId=${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ export default function StudentSubjective() {
   const handleSubmit = async (assignment) => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/assignments/subjective/submit",
+        "https://fusion0-1.onrender.com/api/assignments/subjective/submit",
         {
           assignmentId: assignment._id,
           answer: answers[assignment._id],

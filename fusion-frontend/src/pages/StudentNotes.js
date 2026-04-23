@@ -18,7 +18,7 @@ const fetchNotes = async()=>{
 try{
 
 const res = await axios.get(
-"http://localhost:5000/api/files/filter",
+"https://fusion0-1.onrender.com/api/files/filter",
 {
 params:{
 subject:subject,
@@ -147,7 +147,7 @@ key={file._id}
 
 <a
 className="note-btn"
-href={`http://localhost:5000/api/files/download/${file.filename}`}
+href={`https://fusion0-1.onrender.com/api/files/download/${file.filename}`}
 target="_blank"
 rel="noreferrer"
 >
@@ -156,7 +156,7 @@ View
 
 <a
 className="note-btn"
-href={`http://localhost:5000/api/files/download/${file.filename}`}
+href={`https://fusion0-1.onrender.com/api/files/download/${file.filename}`}
 download
 >
 Download

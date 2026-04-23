@@ -9,7 +9,7 @@ export default function TeacherCodingQuestionResults() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/coding/results/${questionId}`)
+      .get(`https://fusion0-1.onrender.com/api/coding/results/${questionId}`)
       .then((res) => {
         console.log("Coding Results:", res.data);
         setSubmissions(res.data.submissions || []);

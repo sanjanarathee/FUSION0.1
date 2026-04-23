@@ -23,7 +23,7 @@ export default function CreateSubjective() {
       }
 
       await axios.post(
-        "http://localhost:5000/api/assignments/subjective",
+        "https://fusion0-1.onrender.com/api/assignments/subjective",
         {
           question,
           keywords: keywords.split(",").map((k) => k.trim()),

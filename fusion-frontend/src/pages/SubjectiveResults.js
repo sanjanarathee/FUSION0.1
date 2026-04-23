@@ -11,7 +11,7 @@ export default function TeacherSubjectiveResults() {
   if (!unit) return;
 
 
- axios.get(`http://localhost:5000/api/assignments/unit/${unit}`)
+ axios.get(`https://fusion0-1.onrender.com/api/assignments/unit/${unit}`)
   .then((res) => {
     console.log("TEACHER ASSIGNMENTS:", res.data);
 
@@ -29,7 +29,7 @@ export default function TeacherSubjectiveResults() {
   const fetchResults = (assignmentId) => {
     if (!assignmentId) return;
 
-    axios.get(`http://localhost:5000/api/assignments/subjective/results?assignmentId=${assignmentId}&unit=${unit}`)
+    axios.get(`https://fusion0-1.onrender.com/api/assignments/subjective/results?assignmentId=${assignmentId}&unit=${unit}`)
       .then((res) => {
         console.log("RESULTS:", res.data);
 

@@ -12,7 +12,7 @@ export default function TeacherUnit3ManageAssignments() {
    const fetchAssignments = async () => {
      try {
        const res = await axios.get(
-         `http://localhost:5000/api/assignments/unit/${unit}`
+         `https://fusion0-1.onrender.com/api/assignments/unit/${unit}`
        );
  
        console.log("🔥 API RESPONSE:", res.data);
@@ -28,7 +28,7 @@ export default function TeacherUnit3ManageAssignments() {
 
   const deleteAssignment = async (id) => {
     try {
-      await await axios.delete(`http://localhost:5000/api/assignments/${id}`);;
+      await await axios.delete(`https://fusion0-1.onrender.com/api/assignments/${id}`);;
       alert("Assignment Deleted");
 
       // Refresh list after delete

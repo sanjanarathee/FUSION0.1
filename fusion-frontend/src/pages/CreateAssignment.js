@@ -102,7 +102,7 @@ export default function CreateAssignment() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/assignments/create", {
+      await axios.post("https://fusion0-1.onrender.com/api/assignments/create", {
         unit: Number(unit),
         type: "quiz",
         title,
