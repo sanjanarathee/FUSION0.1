@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
+const API = process.env.REACT_APP_API_URL || "https://fusion-0-1.onrender.com"; 
+
+
 export default function StudentSubjective() {
   const [assignments, setAssignments] = useState([]);
   const [answers, setAnswers] = useState({});
@@ -10,7 +13,7 @@ export default function StudentSubjective() {
   const [submittedIds, setSubmittedIds] = useState([]);
 
   // ✅ GET UNIT FROM URL
-const API = process.env.REACT_APP_API_URL || "https://fusion-0-1.onrender.com";  const { unit } = useParams();
+ const { unit } = useParams();
 
   // ✅ GET USER
   // const userData = JSON.parse(localStorage.getItem("fusionUser"));
@@ -21,6 +24,8 @@ const API = process.env.REACT_APP_API_URL || "https://fusion-0-1.onrender.com"; 
   const user = JSON.parse(localStorage.getItem("fusionUser"));
 const userId = user?.user?.id;
 const token = user?.token;
+
+
 
     useEffect(() => {
     const fetchData = async () => {
