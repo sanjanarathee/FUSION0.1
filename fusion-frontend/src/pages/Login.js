@@ -15,7 +15,7 @@ export default function Login() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://fusion0-1.onrender.com/api/auth/login",
         {
           identifier: identifier.trim(),
           password,

@@ -34,7 +34,7 @@ export default function StudentSubjective() {
 
         // ✅ FETCH ASSIGNMENTS
         const assignmentsRes = await axios.get(
-          `http://localhost:5000/api/assignments/subjective/student?unit=${unit}&section=${section}`,
+          `/api/assignments/subjective/student?unit=${unit}&section=${section}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -44,7 +44,7 @@ export default function StudentSubjective() {
 
         // ✅ FETCH SUBMISSIONS
         const submissionsRes = await axios.get(
-          `http://localhost:5000/api/assignments/subjective/submissions?userId=${userId}`,
+          `/api/assignments/subjective/submissions?userId=${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ export default function StudentSubjective() {
     }
 
     const res = await axios.post(
-  "http://localhost:5000/api/assignments/subjective/submit",
+  "/api/assignments/subjective/submit",
   formData,
   {
     headers: {
