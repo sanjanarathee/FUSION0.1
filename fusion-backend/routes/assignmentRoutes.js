@@ -17,34 +17,47 @@ import {
 
 import Performance from "../models/Performance.js";
 import { protect } from "../middleware/authmiddleware.js";
+import multer from "multer";
 
 const router = express.Router();
 
+/* -------------------- MULTER SETUP -------------------- */
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
 /* -------------------------------------------------------------------------- */
-/* 🧩 TEACHER ROUTES */
+/* 📄 SUBJECTIVE ROUTES (🔥 KEEP FIRST TO AVOID CONFLICT) */
 /* -------------------------------------------------------------------------- */
 
-/* ➕ Create a new assignment */
-router.post("/create", createAssignment);
-
-/* 📘 Get all assignments */
-router.get("/all", getAllAssignments);
-
-/* 🔍 Get assignments by UNIT (🔥 IMPORTANT TOP PE) */
-router.get("/unit/:unit", getAssignmentsByUnit);
-
-/* 📄 Subjective specific */
 router.get("/subjective/results", getSubjectiveResults);
 router.get("/subjective/student", getSubjectiveAssignmentsForStudent);
 router.get("/subjective/submissions", getStudentSubmissions);
 
 router.post("/subjective", protect, createSubjectiveAssignment);
-router.post("/subjective/submit", submitSubjectiveAnswer);
+
+router.post(
+  "/subjective/submit",
+  protect, // 🔥 added security
+  upload.single("file"),
+  submitSubjectiveAnswer
+);
 
 router.put("/subjective/:id", updateSubjectiveAssignment);
 
-/* 🗑 Delete (🔥 ALWAYS LAST) */
-router.delete("/:id", deleteAssignment);
+/* -------------------------------------------------------------------------- */
+/* 🧩 TEACHER ROUTES */
+/* -------------------------------------------------------------------------- */
+
+router.post("/create", createAssignment);
+router.get("/all", getAllAssignments);
 
 /* -------------------------------------------------------------------------- */
 /* 👩‍🎓 STUDENT ROUTES */
@@ -52,11 +65,21 @@ router.delete("/:id", deleteAssignment);
 
 router.get("/student", getAssignment);
 
+/* -------------------------------------------------------------------------- */
+/* 📊 PERFORMANCE */
+/* -------------------------------------------------------------------------- */
+
 router.post("/performance", savePerformance);
 router.get("/performance", getAllPerformances);
 
 /* -------------------------------------------------------------------------- */
-/* ⭐ Check if student already attempted */
+/* 🔍 UNIT ROUTE (🔥 KEEP AFTER SUBJECTIVE) */
+/* -------------------------------------------------------------------------- */
+
+router.get("/unit/:unit", getAssignmentsByUnit);
+
+/* -------------------------------------------------------------------------- */
+/* ⭐ CHECK ATTEMPT */
 /* -------------------------------------------------------------------------- */
 
 router.post("/check", async (req, res) => {
@@ -86,5 +109,11 @@ router.post("/check", async (req, res) => {
     });
   }
 });
+
+/* -------------------------------------------------------------------------- */
+/* 🗑 DELETE (ALWAYS LAST) */
+/* -------------------------------------------------------------------------- */
+
+router.delete("/:id", deleteAssignment);
 
 export default router;

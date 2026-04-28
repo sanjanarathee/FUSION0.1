@@ -2,8 +2,8 @@ import Assignment from "../models/Assignment.js";
 import Performance from "../models/Performance.js";
 import Submission from "../models/Submission.js";
 import { evaluateWithKeywords, evaluateWithAI } from "../utils/evaluate.js";
-
-/* ================================================================
+import fs from "fs";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";/* ================================================================
    🧩 TEACHER: CREATE ASSIGNMENT
 ================================================================ */
 import User from "../models/user.js";
@@ -415,9 +415,50 @@ export const getSubjectiveResults = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch results" });
   }
 };
+
+
 export const submitSubjectiveAnswer = async (req, res) => {
   try {
-    const { assignmentId, answer, userId } = req.body;
+    console.log("🚀 HIT SUBMIT API");
+    const { assignmentId, answer } = req.body;
+const userId = req.user?.id || req.body.userId;
+    const file = req.file;
+
+    console.log("BODY:", req.body);
+    console.log("FILE:", file);
+
+    let finalAnswer = answer;
+
+    // 👉 PDF handling
+    if (file) {
+      const dataBuffer = new Uint8Array(fs.readFileSync(file.path));
+      const pdf = await pdfjsLib.getDocument({ data: dataBuffer }).promise;
+
+      let text = "";
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+
+        const strings = content.items.map(item => item.str);
+        text += strings.join(" ") + "\n";
+      }
+
+      finalAnswer = text.trim() || "";
+      fs.unlinkSync(file.path); // 🔥 ADD THIS
+    }
+
+    // ❗ Empty check
+    if (!finalAnswer || finalAnswer.trim() === "") {
+      return res.status(400).json({
+        error: "No answer provided (text or PDF)"
+      });
+    }
+
+    // ❗ Assignment check
+    if (!assignmentId) {
+      return res.status(400).json({ error: "Assignment ID missing" });
+    }
 
     const assignment = await Assignment.findById(assignmentId);
 
@@ -425,49 +466,115 @@ export const submitSubjectiveAnswer = async (req, res) => {
       return res.status(404).json({ error: "Assignment not found" });
     }
 
-    // 🔥 yaha evaluation hona chahiye
-    // ✅ 1. KEYWORD EVALUATION
-const keywordResult = evaluateWithKeywords(
-  answer,
-  assignment.keywords,
-  assignment.maxMarks
+    // 🔥 DEFINE maxMarks FIRST (MOST IMPORTANT)
+    const maxMarks = parseInt(assignment.maxMarks, 10);
+
+    if (isNaN(maxMarks)) {
+      console.error("❌ Invalid maxMarks:", assignment.maxMarks);
+      return res.status(500).json({ error: "Invalid maxMarks" });
+    }
+
+    // 👉 Keyword evaluation
+    const keywordResult = evaluateWithKeywords(
+      finalAnswer,
+      assignment.keywords || [],
+      maxMarks
+    );
+console.log("➡️ CALLING AI...");
+    // 👉 AI evaluation
+    let aiResult;
+
+    try {
+      aiResult = await evaluateWithAI(
+        assignment.question,
+        finalAnswer,
+        maxMarks
+      );
+    } catch (err) {
+      console.error("AI ERROR:", err);
+
+      aiResult = {
+        marks: keywordResult.marks,
+        feedback: "AI evaluation failed"
+      };
+    }
+
+    console.log("AI RESULT:", aiResult);
+// SAFE KEYWORD MAKS
+const keywordMarks = Math.max(
+  0,
+  Math.min(Number(keywordResult.marks || 0), maxMarks)
 );
+//AI MARKS
+let aiMarksRaw = 0;
 
-// ✅ 2. AI EVALUATION
-const aiResult = await evaluateWithAI(
-  assignment.question,
-  answer,
-  assignment.maxMarks
-);
+if (typeof aiResult?.marks === "string") {
+  const match = aiResult.marks.match(/\d+/);
+  aiMarksRaw = match ? Math.min(parseInt(match[0], 10), maxMarks) : 0;
+} else {
+  aiMarksRaw = Number(aiResult?.marks || 0);
+}
 
-// extract AI marks
-let aiMarks = 0;
-const match = aiResult.match(/Marks:\s*(\d+)/);
-if (match) aiMarks = parseInt(match[1]);
+const aiMarks = Math.max(0, Math.min(aiMarksRaw, maxMarks));
+    
 
-// ✅ 3. FINAL MARKS (HYBRID)
-const finalMarks = Math.round(
-  keywordResult.marks * 0.4 + aiMarks * 0.6
-);
+    // ✅ FINAL MARKS
+let finalMarks = aiMarks;
+finalMarks = Math.max(0, Math.min(finalMarks, maxMarks));
 
-// ✅ 4. FINAL FEEDBACK (AI priority)
-const feedback =
-  aiResult.split("Feedback:")[1]?.trim() || keywordResult.feedback;
+    console.log("MAX:", maxMarks);
+    console.log("KEYWORD:", keywordMarks);
+    console.log("AI RAW:", aiMarksRaw);
+    console.log("FINAL:", finalMarks);
 
-    const submission = await Submission.create({
-      userId,
-      assignmentId,
-      answer,
-      marks: finalMarks,
-      feedback: feedback,    
-      unit: assignment.unit 
-    });
+    // 🔥 FEEDBACK FIX
+    let feedback = aiResult?.feedback || "";
 
-    res.json({ success: true, submission });
+feedback = feedback.trim();
 
-  } catch (err) {
-    console.error("🔥 Submit error:", err);
-    res.status(500).json({ error: "Submission failed" });
+// 🔥 remove extra long responses
+const lines = feedback.split("\n").slice(0, 4);
+
+feedback = lines
+  .map(l => l.trim())
+  .filter(l => l.length > 0)
+  .map(l => (l.startsWith("-") ? l : "- " + l))
+  .join("\n");
+
+// 🔥 fallback
+if (!feedback || feedback.length < 10) {
+  feedback = `- Improve explanation
+- Add key concepts
+- Use examples
+- Write in points`;
+}
+    // 👉 SAVE
+    let submission = await Submission.findOne({ userId, assignmentId });
+
+if (submission) {
+  // 🔁 UPDATE existing
+  submission.answer = finalAnswer;
+  submission.marks = finalMarks;
+  submission.feedback = feedback;
+
+  await submission.save();
+} else {
+  // ➕ CREATE new
+  submission = await Submission.create({
+    userId,
+    assignmentId,
+    answer: finalAnswer,
+    marks: finalMarks,
+    feedback,
+    unit: assignment.unit
+  });
+}
+
+    res.json({ submission });
+
+  } catch (error) {
+    console.error("🔥 BACKEND ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 export const getSubjectiveAssignmentsForStudent = async (req, res) => {
@@ -506,8 +613,8 @@ export const getStudentSubmissions = async (req, res) => {
   try {
     const { userId } = req.query;
 
-    const submissions = await Submission.find({ userId });
-
+const submissions = await Submission.find({ userId })
+  .sort({ createdAt: -1 });
     res.json({ success: true, submissions });
   } catch (err) {
     console.error(err);

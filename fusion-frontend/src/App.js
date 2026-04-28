@@ -203,10 +203,10 @@ function App() {
  
 
         <Route path="/teacher/assignment-results/:assignmentId" element={<AssignmentResultTable />} />
-        <Route
- path="/teacher/unit3/subjective"
-  element={<TeacherSubjectiveAssignment />}
-/>
+        <Route path="/teacher/unit1/subjective" element={<TeacherSubjectiveAssignment />} />
+<Route path="/teacher/unit2/subjective" element={<TeacherSubjectiveAssignment />} />
+<Route path="/teacher/unit3/subjective" element={<TeacherSubjectiveAssignment />} />
+<Route path="/teacher/unit4/subjective" element={<TeacherSubjectiveAssignment />} />
         
 
 <Route path="/learn-c/unit/:unit/subjective" element={<StudentSubjective />} />   {/* ======================
@@ -238,10 +238,16 @@ function App() {
   path="/learn-cpp/unit1/notes"
   element={<Navigate to="/student/notes/cpp/1" replace />}
 />
-<Route path="/teacher/unit3/subjective/create" element={<CreateSubjective />} />
+<Route path="/teacher/unit1/subjective/manage" element={<ManageSubjective />} />
+<Route path="/teacher/unit2/subjective/manage" element={<ManageSubjective />} />
 <Route path="/teacher/unit3/subjective/manage" element={<ManageSubjective />} />
+<Route path="/teacher/unit4/subjective/manage" element={<ManageSubjective />} />
 
 
+<Route path="/teacher/unit1/subjective/create" element={<CreateSubjective />} />
+<Route path="/teacher/unit2/subjective/create" element={<CreateSubjective />} />
+<Route path="/teacher/unit3/subjective/create" element={<CreateSubjective />} />
+<Route path="/teacher/unit4/subjective/create" element={<CreateSubjective />} />
   <Route
     path="/teacher/unit/:unit/subjective/results"
     element={<SubjectiveResults />}
