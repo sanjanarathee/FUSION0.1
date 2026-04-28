@@ -13,28 +13,26 @@ export default function StudentSubjective() {
   const { unit } = useParams();
 
   // ✅ GET USER
-  const userData = JSON.parse(localStorage.getItem("fusionUser"));
+  // const userData = JSON.parse(localStorage.getItem("fusionUser"));
+  // const user = JSON.parse(localStorage.getItem("fusionUser"));
+
+  // console.log("USER:", user);
+
   const user = JSON.parse(localStorage.getItem("fusionUser"));
+const userId = user?.user?.id;
+const token = user?.token;
 
-  console.log("USER:", user);
-
-  const userId = userData?.user?.id;
-  const section = userData?.user?.section;
-  const token = userData?.token;
-
-  useEffect(() => {
+    useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("DEBUG:", { userId, section, unit });
-
-        if (!userId || !section || !unit) {
-          console.error("User or unit missing. Please login again.");
+        if (!userId || !unit) {
+          console.error("User or unit missing.");
           return;
         }
 
-        // ✅ FETCH ASSIGNMENTS
+        // ✅ FETCH ASSIGNMENTS (NO section needed)
         const assignmentsRes = await axios.get(
-          `/api/assignments/subjective/student?unit=${unit}&section=${section}`,
+          `/api/assignments/subjective/student?unit=${unit}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -42,7 +40,7 @@ export default function StudentSubjective() {
           }
         );
 
-        // ✅ FETCH SUBMISSIONS
+        // ✅ FETCH SUBMISSIONS (CORRECT API)
         const submissionsRes = await axios.get(
           `/api/assignments/subjective/submissions?userId=${userId}`,
           {
@@ -52,25 +50,25 @@ export default function StudentSubjective() {
           }
         );
 
+        // ✅ SET ASSIGNMENTS
         setAssignments(assignmentsRes.data.assignments || []);
 
         // ✅ MAP RESULTS
         const resultMap = {};
         const ids = [];
 
-        submissionsRes.data.submissions.forEach((s) => {
-  const id = s.assignmentId?._id || s.assignmentId;
+        (submissionsRes.data.submissions || []).forEach((s) => {
+          const id = s.assignmentId?._id || s.assignmentId;
 
-  // 🔥 only keep latest submission
-  if (
-    !resultMap[id] ||
-    new Date(s.createdAt) > new Date(resultMap[id].createdAt)
-  ) {
-    resultMap[id] = s;
-  }
+          if (
+            !resultMap[id] ||
+            new Date(s.createdAt) > new Date(resultMap[id].createdAt)
+          ) {
+            resultMap[id] = s;
+          }
 
-  ids.push(id);
-});
+          ids.push(id);
+        });
 
         setResults(resultMap);
         setSubmittedIds(ids);
@@ -81,50 +79,52 @@ export default function StudentSubjective() {
     };
 
     fetchData();
-  }, [userId, section, unit, token]);
+  }, [userId, unit, token]);
 
-  const handleChange = (id, value) => {
+  
+
+    const handleChange = (id, value) => {
     setAnswers({ ...answers, [id]: value });
   };
+
   const handleFileChange = (id, file) => {
-  setFiles({ ...files, [id]: file });
-};
+    setFiles({ ...files, [id]: file });
+  };
 
   const handleSubmit = async (assignment) => {
-  try {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    formData.append("assignmentId", assignment._id);
-    formData.append("answer", answers[assignment._id] || "");
-    formData.append("userId", user?.user?.id);
+      formData.append("assignmentId", assignment._id);
+      formData.append("answer", answers[assignment._id] || "");
+      formData.append("userId", userId);
 
-    // 👉 PDF add karo
-    if (files[assignment._id]) {
-      formData.append("file", files[assignment._id]);
+      if (files[assignment._id]) {
+        formData.append("file", files[assignment._id]);
+      }
+
+      const res = await axios.post(
+        "/api/assignments/subjective/submit",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setResults((prev) => ({
+  ...prev,
+  [assignment._id]: res.data.submission,
+}));
+
+setSubmittedIds((prev) => [...prev, assignment._id]);
+    } catch (err) {
+      console.error(err);
+      alert("Submission failed");
     }
+  };
 
-    const res = await axios.post(
-  "/api/assignments/subjective/submit",
-  formData,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
-
-    setResults({
-      ...results,
-      [assignment._id]: res.data.submission,
-    });
-
-    setSubmittedIds([...submittedIds, assignment._id]);
-
-  } catch (err) {
-    console.error(err);
-    alert("Submission failed");
-  }
-};
   // ✅ STYLES (FIXED ERROR)
   const styles = {
 
