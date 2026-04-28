@@ -2,8 +2,8 @@ import Assignment from "../models/Assignment.js";
 import Performance from "../models/Performance.js";
 import Submission from "../models/Submission.js";
 import { evaluateWithKeywords, evaluateWithAI } from "../utils/evaluate.js";
-import fs from "fs";
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";/* ================================================================
+import PDFParser from "pdf2json";
+/* ================================================================
    🧩 TEACHER: CREATE ASSIGNMENT
 ================================================================ */
 import User from "../models/user.js";
@@ -430,23 +430,35 @@ const userId = req.user?.id || req.body.userId;
     let finalAnswer = answer;
 
     // 👉 PDF handling
-    if (file) {
-      const dataBuffer = new Uint8Array(fs.readFileSync(file.path));
-      const pdf = await pdfjsLib.getDocument({ data: dataBuffer }).promise;
+   if (file && file.buffer) {
+  try {
+    const pdfParser = new PDFParser();
 
-      let text = "";
+    const text = await new Promise((resolve, reject) => {
+      pdfParser.on("pdfParser_dataError", err => reject(err));
+      pdfParser.on("pdfParser_dataReady", pdfData => {
+        let extractedText = "";
 
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
+        pdfData.Pages.forEach(page => {
+          page.Texts.forEach(textItem => {
+            textItem.R.forEach(r => {
+              extractedText += decodeURIComponent(r.T) + " ";
+            });
+          });
+        });
 
-        const strings = content.items.map(item => item.str);
-        text += strings.join(" ") + "\n";
-      }
+        resolve(extractedText);
+      });
 
-      finalAnswer = text.trim() || "";
-      fs.unlinkSync(file.path); // 🔥 ADD THIS
-    }
+      pdfParser.parseBuffer(file.buffer);
+    });
+
+    finalAnswer = text?.trim() || answer || "";
+
+  } catch (err) {
+    console.error("PDF PARSE ERROR:", err);
+  }
+}
 
     // ❗ Empty check
     if (!finalAnswer || finalAnswer.trim() === "") {
