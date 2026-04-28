@@ -22,16 +22,10 @@ import multer from "multer";
 const router = express.Router();
 
 /* -------------------- MULTER SETUP -------------------- */
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
+const upload = multer({
+  storage: multer.memoryStorage(), // ⭐ IMPORTANT
 });
 
-const upload = multer({ storage });
 
 /* -------------------------------------------------------------------------- */
 /* 📄 SUBJECTIVE ROUTES (🔥 KEEP FIRST TO AVOID CONFLICT) */
