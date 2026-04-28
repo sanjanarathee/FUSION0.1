@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "../styles/teacher.css";   // ✅ FIXED
+import "../styles/teacher.css";
 
 export default function CreateSubjective() {
   const [question, setQuestion] = useState("");
@@ -9,12 +9,12 @@ export default function CreateSubjective() {
   const [deadline, setDeadline] = useState("");
   const [unit, setUnit] = useState("");
   const [msg, setMsg] = useState("");
+  const [section, setSection] = useState(""); // ✅ NEW
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // ✅ GET USER FROM LOCAL STORAGE
       const user = JSON.parse(localStorage.getItem("fusionUser"));
 
       if (!user) {
@@ -30,9 +30,8 @@ export default function CreateSubjective() {
           maxMarks: Number(marks),
           unit: Number(unit),
           deadline,
-          section: user.user.section 
+          section, // ✅ FIXED (dropdown value)
         },
-
         {
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -48,6 +47,7 @@ export default function CreateSubjective() {
       setMarks("");
       setDeadline("");
       setUnit("");
+      setSection(""); // ✅ reset
 
     } catch (err) {
       console.error(err);
@@ -56,78 +56,86 @@ export default function CreateSubjective() {
   };
 
   return (
-  <div className="unit-page">
+    <div className="unit-page">
 
-    {/* 🔶 Header */}
-    <div className="unit-header">
-      <h2>📝 Create Subjective Assignment</h2>
-    </div>
-
-    {/* 🔷 Form Section */}
-    <div className="section">
-      
-      <div className="form-wrapper">
-
-        <form className="modern-form" onSubmit={handleSubmit}>
-          
-          <input
-            className="modern-input"
-            type="text"
-            placeholder="Enter Question"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            required
-          />
-
-          <input
-            className="modern-input"
-            type="text"
-            placeholder="Keywords (comma separated)"
-            value={keywords}
-            onChange={(e) => setKeywords(e.target.value)}
-            required
-          />
-
-          <input
-            className="modern-input"
-            type="number"
-            placeholder="Max Marks"
-            value={marks}
-            onChange={(e) => setMarks(e.target.value)}
-            required
-          />
-
-          <input
-            className="modern-input"
-            type="number"
-            placeholder="Unit Number"
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-            required
-          />
-
-          <input
-            className="modern-input"
-            type="date"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            required
-          />
-
-          <button className="submit-btn" type="submit">
-            Create Assignment
-          </button>
-
-          {msg && <p className="form-msg">{msg}</p>}
-
-        </form>
-
-        
-
+      {/* 🔶 Header */}
+      <div className="unit-header">
+        <h2>📝 Create Subjective Assignment</h2>
       </div>
 
-    </div>
-  </div>
-);
+      {/* 🔷 Form Section */}
+      <div className="section">
+        <div className="form-wrapper">
 
+          <form className="modern-form" onSubmit={handleSubmit}>
+
+            <input
+              className="modern-input"
+              type="text"
+              placeholder="Enter Question"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              required
+            />
+
+            <input
+              className="modern-input"
+              type="text"
+              placeholder="Keywords (comma separated)"
+              value={keywords}
+              onChange={(e) => setKeywords(e.target.value)}
+              required
+            />
+
+            <input
+              className="modern-input"
+              type="number"
+              placeholder="Max Marks"
+              value={marks}
+              onChange={(e) => setMarks(e.target.value)}
+              required
+            />
+
+            <input
+              className="modern-input"
+              type="number"
+              placeholder="Unit Number"
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+              required
+            />
+
+            {/* ✅ NEW SECTION DROPDOWN */}
+            <select
+              className="modern-input"
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+              required
+            >
+              <option value="">Select Section</option>
+              <option value="CSE-A">CSE-A</option>
+              <option value="CSE-B">CSE-B</option>
+              <option value="CSE-C">CSE-C</option>
+            </select>
+
+            <input
+              className="modern-input"
+              type="date"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              required
+            />
+
+            <button className="submit-btn" type="submit">
+              Create Assignment
+            </button>
+
+            {msg && <p className="form-msg">{msg}</p>}
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -4,26 +4,22 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-
-// ✅ 1. KEYWORD-BASED EVALUATION
+/* ================================================================
+   ✅ KEYWORD EVALUATION
+================================================================ */
 export const evaluateWithKeywords = (answer, keywords, maxMarks) => {
   let score = 0;
 
   if (!answer || answer.trim().length < 20) {
-    return {
-      marks: 0,
-      feedback: "Answer too short",
-    };
+    return { marks: 0, feedback: "Answer too short" };
+  }
+
+  // 🔥 FIX 1: avoid crash
+  if (!keywords || keywords.length === 0) {
+    return { marks: 0 };
   }
 
   const lowerAnswer = answer.toLowerCase();
-
-  if (!keywords || keywords.length === 0) {
-    return {
-      marks: 0,
-      feedback: "No keywords provided",
-    };
-  }
 
   keywords.forEach((keyword) => {
     if (lowerAnswer.includes(keyword.toLowerCase())) {
@@ -31,72 +27,108 @@ export const evaluateWithKeywords = (answer, keywords, maxMarks) => {
     }
   });
 
-  const marks = Math.round((score / keywords.length) * maxMarks);
+  let marks = Math.round((score / keywords.length) * maxMarks);
 
-  let feedback = "";
-  if (marks > maxMarks * 0.7) {
-    feedback = "Good answer, most keywords covered";
-  } else if (marks > maxMarks * 0.4) {
-    feedback = "Average answer, some concepts missing";
-  } else {
-    feedback = "Poor answer, important keywords missing";
-  }
+  // 🔥 FIX 2: clamp marks
+  marks = Math.max(0, Math.min(marks, maxMarks));
 
-  return { marks, feedback };
+  return { marks };
 };
 
 
-
-// ✅ 2. GROQ AI EVALUATION (FINAL SAFE VERSION 🔥)
-export const evaluateWithAI = async (
-  question,
-  correctAnswer,
-  studentAnswer,
-  maxMarks
-) => {
+/* ================================================================
+   🤖 GROQ AI (POINT FORMAT + SAFE)
+================================================================ */
+export const evaluateWithAI = async (question, studentAnswer, maxMarks) => {
   try {
     const response = await groq.chat.completions.create({
-      // ✅ LATEST WORKING MODEL
       model: "llama-3.1-8b-instant",
 
       messages: [
         {
           role: "system",
-          content:
-            "You are a strict teacher. Do not give full marks easily. Be fair and critical.",
-        },
-        {
-          role: "user",
           content: `
-Question: ${question}
+You are a strict teacher.
 
+Evaluate the student's answer based on the question.
+
+Question: ${question}
 Student Answer: ${studentAnswer}
 
-Instructions:
-- Evaluate based on correctness and understanding
-- Check if concepts match the question
-- Penalize vague or irrelevant answers
-- Give marks out of ${maxMarks}
-- Keep feedback short (1-2 lines)
+STRICT RULES:
+- Maximum marks: ${maxMarks}
+- Give marks strictly out of ${maxMarks}
+- DO NOT give full marks unless answer is perfect
+- If answer is weak → low marks
+- If average → medium marks
+- If good → high marks
 
-Format strictly:
-Marks: X/${maxMarks}
-Feedback: ...
+Feedback Rules:
+- Only 3 to 4 bullet points
+- Each line starts with "-"
+- Each point max 10 words
+- No paragraph
+
+Return EXACT format:
+
+Marks: X
+
+Feedback:
+- point 1
+- point 2
+- point 3
 `,
         },
       ],
     });
 
-    // ✅ SAFE RESPONSE ACCESS
-    const output =
+    const text =
       response?.choices?.[0]?.message?.content ||
-      `Marks: 0/${maxMarks}\nFeedback: Could not evaluate`;
+      "Marks: 0\nFeedback:\n- Could not evaluate";
 
-    return output;
+    console.log("🧠 AI RAW:", text);
+
+    // ✅ MARKS
+    const marksMatch = text.match(/Marks:\s*(\d+)(?:\s*\/\s*\d+)?/i);
+
+let marks = marksMatch ? parseInt(marksMatch[1]) : 0;
+
+// 🔥 HARD LIMIT
+marks = Math.max(0, Math.min(marks, maxMarks));
+    // ✅ FEEDBACK
+let feedbackMatch = text.match(/Feedback:\s*([\s\S]*)/i);
+
+    let feedback = feedbackMatch
+  ? feedbackMatch[1].trim()
+  : "";
+
+  // 🔥 fallback if empty
+if (!feedback || feedback.length < 5) {
+  feedback = `
+- Answer needs improvement
+- Add key concepts
+- Use bullet points
+  `.trim();
+}
+
+    // 🔥 CLEAN BULLET POINTS
+    const lines = feedback.split("\n");
+
+    const clean = lines
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0)
+      .map((l) => (l.startsWith("-") ? l : "- " + l));
+
+    feedback = clean.join("\n");
+
+    return { marks, feedback };
 
   } catch (err) {
-    console.error("🔥 Groq FULL ERROR:", err);
+    console.error("AI ERROR:", err);
 
-    return `Marks: 0/${maxMarks}\nFeedback: Error evaluating answer`;
+    return {
+      marks: 0,
+      feedback: "- AI failed\n- Try again\n- Write clearer answer",
+    };
   }
 };

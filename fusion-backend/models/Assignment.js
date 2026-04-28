@@ -21,17 +21,29 @@ const assignmentSchema = new mongoose.Schema({
   deadline: { type: Date, default: null },
   questions: [questionSchema],
 
-  // ✅ SUBJECTIVE 🔥 (CLEAN VERSION)
+  // ✅ SUBJECTIVE
   question: { type: String, default: "" },
   keywords: [{ type: String }],
-  maxMarks: { type: Number, default: 100 },
+
+  // 🔥 ONLY REQUIRED CHANGE (SMART maxMarks)
+  maxMarks: {
+    type: Number,
+    required: function () {
+      return this.type === "subjective";
+    },
+    default: function () {
+      return this.type === "quiz" ? 100 : undefined;
+    },
+  },
 
   isActive: { type: Boolean, default: true },
 
   section: {
-    type: String,
-    default: "",
+  type: String,
+  required: function () {
+    return this.type === "subjective";
   },
+},
 
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

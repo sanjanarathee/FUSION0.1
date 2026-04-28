@@ -85,7 +85,7 @@ export default function TeacherSubjectiveResults() {
           <thead>
             <tr>
               <th>Student</th>
-              <th>Answer</th>
+              {/* <th>Answer</th> */}
               <th>Marks</th>
               <th>Feedback</th>
             </tr>
@@ -102,7 +102,7 @@ export default function TeacherSubjectiveResults() {
               results.map((r, i) => (
                 <tr key={i}>
                   <td>{r.userId?.name}</td>
-                  <td>{r.answer}</td>
+                  {/* <td>{r.answer}</td> */}
 
                   <td className="marks-cell">
                     {r.marks} {r.marks > 8 && "🏆"}
