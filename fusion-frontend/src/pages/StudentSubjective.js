@@ -10,7 +10,7 @@ export default function StudentSubjective() {
   const [submittedIds, setSubmittedIds] = useState([]);
 
   // ✅ GET UNIT FROM URL
-  const { unit } = useParams();
+const API = process.env.REACT_APP_API_URL || "https://fusion-0-1.onrender.com";  const { unit } = useParams();
 
   // ✅ GET USER
   // const userData = JSON.parse(localStorage.getItem("fusionUser"));
@@ -31,9 +31,7 @@ const token = user?.token;
         }
 
         // ✅ FETCH ASSIGNMENTS (NO section needed)
-        const assignmentsRes = await axios.get(
-          `/api/assignments/subjective/student?unit=${unit}`,
-          {
+        const assignmentsRes = await axios.get(`${API}/api/assignments/subjective/student?unit=${unit}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -41,9 +39,7 @@ const token = user?.token;
         );
 
         // ✅ FETCH SUBMISSIONS (CORRECT API)
-        const submissionsRes = await axios.get(
-          `/api/assignments/subjective/submissions?userId=${userId}`,
-          {
+        const submissionsRes = await axios.get(`${API}/api/assignments/subjective/submissions?userId=${userId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -103,10 +99,7 @@ const token = user?.token;
         formData.append("file", files[assignment._id]);
       }
 
-      const res = await axios.post(
-        "/api/assignments/subjective/submit",
-        formData,
-        {
+      const res = await axios.post(`${API}/api/assignments/subjective/submit`, formData, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
