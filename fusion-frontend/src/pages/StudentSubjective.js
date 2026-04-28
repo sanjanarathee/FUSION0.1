@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
-const API = process.env.REACT_APP_API_URL || "https://fusion-0-1.onrender.com"; 
-
+const API = "https://fusion0-1.onrender.com";
 
 export default function StudentSubjective() {
   const [assignments, setAssignments] = useState([]);
