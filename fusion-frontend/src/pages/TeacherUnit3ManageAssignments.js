@@ -12,8 +12,8 @@ export default function TeacherUnit3ManageAssignments() {
    const fetchAssignments = async () => {
      try {
        const res = await axios.get(
-         `https://fusion0-1.onrender.com/api/assignments/unit/${unit}`
-       );
+  `http://localhost:5000/api/assignments/unit/${unit}?type=quiz`
+);
  
        console.log("🔥 API RESPONSE:", res.data);
  

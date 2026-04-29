@@ -13,8 +13,7 @@ export default function TeacherUnit3Results() {
       FETCH ASSIGNMENTS (UNIT 3)
   -------------------------------------------------- */
   useEffect(() => {
-    axios
-      .get("https://fusion0-1.onrender.com/api/assignments/unit/3")
+   axios.get("https://fusion0-1.onrender.com/api/assignments/unit/3?type=quiz")
       .then((res) => {
 setAssignments(res.data.assignments || []);      })
       .catch((err) => console.error(err));

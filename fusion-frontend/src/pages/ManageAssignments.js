@@ -16,13 +16,13 @@ export default function ManageAssignments() {
   const fetchAssignments = async () => {
     try {
       const res = await axios.get(
-        `https://fusion0-1.onrender.com/api/assignments/unit/${unit}`
-      );
+  `https://fusion0-1.onrender.com/api/assignments/unit/${unit}?type=quiz`
+);
 
       console.log("🔥 API RESPONSE:", res.data);
 
-setAssignments(res.data || []);
-    } catch (error) {
+setAssignments(res.data.assignments || []);
+   } catch (error) {
       console.error("❌ Error fetching assignments", error);
     }
   };

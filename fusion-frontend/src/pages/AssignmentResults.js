@@ -1,51 +1,50 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom"; // ✅ NEW
+import { useLocation } from "react-router-dom";
 import "./PageStyles.css";
 
 export default function AssignmentResults() {
   const [results, setResults] = useState([]);
   const [filtered, setFiltered] = useState([]);
 
-  // Filters
   const [nameFilter, setNameFilter] = useState("");
   const [rollFilter, setRollFilter] = useState("");
   const [accuracyFilter, setAccuracyFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [unitFilter, setUnitFilter] = useState("");
 
-  const location = useLocation(); // ✅ NEW
+  const location = useLocation();
 
-  // ✅ Extract unit dynamically from URL
   const unit = Number(location.pathname.match(/unit(\d+)/)?.[1]);
 
   useEffect(() => {
-  const fetchResults = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem("fusionUser"));
+    const fetchResults = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("fusionUser"));
 
-      if (!user) {
-        console.error("❌ USER NOT FOUND");
-        return;
-      }
-
-      // ✅ 👉 YAHI ADD KARNA THA (STEP 3 DEBUG)
-      console.log("Sending →", {
-        teacherId: user.id,
-        section: user.sections[0],
-        unit: unit,
-      });
-
-      const res = await axios.get(
-        "https://fusion0-1.onrender.com/api/assignments/performance",
-        {
-          params: {
-            teacherId: user.id,
-            section: user.sections[0],
-            unit: unit,
-          },
+        if (!user) {
+          console.error("❌ USER NOT FOUND");
+          return;
         }
-      );
+
+        console.log("Sending →", {
+          teacherId: user.id,
+          section: user.sections[0],
+          unit: unit,
+          type: "quiz", // ✅ ADD THIS
+        });
+
+        const res = await axios.get(
+          "https://fusion0-1.onrender.com/api/assignments/performance",
+          {
+            params: {
+              teacherId: user.id,
+              section: user.sections[0],
+              unit: unit,
+              type: "quiz", // ✅ ADD THIS
+            },
+          }
+        );
 
         console.log("API response →", res.data);
 
@@ -57,7 +56,9 @@ export default function AssignmentResults() {
           dataArray = res.data;
         }
 
-        // Normalize date
+        // ✅ OPTIONAL SAFETY FILTER (extra protection)
+        dataArray = dataArray.filter((d) => d.assignmentId);
+
         dataArray = dataArray.map((d) => ({
           ...d,
           date: d.date ? new Date(d.date).toISOString() : null,
@@ -71,9 +72,8 @@ export default function AssignmentResults() {
     };
 
     fetchResults();
-  }, [unit]); // ✅ re-run when unit changes
+  }, [unit]);
 
-  // APPLY FILTERS
   const applyFilters = () => {
     let data = [...results];
 
@@ -112,7 +112,6 @@ export default function AssignmentResults() {
     setAccuracyFilter("");
     setDateFilter("");
     setUnitFilter("");
-
     setFiltered(results);
   };
 
@@ -120,7 +119,6 @@ export default function AssignmentResults() {
     <div className="learn-container">
       <h1 className="learn-title">📊 Unit {unit} – Assignment Results</h1>
 
-      {/* FILTER BAR */}
       <div className="filter-container">
         <input
           type="text"
@@ -177,7 +175,6 @@ export default function AssignmentResults() {
         </button>
       </div>
 
-      {/* RESULTS LIST */}
       {filtered.length === 0 ? (
         <p style={{ marginTop: "20px", fontSize: "18px" }}>No results found.</p>
       ) : (

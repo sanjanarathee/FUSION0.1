@@ -1,0 +1,134 @@
+/* PAGE */
+.uploads-page {
+  min-height: 100vh;
+  background: #f4f6f9;
+  font-family: "Poppins", sans-serif;
+  padding-top: 20px;
+}
+
+/* TITLE */
+.uploads-title {
+  margin: 30px;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.uploads-subtext {
+  margin-left: 30px;
+  color: #555;
+}
+
+.uploads-text {
+  margin-left: 30px;
+  color: #777;
+}
+
+/* GRID */
+.uploads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+  padding: 30px;
+}
+
+/* CARD */
+.upload-card {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.upload-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  border-color: #ff7a00;
+  background: linear-gradient(135deg, #fff, #fff7ed);
+}
+
+.upload-card h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.upload-card p {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* BUTTONS */
+.file-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.view-btn {
+  background: #ff7a00;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.view-btn:hover {
+  background: #e66a00;
+}
+
+.delete-btn {
+  background: #ff4d4f;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #d9363e;
+}
+
+/* UNIT FILTER */
+.unit-filter {
+  margin: 20px 30px;
+}
+
+.unit-btn {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 8px 14px;
+  border-radius: 8px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.unit-btn:hover {
+  border-color: #ff7a00;
+  color: #ff7a00;
+}
+
+.active-unit {
+  background: linear-gradient(135deg, #ff7a00, #ff9f43);
+  color: white;
+  border: none;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  margin: 30px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  opacity: 0.9;
+}
