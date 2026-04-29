@@ -10,37 +10,35 @@ const navigate = useNavigate();
 const [files,setFiles] = useState([]);
 const [loading,setLoading] = useState(true);
 
-useEffect(()=>{
+useEffect(() => {
+  const fetchNotes = async () => {
+    try {
+      const res = await axios.get(
+        "https://fusion0-1.onrender.com/api/files/filter",
+        {
+          params: {
+            subject: "c",
+            unit: "unit 3",   // ✅ EXACT MATCH
+            category: "notes"
+          }
+        }
+      );
 
-axios.get(
-"https://fusion0-1.onrender.com/api/notes/filter",
-{
-params:{
-subject:"c",
-unit:"unit 3",
-category:"notes"
-}
-}
-)
+      console.log("🔥 RESPONSE:", res.data);   // ✅ MUST PRINT
 
-.then((res)=>{
+      if (res.data.success) {
+        setFiles(res.data.files || []);
+      }
 
-if(res.data.success){
-setFiles(res.data.files || []);
-}
+    } catch (err) {
+      console.error("❌ ERROR:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-setLoading(false);
-
-})
-
-.catch((err)=>{
-console.log(err);
-setLoading(false);
-});
-
-},[]);
-
-
+  fetchNotes();
+}, []);
 return(
 
 <div className="student-page">
@@ -115,8 +113,12 @@ key={index}
 >
 
 <h3 className="note-title">
-📘 {note.metadata?.title}
+  📘 {note.metadata?.title}
 </h3>
+
+<p style={{ marginTop: "5px", color: "#555", fontSize: "14px" }}>
+  {note.metadata?.description || "No description"}
+</p>
 
 <div className="note-meta">
 
@@ -143,7 +145,7 @@ key={index}
 <div className="note-actions">
 
 <a
-href={`https://fusion0-1.onrender.com/api/notes/file/${note.filename}`}
+href={`https://fusion0-1.onrender.com/api/files/file/${note.filename}`}
 target="_blank"
 rel="noreferrer"
 className="note-btn"
@@ -152,7 +154,7 @@ View
 </a>
 
 <a
-href={`https://fusion0-1.onrender.com/api/notes/file/${note.filename}`}
+href={`https://fusion0-1.onrender.com/api/files/file/${note.filename}`}
 download
 className="note-btn"
 >

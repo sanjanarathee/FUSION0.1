@@ -82,16 +82,16 @@ export const createAssignment = async (req, res) => {
 ================================================================ */
 export const getAllAssignments = async (req, res) => {
   try {
-    const { unit, section } = req.query;
+    const { unit, section, type } = req.query;
 
-    const filter = {};
-    if (unit) filter.unit = Number(unit);
-    if (section) filter.section = section;
-    
+const filter = {};
+if (unit) filter.unit = Number(unit);
+if (section) filter.section = section;
+if (type) filter.type = type;
 
-    const assignments = await Assignment.find(filter).sort({
-      createdAt: -1,
-    });
+const assignments = await Assignment.find(filter).sort({
+  createdAt: -1,
+});
 
     res.status(200).json({
       success: true,
@@ -112,30 +112,27 @@ export const getAllAssignments = async (req, res) => {
 ================================================================ */
 export const getAssignmentsByUnit = async (req, res) => {
   try {
-    const unit = Number(req.params.unit);
+    const { unit } = req.params;
+    const { type } = req.query;
 
-    if (isNaN(unit)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid unit number",
-      });
+    let filter = { unit: Number(unit) };
+
+    // 🔥 THIS IS THE MAIN FIX
+    if (type) {
+      filter.type = type;   // only quiz आएंगे
     }
 
-    const assignments = await Assignment.find({
-      unit,
-    }).sort({ createdAt: -1 });
+    const assignments = await Assignment.find(filter);
 
     res.status(200).json({
       success: true,
-      assignments,
+      assignments
     });
 
   } catch (error) {
-    console.error("❌ Error fetching assignments by unit:", error);
     res.status(500).json({
       success: false,
-      message: "Error fetching assignments",
-      error: error.message,
+      message: error.message
     });
   }
 };
@@ -284,7 +281,7 @@ if (!assignment) {
 ================================================================ */
 export const getAllPerformances = async (req, res) => {
   try {
-    const { unit, section, assignmentId } = req.query;
+    const { unit, section, assignmentId, type } = req.query;
 
     let filter = {
       unit: Number(unit),
@@ -292,10 +289,20 @@ export const getAllPerformances = async (req, res) => {
     };
 
     if (assignmentId) {
-      filter.assignmentId = assignmentId;   // 🔥 KEY LINE
+      filter.assignmentId = assignmentId;
     }
 
-    const performances = await Performance.find(filter);
+    let performances = await Performance.find(filter);
+
+    // 🔥 MAIN FIX (TYPE FILTER)
+    if (type) {
+      const assignments = await Assignment.find({ type });
+      const assignmentIds = assignments.map(a => a._id.toString());
+
+      performances = performances.filter(p =>
+        assignmentIds.includes(p.assignmentId?.toString())
+      );
+    }
 
     res.status(200).json({
       success: true,
@@ -310,6 +317,7 @@ export const getAllPerformances = async (req, res) => {
     });
   }
 };
+
 /* ================================================================
    ❌ TEACHER: DELETE ASSIGNMENT
 ================================================================ */

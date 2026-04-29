@@ -32,7 +32,7 @@ export default function ManageCLanguage() {
               <span className="card-icon">1️⃣</span>
               <div>
                 <h3>Unit 1</h3>
-                <p>Manage Unit 1 content</p>
+                <p>Introduction to C Programming</p>
               </div>
             </div>
             <div className="arrow">➜</div>
@@ -46,7 +46,7 @@ export default function ManageCLanguage() {
               <span className="card-icon">2️⃣</span>
               <div>
                 <h3>Unit 2</h3>
-                <p>Manage Unit 2 content</p>
+                <p>Control Statements and Loops</p>
               </div>
             </div>
             <div className="arrow">➜</div>
@@ -60,7 +60,7 @@ export default function ManageCLanguage() {
               <span className="card-icon">3️⃣</span>
               <div>
                 <h3>Unit 3</h3>
-                <p>Manage Unit 3 content</p>
+                <p>Functions and Array</p>
               </div>
             </div>
             <div className="arrow">➜</div>
@@ -74,7 +74,7 @@ export default function ManageCLanguage() {
               <span className="card-icon">4️⃣</span>
               <div>
                 <h3>Unit 4</h3>
-                <p>Manage Unit 4 content</p>
+                <p>Pointers and File Hnadling</p>
               </div>
             </div>
             <div className="arrow">➜</div>
